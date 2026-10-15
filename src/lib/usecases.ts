@@ -1,0 +1,136 @@
+import type { UseCase } from "./types";
+
+export const ALL_DATASET_IDS = ["hk-indices", "hk-valuations", "hk-prices", "hk-financials", "us-macro", "world-economy", "climate-signals", "co2-emitters", "electricity-mix", "renewables-growth", "ev-global", "ev-regions", "big-tech"];
+
+export const USE_CASES: UseCase[] = [
+  {
+    id: "hk",
+    name: "HK Equities Analyst",
+    persona: "Portfolio manager at a Hong Kong fund house",
+    tagline: "Hang Seng, blue-chip valuations, dividends and earnings",
+    scenario:
+      "You run an Asia equity income fund and the Monday investment meeting starts in an hour. You need a read on how the Hang Seng has moved, which blue chips look cheap, where the dividend yield is, and whose earnings are actually growing.",
+    icon: "candlestick",
+    accent: "#f87171",
+    datasetIds: ["hk-indices", "hk-valuations", "hk-prices", "hk-financials"],
+    questions: [
+      { q: "How has the Hang Seng Index performed over the last 5 years?", tag: "Trend" },
+      { q: "Top 10 Hong Kong stocks by market cap", tag: "Ranking" },
+      { q: "Which blue chips have the highest dividend yield?", tag: "Ranking" },
+      { q: "Market cap breakdown by sector", tag: "Breakdown" },
+      { q: "Compare Tencent, Alibaba and Meituan stock performance", tag: "Compare" },
+      { q: "Which stocks are cheapest by P/E?", tag: "Ranking" },
+      { q: "Biggest 52-week winners and losers", tag: "Ranking" },
+      { q: "Relationship between P/E and dividend yield", tag: "Correlation" },
+      { q: "Tencent revenue and profit trend", tag: "Trend" },
+      { q: "Which company grew net income fastest?", tag: "Growth" },
+      { q: "Detect anomalies in the Hang Seng Index", tag: "Anomaly" },
+      { q: "Forecast the Hang Seng Index to 2027", tag: "Forecast" },
+    ],
+  },
+  {
+    id: "macro",
+    name: "Macro Economist",
+    persona: "Chief economist at an asset manager",
+    tagline: "Rates, inflation, jobs and the global economy",
+    scenario:
+      "You're drafting the quarterly macro outlook for the investment committee. They want to know how the post-pandemic inflation shock played out, how the Fed responded, and where the world's economic weight sits today.",
+    icon: "landmark",
+    accent: "#60a5fa",
+    datasetIds: ["us-macro", "world-economy"],
+    questions: [
+      { q: "How has US inflation trended since 2015?", tag: "Trend" },
+      { q: "Is there a relationship between inflation and the fed funds rate?", tag: "Correlation" },
+      { q: "Detect anomalies in US unemployment", tag: "Anomaly" },
+      { q: "Top 10 largest economies by GDP", tag: "Ranking" },
+      { q: "Break down GDP by region", tag: "Breakdown" },
+      { q: "Compare United States, China and India", tag: "Compare" },
+      { q: "Which countries have the highest GDP per capita?", tag: "Ranking" },
+      { q: "Forecast US unemployment to 2027", tag: "Forecast" },
+    ],
+  },
+  {
+    id: "climate",
+    name: "Climate Analyst",
+    persona: "Sustainability lead preparing an ESG briefing",
+    tagline: "Emissions, warming and the energy transition",
+    scenario:
+      "The board asked for a one-page climate briefing: how fast the planet is warming, who the biggest emitters are, and how much of the world's power is already clean.",
+    icon: "leaf",
+    accent: "#34d399",
+    datasetIds: ["climate-signals", "co2-emitters", "electricity-mix", "renewables-growth"],
+    questions: [
+      { q: "How has the global temperature anomaly changed since 2000?", tag: "Trend" },
+      { q: "Correlation between CO2 concentration and temperature", tag: "Correlation" },
+      { q: "Who are the top 10 CO2 emitters?", tag: "Ranking" },
+      { q: "Which countries emit the most CO2 per capita?", tag: "Ranking" },
+      { q: "What is the global electricity mix?", tag: "Breakdown" },
+      { q: "Fossil vs clean share of electricity", tag: "Breakdown" },
+      { q: "Compare solar and wind growth", tag: "Compare" },
+      { q: "Forecast CO2 ppm to 2030", tag: "Forecast" },
+    ],
+  },
+  {
+    id: "ev",
+    name: "EV Market Strategist",
+    persona: "Strategy director at an auto supplier",
+    tagline: "Adoption curves, regional demand and forecasts",
+    scenario:
+      "Your company is deciding where to build its next battery-component plant. Leadership wants to see how fast EV adoption is compounding, where demand is concentrated, and what volumes to plan for by 2030.",
+    icon: "zap",
+    accent: "#fbbf24",
+    datasetIds: ["ev-global", "ev-regions", "renewables-growth"],
+    questions: [
+      { q: "How fast are global EV sales growing?", tag: "Growth" },
+      { q: "Forecast EV sales to 2030", tag: "Forecast" },
+      { q: "EV sales share by region", tag: "Breakdown" },
+      { q: "Which market has the highest EV adoption?", tag: "Ranking" },
+      { q: "EV market share trend since 2018", tag: "Trend" },
+      { q: "Compare China and Europe EV sales", tag: "Compare" },
+      { q: "When did EV growth spike?", tag: "Anomaly" },
+    ],
+  },
+  {
+    id: "tech",
+    name: "Equity Research: Big Tech",
+    persona: "Equity analyst covering mega-cap tech",
+    tagline: "Revenue, profit and margins of the Magnificent 7",
+    scenario:
+      "Ahead of earnings season you need a fast read on the Magnificent 7: who is growing fastest, who converts revenue into profit best, and how the AI cycle shows up in the numbers.",
+    icon: "cpu",
+    accent: "#a78bfa",
+    datasetIds: ["big-tech"],
+    questions: [
+      { q: "Rank big tech by revenue in 2024", tag: "Ranking" },
+      { q: "Which company grew revenue fastest since 2021?", tag: "Growth" },
+      { q: "Compare Nvidia and Microsoft net income", tag: "Compare" },
+      { q: "Who has the best net margin?", tag: "Ranking" },
+      { q: "Revenue share of big tech in 2024", tag: "Breakdown" },
+      { q: "Correlation between revenue and net income", tag: "Correlation" },
+      { q: "Show Amazon profit trend", tag: "Trend" },
+      { q: "Forecast Nvidia revenue to 2026", tag: "Forecast" },
+    ],
+  },
+  {
+    id: "explore",
+    name: "Open Exploration",
+    persona: "Ask anything across every dataset",
+    tagline: "All 13 datasets, routed automatically",
+    scenario:
+      "No brief — just curiosity. Ask about any indicator and the engine will pick the right dataset, choose an analysis, and build the visuals.",
+    icon: "globe",
+    accent: "#f472b6",
+    datasetIds: ALL_DATASET_IDS,
+    questions: [
+      { q: "Most populous countries", tag: "Ranking" },
+      { q: "Tesla vs Apple net margin", tag: "Compare" },
+      { q: "Unemployment vs GDP growth", tag: "Correlation" },
+      { q: "Solar share forecast to 2030", tag: "Forecast" },
+      { q: "How did the fed funds rate change since 2020?", tag: "Trend" },
+      { q: "Population by region", tag: "Breakdown" },
+      { q: "HSBC vs AIA share price", tag: "Compare" },
+    ],
+  },
+];
+
+export const USE_CASE_BY_ID: Record<string, UseCase> = Object.fromEntries(USE_CASES.map((u) => [u.id, u]));
