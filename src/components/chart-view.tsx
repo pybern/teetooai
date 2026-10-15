@@ -94,6 +94,11 @@ function categoryInterval(n: number): number | "preserveStartEnd" {
   return n > 24 ? Math.ceil(n / 10) - 1 : "preserveStartEnd";
 }
 
+function refLabelPos(spec: ChartSpec, x: string | number): "insideTopLeft" | "insideTopRight" {
+  const idx = spec.data.findIndex((d) => d[spec.xKey] === x);
+  return idx >= 0 && idx > spec.data.length * 0.8 ? "insideTopRight" : "insideTopLeft";
+}
+
 export function ChartView({ spec, height }: { spec: ChartSpec; height?: number }) {
   const h = height ?? (spec.type === "hbar" ? Math.max(220, spec.data.length * 28 + 40) : spec.span === "full" ? 320 : 260);
   const tooltip = <Tooltip content={<ChartTooltip spec={spec} />} cursor={{ fill: "rgba(148,163,184,0.08)", stroke: "rgba(148,163,184,0.25)" }} />;
@@ -120,7 +125,7 @@ export function ChartView({ spec, height }: { spec: ChartSpec; height?: number }
               <ReferenceLine key={r.label} y={r.value} stroke="#64748b" strokeDasharray="4 4" label={{ value: r.label, fill: "#94a3b8", fontSize: 10, position: "insideTopRight" }} />
             ))}
             {spec.referenceX?.map((r) => (
-              <ReferenceLine key={r.label} x={r.value} stroke="#fbbf24" strokeDasharray="3 3" label={{ value: r.label, fill: "#fbbf24", fontSize: 10, position: "insideTopLeft" }} />
+              <ReferenceLine key={r.label} x={r.value} stroke="#fbbf24" strokeDasharray="3 3" label={{ value: r.label, fill: "#fbbf24", fontSize: 10, position: refLabelPos(spec, r.value) }} />
             ))}
             {spec.series.map((s, i) => (
               <Area key={s.key} type="monotone" dataKey={s.key} name={s.label} stroke={colorOf(s, i)} strokeWidth={2.2} fill={`url(#g-${spec.id}-${i})`} dot={n <= 16 ? { r: 2.5, fill: colorOf(s, i) } : false} activeDot={{ r: 4 }} />
@@ -236,7 +241,7 @@ export function ChartView({ spec, height }: { spec: ChartSpec; height?: number }
               </>
             )}
             {spec.referenceX?.map((r) => (
-              <ReferenceLine key={r.label} yAxisId="left" x={r.value} stroke="#94a3b8" strokeDasharray="3 3" label={{ value: r.label, fill: "#94a3b8", fontSize: 10, position: "insideTopLeft" }} />
+              <ReferenceLine key={r.label} yAxisId="left" x={r.value} stroke="#94a3b8" strokeDasharray="3 3" label={{ value: r.label, fill: "#94a3b8", fontSize: 10, position: refLabelPos(spec, r.value) }} />
             ))}
             {spec.series.map((s, i) => {
               const axis = s.axis === "right" ? "right" : "left";

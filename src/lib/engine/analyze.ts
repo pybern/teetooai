@@ -385,9 +385,9 @@ function trend(ds: Dataset, it: Interpretation): Draft {
     },
     sql: `SELECT ${ds.grain === "month" ? "month" : "year"}, ${metricKeys.join(", ")}\nFROM ${tableName(ds)}${entity || rangeSql(it) ? `\nWHERE ${[entity ? `${(ds.entityLabel ?? "entity").toLowerCase()} = '${entity}'` : "", rangeSql(it)].filter(Boolean).join(" AND ")}` : ""}\nORDER BY ${ds.grain === "month" ? "month" : "year"};`,
     followUps: [
-      `Forecast ${entity ? `${entity} ` : ""}${lc(m.label)} to ${Math.floor(last.x) + (ds.grain === "month" ? 1 : 3)}`,
-      `Detect anomalies in ${entity ? `${entity} ` : ""}${lc(m.label)}`,
-      ds.kind === "panel" ? `Rank by ${lc(m.label)}` : ds.metrics.length > 1 ? `${m.label} vs ${ds.metrics.find((x) => x.key !== m.key)?.label.toLowerCase()}` : `${m.label} since ${Math.floor(last.x) - 5}`,
+      `Forecast ${subjectFor(entity, m)} to ${Math.floor(last.x) + (ds.grain === "month" ? 1 : 3)}`,
+      `Detect anomalies in ${subjectFor(entity, m)}`,
+      ds.kind === "panel" && (ds.entities?.length ?? 0) <= 3 ? `Compare ${(ds.entities ?? []).map((e) => e.name).join(" and ")}` : ds.kind === "panel" ? `Rank by ${lc(m.label)}` : ds.metrics.length > 1 ? `${m.label} vs ${ds.metrics.find((x) => x.key !== m.key)?.label.toLowerCase()}` : `${m.label} since ${Math.floor(last.x) - 5}`,
     ],
   };
 }

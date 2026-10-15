@@ -22,7 +22,7 @@ function previewInterpretation(ds: Dataset): Interpretation {
     question: ds.name,
     datasetId: ds.id,
     datasetName: ds.name,
-    intent: cross ? "rank" : "trend",
+    intent: cross ? "rank" : ds.kind === "panel" ? "compare" : "trend",
     metrics: [ds.defaultMetric],
     entities: ds.kind === "panel" ? (ds.entities ?? []).slice(0, 5).map((e) => e.name) : [],
     topN: cross ? 10 : undefined,
