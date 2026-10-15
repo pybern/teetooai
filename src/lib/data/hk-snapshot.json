@@ -1,0 +1,6322 @@
+{
+ "fetchedAt": "2026-10-15T09:36:53.420Z",
+ "source": "Yahoo Finance",
+ "fx": {
+  "HKD": 1,
+  "CNY": 1.1716,
+  "USD": 7.8467
+ },
+ "indices": [
+  {
+   "symbol": "^HSI",
+   "name": "Hang Seng Index",
+   "last": 24062.72,
+   "changePct": -1.0341674,
+   "high52": 28056.1,
+   "low52": 22518,
+   "series": [
+    {
+     "month": "2021-11",
+     "close": 23475.26
+    },
+    {
+     "month": "2021-12",
+     "close": 23397.67
+    },
+    {
+     "month": "2022-01",
+     "close": 23802.26
+    },
+    {
+     "month": "2022-02",
+     "close": 22713.02
+    },
+    {
+     "month": "2022-03",
+     "close": 21996.85
+    },
+    {
+     "month": "2022-04",
+     "close": 21089.391
+    },
+    {
+     "month": "2022-05",
+     "close": 21415.199
+    },
+    {
+     "month": "2022-06",
+     "close": 21859.789
+    },
+    {
+     "month": "2022-07",
+     "close": 20156.51
+    },
+    {
+     "month": "2022-08",
+     "close": 19954.391
+    },
+    {
+     "month": "2022-09",
+     "close": 17222.83
+    },
+    {
+     "month": "2022-10",
+     "close": 14687.02
+    },
+    {
+     "month": "2022-11",
+     "close": 18597.23
+    },
+    {
+     "month": "2022-12",
+     "close": 19781.41
+    },
+    {
+     "month": "2023-01",
+     "close": 21842.33
+    },
+    {
+     "month": "2023-02",
+     "close": 19785.939
+    },
+    {
+     "month": "2023-03",
+     "close": 20400.109
+    },
+    {
+     "month": "2023-04",
+     "close": 19894.57
+    },
+    {
+     "month": "2023-05",
+     "close": 18234.27
+    },
+    {
+     "month": "2023-06",
+     "close": 18916.43
+    },
+    {
+     "month": "2023-07",
+     "close": 20078.939
+    },
+    {
+     "month": "2023-08",
+     "close": 18382.061
+    },
+    {
+     "month": "2023-09",
+     "close": 17809.66
+    },
+    {
+     "month": "2023-10",
+     "close": 17112.48
+    },
+    {
+     "month": "2023-11",
+     "close": 17042.881
+    },
+    {
+     "month": "2023-12",
+     "close": 17047.391
+    },
+    {
+     "month": "2024-01",
+     "close": 15485.07
+    },
+    {
+     "month": "2024-02",
+     "close": 16511.439
+    },
+    {
+     "month": "2024-03",
+     "close": 16541.42
+    },
+    {
+     "month": "2024-04",
+     "close": 17763.029
+    },
+    {
+     "month": "2024-05",
+     "close": 18079.609
+    },
+    {
+     "month": "2024-06",
+     "close": 17718.609
+    },
+    {
+     "month": "2024-07",
+     "close": 17344.6
+    },
+    {
+     "month": "2024-08",
+     "close": 17989.07
+    },
+    {
+     "month": "2024-09",
+     "close": 21133.68
+    },
+    {
+     "month": "2024-10",
+     "close": 20317.33
+    },
+    {
+     "month": "2024-11",
+     "close": 19423.609
+    },
+    {
+     "month": "2024-12",
+     "close": 20059.949
+    },
+    {
+     "month": "2025-01",
+     "close": 20225.109
+    },
+    {
+     "month": "2025-02",
+     "close": 22941.32
+    },
+    {
+     "month": "2025-03",
+     "close": 23119.58
+    },
+    {
+     "month": "2025-04",
+     "close": 22119.41
+    },
+    {
+     "month": "2025-05",
+     "close": 23289.77
+    },
+    {
+     "month": "2025-06",
+     "close": 24072.279
+    },
+    {
+     "month": "2025-07",
+     "close": 24773.33
+    },
+    {
+     "month": "2025-08",
+     "close": 25077.619
+    },
+    {
+     "month": "2025-09",
+     "close": 26855.561
+    },
+    {
+     "month": "2025-10",
+     "close": 25906.65
+    },
+    {
+     "month": "2025-11",
+     "close": 25858.891
+    },
+    {
+     "month": "2025-12",
+     "close": 25630.539
+    },
+    {
+     "month": "2026-01",
+     "close": 27387.109
+    },
+    {
+     "month": "2026-02",
+     "close": 26630.539
+    },
+    {
+     "month": "2026-03",
+     "close": 24788.141
+    },
+    {
+     "month": "2026-04",
+     "close": 25776.529
+    },
+    {
+     "month": "2026-05",
+     "close": 25182.391
+    },
+    {
+     "month": "2026-06",
+     "close": 22881.02
+    },
+    {
+     "month": "2026-07",
+     "close": 25884.43
+    },
+    {
+     "month": "2026-08",
+     "close": 25566.99
+    },
+    {
+     "month": "2026-09",
+     "close": 24613.27
+    },
+    {
+     "month": "2026-10",
+     "close": 24062.721
+    }
+   ]
+  },
+  {
+   "symbol": "^HSCE",
+   "name": "HS China Enterprises",
+   "last": 8103.27,
+   "changePct": -0.97639304,
+   "high52": 9645.9,
+   "low52": 7404.47,
+   "series": [
+    {
+     "month": "2021-11",
+     "close": 8368.49
+    },
+    {
+     "month": "2021-12",
+     "close": 8236.35
+    },
+    {
+     "month": "2022-01",
+     "close": 8349.95
+    },
+    {
+     "month": "2022-02",
+     "close": 8023.93
+    },
+    {
+     "month": "2022-03",
+     "close": 7525.89
+    },
+    {
+     "month": "2022-04",
+     "close": 7298.69
+    },
+    {
+     "month": "2022-05",
+     "close": 7416.75
+    },
+    {
+     "month": "2022-06",
+     "close": 7666.88
+    },
+    {
+     "month": "2022-07",
+     "close": 6885.48
+    },
+    {
+     "month": "2022-08",
+     "close": 6865.12
+    },
+    {
+     "month": "2022-09",
+     "close": 5914.08
+    },
+    {
+     "month": "2022-10",
+     "close": 4938.56
+    },
+    {
+     "month": "2022-11",
+     "close": 6374.44
+    },
+    {
+     "month": "2022-12",
+     "close": 6704.94
+    },
+    {
+     "month": "2023-01",
+     "close": 7424.92
+    },
+    {
+     "month": "2023-02",
+     "close": 6581.47
+    },
+    {
+     "month": "2023-03",
+     "close": 6968.86
+    },
+    {
+     "month": "2023-04",
+     "close": 6702.15
+    },
+    {
+     "month": "2023-05",
+     "close": 6163.34
+    },
+    {
+     "month": "2023-06",
+     "close": 6424.88
+    },
+    {
+     "month": "2023-07",
+     "close": 6899.31
+    },
+    {
+     "month": "2023-08",
+     "close": 6332.42
+    },
+    {
+     "month": "2023-09",
+     "close": 6148.33
+    },
+    {
+     "month": "2023-10",
+     "close": 5861.74
+    },
+    {
+     "month": "2023-11",
+     "close": 5857.54
+    },
+    {
+     "month": "2023-12",
+     "close": 5768.5
+    },
+    {
+     "month": "2024-01",
+     "close": 5194.04
+    },
+    {
+     "month": "2024-02",
+     "close": 5677.88
+    },
+    {
+     "month": "2024-03",
+     "close": 5810.79
+    },
+    {
+     "month": "2024-04",
+     "close": 6273.75
+    },
+    {
+     "month": "2024-05",
+     "close": 6392.58
+    },
+    {
+     "month": "2024-06",
+     "close": 6331.86
+    },
+    {
+     "month": "2024-07",
+     "close": 6107.16
+    },
+    {
+     "month": "2024-08",
+     "close": 6331.14
+    },
+    {
+     "month": "2024-09",
+     "close": 7509.79
+    },
+    {
+     "month": "2024-10",
+     "close": 7264.11
+    },
+    {
+     "month": "2024-11",
+     "close": 6946.68
+    },
+    {
+     "month": "2024-12",
+     "close": 7289.89
+    },
+    {
+     "month": "2025-01",
+     "close": 7382.13
+    },
+    {
+     "month": "2025-02",
+     "close": 8417.43
+    },
+    {
+     "month": "2025-03",
+     "close": 8516.55
+    },
+    {
+     "month": "2025-04",
+     "close": 8076.26
+    },
+    {
+     "month": "2025-05",
+     "close": 8432.02
+    },
+    {
+     "month": "2025-06",
+     "close": 8678.3
+    },
+    {
+     "month": "2025-07",
+     "close": 8882.95
+    },
+    {
+     "month": "2025-08",
+     "close": 8947.79
+    },
+    {
+     "month": "2025-09",
+     "close": 9555.33
+    },
+    {
+     "month": "2025-10",
+     "close": 9168.58
+    },
+    {
+     "month": "2025-11",
+     "close": 9130.18
+    },
+    {
+     "month": "2025-12",
+     "close": 8913.68
+    },
+    {
+     "month": "2026-01",
+     "close": 9317.09
+    },
+    {
+     "month": "2026-02",
+     "close": 8859.49
+    },
+    {
+     "month": "2026-03",
+     "close": 8374.3
+    },
+    {
+     "month": "2026-04",
+     "close": 8681.83
+    },
+    {
+     "month": "2026-05",
+     "close": 8425.82
+    },
+    {
+     "month": "2026-06",
+     "close": 7558.3
+    },
+    {
+     "month": "2026-07",
+     "close": 8612.15
+    },
+    {
+     "month": "2026-08",
+     "close": 8513.18
+    },
+    {
+     "month": "2026-09",
+     "close": 8220.08
+    },
+    {
+     "month": "2026-10",
+     "close": 8103.27
+    }
+   ]
+  },
+  {
+   "symbol": "HSTECH.HK",
+   "name": "Hang Seng TECH",
+   "last": 4060.99,
+   "changePct": -2.718434,
+   "high52": 4103.99,
+   "low52": 4042.05,
+   "series": [
+    {
+     "month": "2026-10",
+     "close": 4060.99
+    }
+   ]
+  }
+ ],
+ "stocks": [
+  {
+   "symbol": "0700.HK",
+   "name": "Tencent",
+   "longName": "Tencent Holdings Limited",
+   "aliases": [
+    "tencent",
+    "wechat",
+    "0700",
+    "700"
+   ],
+   "sector": "Communication Services",
+   "industry": "Internet Content & Information",
+   "employees": 115927,
+   "currency": "HKD",
+   "financialCurrency": "CNY",
+   "price": 417.8,
+   "changePct": -1.3226278,
+   "marketCapHkdB": 3762.3,
+   "trailingPE": 14.706089,
+   "forwardPE": 11.635463,
+   "dividendYield": 1.25,
+   "priceToBook": 2.8234186,
+   "change52wPct": -31.709677,
+   "high52": 664,
+   "low52": 411,
+   "analystRating": "1.4 - Strong Buy",
+   "financials": [
+    {
+     "year": 2022,
+     "revenueHkdB": 649.71,
+     "netIncomeHkdB": 220.55
+    },
+    {
+     "year": 2023,
+     "revenueHkdB": 713.52,
+     "netIncomeHkdB": 134.99
+    },
+    {
+     "year": 2024,
+     "revenueHkdB": 773.56,
+     "netIncomeHkdB": 227.38
+    },
+    {
+     "year": 2025,
+     "revenueHkdB": 880.77,
+     "netIncomeHkdB": 263.42
+    }
+   ],
+   "series": [
+    {
+     "month": "2021-11",
+     "close": 406.527
+    },
+    {
+     "month": "2021-12",
+     "close": 404.226
+    },
+    {
+     "month": "2022-01",
+     "close": 429.599
+    },
+    {
+     "month": "2022-02",
+     "close": 384.013
+    },
+    {
+     "month": "2022-03",
+     "close": 341.163
+    },
+    {
+     "month": "2022-04",
+     "close": 344.08
+    },
+    {
+     "month": "2022-05",
+     "close": 332.041
+    },
+    {
+     "month": "2022-06",
+     "close": 324.711
+    },
+    {
+     "month": "2022-07",
+     "close": 281.099
+    },
+    {
+     "month": "2022-08",
+     "close": 299.79
+    },
+    {
+     "month": "2022-09",
+     "close": 244.083
+    },
+    {
+     "month": "2022-10",
+     "close": 188.376
+    },
+    {
+     "month": "2022-11",
+     "close": 263.141
+    },
+    {
+     "month": "2022-12",
+     "close": 306.02
+    },
+    {
+     "month": "2023-01",
+     "close": 368.699
+    },
+    {
+     "month": "2023-02",
+     "close": 331.462
+    },
+    {
+     "month": "2023-03",
+     "close": 372.172
+    },
+    {
+     "month": "2023-04",
+     "close": 332.234
+    },
+    {
+     "month": "2023-05",
+     "close": 301.759
+    },
+    {
+     "month": "2023-06",
+     "close": 322.162
+    },
+    {
+     "month": "2023-07",
+     "close": 344.313
+    },
+    {
+     "month": "2023-08",
+     "close": 315.749
+    },
+    {
+     "month": "2023-09",
+     "close": 297.485
+    },
+    {
+     "month": "2023-10",
+     "close": 280.968
+    },
+    {
+     "month": "2023-11",
+     "close": 317.693
+    },
+    {
+     "month": "2023-12",
+     "close": 285.243
+    },
+    {
+     "month": "2024-01",
+     "close": 262.898
+    },
+    {
+     "month": "2024-02",
+     "close": 269.31
+    },
+    {
+     "month": "2024-03",
+     "close": 295.153
+    },
+    {
+     "month": "2024-04",
+     "close": 337.318
+    },
+    {
+     "month": "2024-05",
+     "close": 352.578
+    },
+    {
+     "month": "2024-06",
+     "close": 364.926
+    },
+    {
+     "month": "2024-07",
+     "close": 354.93
+    },
+    {
+     "month": "2024-08",
+     "close": 374.333
+    },
+    {
+     "month": "2024-09",
+     "close": 435.676
+    },
+    {
+     "month": "2024-10",
+     "close": 396.479
+    },
+    {
+     "month": "2024-11",
+     "close": 390.012
+    },
+    {
+     "month": "2024-12",
+     "close": 411.374
+    },
+    {
+     "month": "2025-01",
+     "close": 393.931
+    },
+    {
+     "month": "2025-02",
+     "close": 468.994
+    },
+    {
+     "month": "2025-03",
+     "close": 487.025
+    },
+    {
+     "month": "2025-04",
+     "close": 467.622
+    },
+    {
+     "month": "2025-05",
+     "close": 492.462
+    },
+    {
+     "month": "2025-06",
+     "close": 497.207
+    },
+    {
+     "month": "2025-07",
+     "close": 543.666
+    },
+    {
+     "month": "2025-08",
+     "close": 589.63
+    },
+    {
+     "month": "2025-09",
+     "close": 655.364
+    },
+    {
+     "month": "2025-10",
+     "close": 621.756
+    },
+    {
+     "month": "2025-11",
+     "close": 604.458
+    },
+    {
+     "month": "2025-12",
+     "close": 592.101
+    },
+    {
+     "month": "2026-01",
+     "close": 599.021
+    },
+    {
+     "month": "2026-02",
+     "close": 512.034
+    },
+    {
+     "month": "2026-03",
+     "close": 478.426
+    },
+    {
+     "month": "2026-04",
+     "close": 462.412
+    },
+    {
+     "month": "2026-05",
+     "close": 427.2
+    },
+    {
+     "month": "2026-06",
+     "close": 429.8
+    },
+    {
+     "month": "2026-07",
+     "close": 475.2
+    },
+    {
+     "month": "2026-08",
+     "close": 453
+    },
+    {
+     "month": "2026-09",
+     "close": 431
+    },
+    {
+     "month": "2026-10",
+     "close": 417.8
+    }
+   ]
+  },
+  {
+   "symbol": "9988.HK",
+   "name": "Alibaba",
+   "longName": "Alibaba Group Holding Limited",
+   "aliases": [
+    "alibaba",
+    "baba",
+    "9988",
+    "taobao"
+   ],
+   "sector": "Consumer Cyclical",
+   "industry": "Internet Retail",
+   "employees": 132165,
+   "currency": "HKD",
+   "financialCurrency": "CNY",
+   "price": 106.4,
+   "changePct": -3.7104058,
+   "marketCapHkdB": 2117.6,
+   "trailingPE": 26.401983,
+   "forwardPE": 11.74919,
+   "dividendYield": 0.93,
+   "priceToBook": 1.614763,
+   "change52wPct": -31.621288,
+   "high52": 175,
+   "low52": 88.65,
+   "analystRating": "1.4 - Strong Buy",
+   "financials": [
+    {
+     "year": 2023,
+     "revenueHkdB": 1017.75,
+     "netIncomeHkdB": 84.95
+    },
+    {
+     "year": 2024,
+     "revenueHkdB": 1102.67,
+     "netIncomeHkdB": 93.42
+    },
+    {
+     "year": 2025,
+     "revenueHkdB": 1167.32,
+     "netIncomeHkdB": 151.69
+    },
+    {
+     "year": 2026,
+     "revenueHkdB": 1199.33,
+     "netIncomeHkdB": 124.08
+    }
+   ],
+   "series": [
+    {
+     "month": "2021-11",
+     "close": 126.325
+    },
+    {
+     "month": "2021-12",
+     "close": 117.989
+    },
+    {
+     "month": "2022-01",
+     "close": 113.821
+    },
+    {
+     "month": "2022-02",
+     "close": 103.402
+    },
+    {
+     "month": "2022-03",
+     "close": 111.241
+    },
+    {
+     "month": "2022-04",
+     "close": 101.318
+    },
+    {
+     "month": "2022-05",
+     "close": 95.512
+    },
+    {
+     "month": "2022-06",
+     "close": 111.043
+    },
+    {
+     "month": "2022-07",
+     "close": 92.387
+    },
+    {
+     "month": "2022-08",
+     "close": 93.577
+    },
+    {
+     "month": "2022-09",
+     "close": 77.353
+    },
+    {
+     "month": "2022-10",
+     "close": 60.979
+    },
+    {
+     "month": "2022-11",
+     "close": 79.288
+    },
+    {
+     "month": "2022-12",
+     "close": 85.589
+    },
+    {
+     "month": "2023-01",
+     "close": 106.776
+    },
+    {
+     "month": "2023-02",
+     "close": 85.837
+    },
+    {
+     "month": "2023-03",
+     "close": 99.631
+    },
+    {
+     "month": "2023-04",
+     "close": 81.421
+    },
+    {
+     "month": "2023-05",
+     "close": 77.303
+    },
+    {
+     "month": "2023-06",
+     "close": 80.578
+    },
+    {
+     "month": "2023-07",
+     "close": 96.753
+    },
+    {
+     "month": "2023-08",
+     "close": 89.509
+    },
+    {
+     "month": "2023-09",
+     "close": 84.944
+    },
+    {
+     "month": "2023-10",
+     "close": 79.437
+    },
+    {
+     "month": "2023-11",
+     "close": 72.193
+    },
+    {
+     "month": "2023-12",
+     "close": 75.152
+    },
+    {
+     "month": "2024-01",
+     "close": 69.138
+    },
+    {
+     "month": "2024-02",
+     "close": 72.468
+    },
+    {
+     "month": "2024-03",
+     "close": 69.834
+    },
+    {
+     "month": "2024-04",
+     "close": 73.909
+    },
+    {
+     "month": "2024-05",
+     "close": 74.456
+    },
+    {
+     "month": "2024-06",
+     "close": 70.273
+    },
+    {
+     "month": "2024-07",
+     "close": 77.051
+    },
+    {
+     "month": "2024-08",
+     "close": 81.187
+    },
+    {
+     "month": "2024-09",
+     "close": 109.645
+    },
+    {
+     "month": "2024-10",
+     "close": 94.245
+    },
+    {
+     "month": "2024-11",
+     "close": 83.38
+    },
+    {
+     "month": "2024-12",
+     "close": 82.583
+    },
+    {
+     "month": "2025-01",
+     "close": 88.065
+    },
+    {
+     "month": "2025-02",
+     "close": 127.089
+    },
+    {
+     "month": "2025-03",
+     "close": 127.587
+    },
+    {
+     "month": "2025-04",
+     "close": 117.121
+    },
+    {
+     "month": "2025-05",
+     "close": 113.533
+    },
+    {
+     "month": "2025-06",
+     "close": 109.677
+    },
+    {
+     "month": "2025-07",
+     "close": 115.57
+    },
+    {
+     "month": "2025-08",
+     "close": 115.57
+    },
+    {
+     "month": "2025-09",
+     "close": 176.802
+    },
+    {
+     "month": "2025-10",
+     "close": 164.915
+    },
+    {
+     "month": "2025-11",
+     "close": 151.33
+    },
+    {
+     "month": "2025-12",
+     "close": 142.64
+    },
+    {
+     "month": "2026-01",
+     "close": 169.01
+    },
+    {
+     "month": "2026-02",
+     "close": 142.74
+    },
+    {
+     "month": "2026-03",
+     "close": 118.867
+    },
+    {
+     "month": "2026-04",
+     "close": 125.859
+    },
+    {
+     "month": "2026-05",
+     "close": 120.764
+    },
+    {
+     "month": "2026-06",
+     "close": 92.85
+    },
+    {
+     "month": "2026-07",
+     "close": 117
+    },
+    {
+     "month": "2026-08",
+     "close": 114.2
+    },
+    {
+     "month": "2026-09",
+     "close": 106.6
+    },
+    {
+     "month": "2026-10",
+     "close": 106.4
+    }
+   ]
+  },
+  {
+   "symbol": "0005.HK",
+   "name": "HSBC",
+   "longName": "HSBC Holdings plc",
+   "aliases": [
+    "hsbc",
+    "0005"
+   ],
+   "sector": "Financial Services",
+   "industry": "Banks - Diversified",
+   "employees": 206161,
+   "currency": "HKD",
+   "financialCurrency": "USD",
+   "price": 147.9,
+   "changePct": -0.06757169,
+   "marketCapHkdB": 2529.1,
+   "trailingPE": 13.519196,
+   "forwardPE": 10.155412,
+   "dividendYield": 3.96,
+   "priceToBook": 1.8698534,
+   "change52wPct": 43.828964,
+   "high52": 169.7,
+   "low52": 100.5,
+   "analystRating": "1.8 - Buy",
+   "financials": [
+    {
+     "year": 2022,
+     "revenueHkdB": 405.89,
+     "netIncomeHkdB": 116.3
+    },
+    {
+     "year": 2023,
+     "revenueHkdB": 518.34,
+     "netIncomeHkdB": 176.02
+    },
+    {
+     "year": 2024,
+     "revenueHkdB": 516.74,
+     "netIncomeHkdB": 179.82
+    },
+    {
+     "year": 2025,
+     "revenueHkdB": 557.27,
+     "netIncomeHkdB": 165.58
+    }
+   ],
+   "series": [
+    {
+     "month": "2021-11",
+     "close": 31.72
+    },
+    {
+     "month": "2021-12",
+     "close": 34.637
+    },
+    {
+     "month": "2022-01",
+     "close": 40.693
+    },
+    {
+     "month": "2022-02",
+     "close": 39.954
+    },
+    {
+     "month": "2022-03",
+     "close": 41.209
+    },
+    {
+     "month": "2022-04",
+     "close": 36.914
+    },
+    {
+     "month": "2022-05",
+     "close": 39.613
+    },
+    {
+     "month": "2022-06",
+     "close": 39.271
+    },
+    {
+     "month": "2022-07",
+     "close": 37.56
+    },
+    {
+     "month": "2022-08",
+     "close": 37.461
+    },
+    {
+     "month": "2022-09",
+     "close": 31.796
+    },
+    {
+     "month": "2022-10",
+     "close": 31.025
+    },
+    {
+     "month": "2022-11",
+     "close": 36.42
+    },
+    {
+     "month": "2022-12",
+     "close": 37.422
+    },
+    {
+     "month": "2023-01",
+     "close": 44.668
+    },
+    {
+     "month": "2023-02",
+     "close": 45.709
+    },
+    {
+     "month": "2023-03",
+     "close": 42.273
+    },
+    {
+     "month": "2023-04",
+     "close": 44.617
+    },
+    {
+     "month": "2023-05",
+     "close": 46.461
+    },
+    {
+     "month": "2023-06",
+     "close": 49.119
+    },
+    {
+     "month": "2023-07",
+     "close": 52.501
+    },
+    {
+     "month": "2023-08",
+     "close": 47.976
+    },
+    {
+     "month": "2023-09",
+     "close": 50.299
+    },
+    {
+     "month": "2023-10",
+     "close": 45.775
+    },
+    {
+     "month": "2023-11",
+     "close": 48.916
+    },
+    {
+     "month": "2023-12",
+     "close": 52.056
+    },
+    {
+     "month": "2024-01",
+     "close": 50.61
+    },
+    {
+     "month": "2024-02",
+     "close": 49.784
+    },
+    {
+     "month": "2024-03",
+     "close": 52.638
+    },
+    {
+     "month": "2024-04",
+     "close": 57.674
+    },
+    {
+     "month": "2024-05",
+     "close": 61.2
+    },
+    {
+     "month": "2024-06",
+     "close": 60.888
+    },
+    {
+     "month": "2024-07",
+     "close": 62.359
+    },
+    {
+     "month": "2024-08",
+     "close": 61.899
+    },
+    {
+     "month": "2024-09",
+     "close": 63.568
+    },
+    {
+     "month": "2024-10",
+     "close": 65.057
+    },
+    {
+     "month": "2024-11",
+     "close": 66.128
+    },
+    {
+     "month": "2024-12",
+     "close": 69.138
+    },
+    {
+     "month": "2025-01",
+     "close": 72.923
+    },
+    {
+     "month": "2025-02",
+     "close": 81.406
+    },
+    {
+     "month": "2025-03",
+     "close": 82.921
+    },
+    {
+     "month": "2025-04",
+     "close": 81.933
+    },
+    {
+     "month": "2025-05",
+     "close": 87.749
+    },
+    {
+     "month": "2025-06",
+     "close": 90.122
+    },
+    {
+     "month": "2025-07",
+     "close": 91.261
+    },
+    {
+     "month": "2025-08",
+     "close": 95.409
+    },
+    {
+     "month": "2025-09",
+     "close": 104.639
+    },
+    {
+     "month": "2025-10",
+     "close": 103.396
+    },
+    {
+     "month": "2025-11",
+     "close": 105.3
+    },
+    {
+     "month": "2025-12",
+     "close": 117.728
+    },
+    {
+     "month": "2026-01",
+     "close": 131.601
+    },
+    {
+     "month": "2026-02",
+     "close": 141.91
+    },
+    {
+     "month": "2026-03",
+     "close": 124.494
+    },
+    {
+     "month": "2026-04",
+     "close": 138.744
+    },
+    {
+     "month": "2026-05",
+     "close": 144.395
+    },
+    {
+     "month": "2026-06",
+     "close": 147.181
+    },
+    {
+     "month": "2026-07",
+     "close": 167.383
+    },
+    {
+     "month": "2026-08",
+     "close": 161
+    },
+    {
+     "month": "2026-09",
+     "close": 158
+    },
+    {
+     "month": "2026-10",
+     "close": 147.9
+    }
+   ]
+  },
+  {
+   "symbol": "1299.HK",
+   "name": "AIA",
+   "longName": "AIA Group Limited",
+   "aliases": [
+    "aia",
+    "1299"
+   ],
+   "sector": "Financial Services",
+   "industry": "Insurance - Life",
+   "employees": null,
+   "currency": "HKD",
+   "financialCurrency": "USD",
+   "price": 72.45,
+   "changePct": -0.41237533,
+   "marketCapHkdB": 746.5,
+   "trailingPE": 12.196969,
+   "forwardPE": 10.625082,
+   "dividendYield": 2.72,
+   "priceToBook": 2.338164,
+   "change52wPct": 3.0453205,
+   "high52": 92.15,
+   "low52": 68,
+   "analystRating": "1.3 - Strong Buy",
+   "financials": [
+    {
+     "year": 2022,
+     "revenueHkdB": 266.1,
+     "netIncomeHkdB": 2.21
+    },
+    {
+     "year": 2023,
+     "revenueHkdB": 137.43,
+     "netIncomeHkdB": 29.53
+    },
+    {
+     "year": 2024,
+     "revenueHkdB": 151.55,
+     "netIncomeHkdB": 53.64
+    },
+    {
+     "year": 2025,
+     "revenueHkdB": 169.63,
+     "netIncomeHkdB": 48.92
+    }
+   ],
+   "series": [
+    {
+     "month": "2021-11",
+     "close": 72.855
+    },
+    {
+     "month": "2021-12",
+     "close": 69.791
+    },
+    {
+     "month": "2022-01",
+     "close": 71.922
+    },
+    {
+     "month": "2022-02",
+     "close": 72.144
+    },
+    {
+     "month": "2022-03",
+     "close": 73.21
+    },
+    {
+     "month": "2022-04",
+     "close": 69.036
+    },
+    {
+     "month": "2022-05",
+     "close": 72.832
+    },
+    {
+     "month": "2022-06",
+     "close": 76.568
+    },
+    {
+     "month": "2022-07",
+     "close": 71.121
+    },
+    {
+     "month": "2022-08",
+     "close": 68.375
+    },
+    {
+     "month": "2022-09",
+     "close": 59.254
+    },
+    {
+     "month": "2022-10",
+     "close": 53.822
+    },
+    {
+     "month": "2022-11",
+     "close": 71.068
+    },
+    {
+     "month": "2022-12",
+     "close": 78.582
+    },
+    {
+     "month": "2023-01",
+     "close": 80.167
+    },
+    {
+     "month": "2023-02",
+     "close": 75.369
+    },
+    {
+     "month": "2023-03",
+     "close": 74.825
+    },
+    {
+     "month": "2023-04",
+     "close": 76.908
+    },
+    {
+     "month": "2023-05",
+     "close": 68.968
+    },
+    {
+     "month": "2023-06",
+     "close": 72.642
+    },
+    {
+     "month": "2023-07",
+     "close": 71.081
+    },
+    {
+     "month": "2023-08",
+     "close": 65.387
+    },
+    {
+     "month": "2023-09",
+     "close": 59.004
+    },
+    {
+     "month": "2023-10",
+     "close": 62.7
+    },
+    {
+     "month": "2023-11",
+     "close": 62.284
+    },
+    {
+     "month": "2023-12",
+     "close": 62.885
+    },
+    {
+     "month": "2024-01",
+     "close": 56.324
+    },
+    {
+     "month": "2024-02",
+     "close": 58.773
+    },
+    {
+     "month": "2024-03",
+     "close": 48.562
+    },
+    {
+     "month": "2024-04",
+     "close": 53.413
+    },
+    {
+     "month": "2024-05",
+     "close": 56.962
+    },
+    {
+     "month": "2024-06",
+     "close": 49.942
+    },
+    {
+     "month": "2024-07",
+     "close": 49.471
+    },
+    {
+     "month": "2024-08",
+     "close": 52.251
+    },
+    {
+     "month": "2024-09",
+     "close": 66.167
+    },
+    {
+     "month": "2024-10",
+     "close": 58.377
+    },
+    {
+     "month": "2024-11",
+     "close": 55.242
+    },
+    {
+     "month": "2024-12",
+     "close": 53.437
+    },
+    {
+     "month": "2025-01",
+     "close": 51.727
+    },
+    {
+     "month": "2025-02",
+     "close": 56.429
+    },
+    {
+     "month": "2025-03",
+     "close": 55.669
+    },
+    {
+     "month": "2025-04",
+     "close": 55.194
+    },
+    {
+     "month": "2025-05",
+     "close": 63.645
+    },
+    {
+     "month": "2025-06",
+     "close": 68.25
+    },
+    {
+     "month": "2025-07",
+     "close": 71.159
+    },
+    {
+     "month": "2025-08",
+     "close": 71.159
+    },
+    {
+     "month": "2025-09",
+     "close": 72.866
+    },
+    {
+     "month": "2025-10",
+     "close": 73.647
+    },
+    {
+     "month": "2025-11",
+     "close": 78.674
+    },
+    {
+     "month": "2025-12",
+     "close": 78.186
+    },
+    {
+     "month": "2026-01",
+     "close": 88.191
+    },
+    {
+     "month": "2026-02",
+     "close": 84.726
+    },
+    {
+     "month": "2026-03",
+     "close": 82.823
+    },
+    {
+     "month": "2026-04",
+     "close": 83.018
+    },
+    {
+     "month": "2026-05",
+     "close": 81.676
+    },
+    {
+     "month": "2026-06",
+     "close": 70.952
+    },
+    {
+     "month": "2026-07",
+     "close": 78.697
+    },
+    {
+     "month": "2026-08",
+     "close": 75.718
+    },
+    {
+     "month": "2026-09",
+     "close": 73.6
+    },
+    {
+     "month": "2026-10",
+     "close": 72.45
+    }
+   ]
+  },
+  {
+   "symbol": "0941.HK",
+   "name": "China Mobile",
+   "longName": "China Mobile Limited",
+   "aliases": [
+    "china mobile",
+    "0941"
+   ],
+   "sector": "Communication Services",
+   "industry": "Telecom Services",
+   "employees": 457000,
+   "currency": "HKD",
+   "financialCurrency": "CNY",
+   "price": 81,
+   "changePct": 0.12360751,
+   "marketCapHkdB": 1756.4,
+   "trailingPE": 12,
+   "forwardPE": 11.13045,
+   "dividendYield": 6.7,
+   "priceToBook": 1.053537,
+   "change52wPct": -5.600935,
+   "high52": 88.9,
+   "low52": 75.55,
+   "analystRating": "1.6 - Buy",
+   "financials": [
+    {
+     "year": 2022,
+     "revenueHkdB": 1098.09,
+     "netIncomeHkdB": 146.99
+    },
+    {
+     "year": 2023,
+     "revenueHkdB": 1182.51,
+     "netIncomeHkdB": 154.38
+    },
+    {
+     "year": 2024,
+     "revenueHkdB": 1219.35,
+     "netIncomeHkdB": 162.12
+    },
+    {
+     "year": 2025,
+     "revenueHkdB": 1230.4,
+     "netIncomeHkdB": 160.62
+    }
+   ],
+   "series": [
+    {
+     "month": "2021-11",
+     "close": 32.711
+    },
+    {
+     "month": "2021-12",
+     "close": 32.852
+    },
+    {
+     "month": "2022-01",
+     "close": 37.028
+    },
+    {
+     "month": "2022-02",
+     "close": 37.063
+    },
+    {
+     "month": "2022-03",
+     "close": 38.011
+    },
+    {
+     "month": "2022-04",
+     "close": 36.783
+    },
+    {
+     "month": "2022-05",
+     "close": 37.266
+    },
+    {
+     "month": "2022-06",
+     "close": 36.052
+    },
+    {
+     "month": "2022-07",
+     "close": 36.53
+    },
+    {
+     "month": "2022-08",
+     "close": 38.701
+    },
+    {
+     "month": "2022-09",
+     "close": 38.338
+    },
+    {
+     "month": "2022-10",
+     "close": 36.302
+    },
+    {
+     "month": "2022-11",
+     "close": 39.759
+    },
+    {
+     "month": "2022-12",
+     "close": 39.759
+    },
+    {
+     "month": "2023-01",
+     "close": 43.178
+    },
+    {
+     "month": "2023-02",
+     "close": 45.175
+    },
+    {
+     "month": "2023-03",
+     "close": 48.863
+    },
+    {
+     "month": "2023-04",
+     "close": 51.975
+    },
+    {
+     "month": "2023-05",
+     "close": 48.902
+    },
+    {
+     "month": "2023-06",
+     "close": 50.921
+    },
+    {
+     "month": "2023-07",
+     "close": 50.96
+    },
+    {
+     "month": "2023-08",
+     "close": 53.345
+    },
+    {
+     "month": "2023-09",
+     "close": 54.195
+    },
+    {
+     "month": "2023-10",
+     "close": 51.102
+    },
+    {
+     "month": "2023-11",
+     "close": 52.215
+    },
+    {
+     "month": "2023-12",
+     "close": 53.453
+    },
+    {
+     "month": "2024-01",
+     "close": 54.814
+    },
+    {
+     "month": "2024-02",
+     "close": 54.277
+    },
+    {
+     "month": "2024-03",
+     "close": 55.185
+    },
+    {
+     "month": "2024-04",
+     "close": 57.659
+    },
+    {
+     "month": "2024-05",
+     "close": 61.949
+    },
+    {
+     "month": "2024-06",
+     "close": 65.596
+    },
+    {
+     "month": "2024-07",
+     "close": 61.847
+    },
+    {
+     "month": "2024-08",
+     "close": 64.914
+    },
+    {
+     "month": "2024-09",
+     "close": 64.782
+    },
+    {
+     "month": "2024-10",
+     "close": 63.018
+    },
+    {
+     "month": "2024-11",
+     "close": 63.768
+    },
+    {
+     "month": "2024-12",
+     "close": 67.472
+    },
+    {
+     "month": "2025-01",
+     "close": 66.811
+    },
+    {
+     "month": "2025-02",
+     "close": 69.677
+    },
+    {
+     "month": "2025-03",
+     "close": 73.911
+    },
+    {
+     "month": "2025-04",
+     "close": 71.485
+    },
+    {
+     "month": "2025-05",
+     "close": 77.615
+    },
+    {
+     "month": "2025-06",
+     "close": 79.027
+    },
+    {
+     "month": "2025-07",
+     "close": 78.12
+    },
+    {
+     "month": "2025-08",
+     "close": 81.159
+    },
+    {
+     "month": "2025-09",
+     "close": 79.1
+    },
+    {
+     "month": "2025-10",
+     "close": 79.802
+    },
+    {
+     "month": "2025-11",
+     "close": 81.721
+    },
+    {
+     "month": "2025-12",
+     "close": 76.479
+    },
+    {
+     "month": "2026-01",
+     "close": 74.7
+    },
+    {
+     "month": "2026-02",
+     "close": 74.232
+    },
+    {
+     "month": "2026-03",
+     "close": 74.092
+    },
+    {
+     "month": "2026-04",
+     "close": 79.194
+    },
+    {
+     "month": "2026-05",
+     "close": 79.708
+    },
+    {
+     "month": "2026-06",
+     "close": 73.468
+    },
+    {
+     "month": "2026-07",
+     "close": 80.704
+    },
+    {
+     "month": "2026-08",
+     "close": 79.25
+    },
+    {
+     "month": "2026-09",
+     "close": 79.45
+    },
+    {
+     "month": "2026-10",
+     "close": 81
+    }
+   ]
+  },
+  {
+   "symbol": "3690.HK",
+   "name": "Meituan",
+   "longName": "Meituan",
+   "aliases": [
+    "meituan",
+    "3690"
+   ],
+   "sector": "Consumer Cyclical",
+   "industry": "Internet Retail",
+   "employees": 111298,
+   "currency": "HKD",
+   "financialCurrency": "CNY",
+   "price": 75.45,
+   "changePct": -2.1400797,
+   "marketCapHkdB": 465.7,
+   "trailingPE": null,
+   "forwardPE": 15.56637,
+   "dividendYield": 0,
+   "priceToBook": 2.34693,
+   "change52wPct": -21.92405,
+   "high52": 108,
+   "low52": 63.65,
+   "analystRating": "1.6 - Buy",
+   "financials": [
+    {
+     "year": 2022,
+     "revenueHkdB": 257.7,
+     "netIncomeHkdB": -7.83
+    },
+    {
+     "year": 2023,
+     "revenueHkdB": 324.23,
+     "netIncomeHkdB": 16.23
+    },
+    {
+     "year": 2024,
+     "revenueHkdB": 395.52,
+     "netIncomeHkdB": 41.95
+    },
+    {
+     "year": 2025,
+     "revenueHkdB": 427.46,
+     "netIncomeHkdB": -27.36
+    }
+   ],
+   "series": [
+    {
+     "month": "2021-11",
+     "close": 238
+    },
+    {
+     "month": "2021-12",
+     "close": 225.4
+    },
+    {
+     "month": "2022-01",
+     "close": 220.2
+    },
+    {
+     "month": "2022-02",
+     "close": 172.2
+    },
+    {
+     "month": "2022-03",
+     "close": 155.6
+    },
+    {
+     "month": "2022-04",
+     "close": 172
+    },
+    {
+     "month": "2022-05",
+     "close": 187
+    },
+    {
+     "month": "2022-06",
+     "close": 194.2
+    },
+    {
+     "month": "2022-07",
+     "close": 176.3
+    },
+    {
+     "month": "2022-08",
+     "close": 189.8
+    },
+    {
+     "month": "2022-09",
+     "close": 165.6
+    },
+    {
+     "month": "2022-10",
+     "close": 124.8
+    },
+    {
+     "month": "2022-11",
+     "close": 163.6
+    },
+    {
+     "month": "2022-12",
+     "close": 174.7
+    },
+    {
+     "month": "2023-01",
+     "close": 174.6
+    },
+    {
+     "month": "2023-02",
+     "close": 136.1
+    },
+    {
+     "month": "2023-03",
+     "close": 143.5
+    },
+    {
+     "month": "2023-04",
+     "close": 133
+    },
+    {
+     "month": "2023-05",
+     "close": 110.2
+    },
+    {
+     "month": "2023-06",
+     "close": 122.3
+    },
+    {
+     "month": "2023-07",
+     "close": 146.3
+    },
+    {
+     "month": "2023-08",
+     "close": 128.5
+    },
+    {
+     "month": "2023-09",
+     "close": 114.6
+    },
+    {
+     "month": "2023-10",
+     "close": 110.6
+    },
+    {
+     "month": "2023-11",
+     "close": 90.6
+    },
+    {
+     "month": "2023-12",
+     "close": 81.9
+    },
+    {
+     "month": "2024-01",
+     "close": 62.55
+    },
+    {
+     "month": "2024-02",
+     "close": 79.8
+    },
+    {
+     "month": "2024-03",
+     "close": 96.8
+    },
+    {
+     "month": "2024-04",
+     "close": 109.5
+    },
+    {
+     "month": "2024-05",
+     "close": 105.1
+    },
+    {
+     "month": "2024-06",
+     "close": 111.1
+    },
+    {
+     "month": "2024-07",
+     "close": 109.3
+    },
+    {
+     "month": "2024-08",
+     "close": 118.2
+    },
+    {
+     "month": "2024-09",
+     "close": 172
+    },
+    {
+     "month": "2024-10",
+     "close": 182.5
+    },
+    {
+     "month": "2024-11",
+     "close": 168.7
+    },
+    {
+     "month": "2024-12",
+     "close": 152.5
+    },
+    {
+     "month": "2025-01",
+     "close": 148.6
+    },
+    {
+     "month": "2025-02",
+     "close": 162
+    },
+    {
+     "month": "2025-03",
+     "close": 155.8
+    },
+    {
+     "month": "2025-04",
+     "close": 130.3
+    },
+    {
+     "month": "2025-05",
+     "close": 138
+    },
+    {
+     "month": "2025-06",
+     "close": 125.3
+    },
+    {
+     "month": "2025-07",
+     "close": 121.6
+    },
+    {
+     "month": "2025-08",
+     "close": 102.7
+    },
+    {
+     "month": "2025-09",
+     "close": 104.5
+    },
+    {
+     "month": "2025-10",
+     "close": 102
+    },
+    {
+     "month": "2025-11",
+     "close": 102.5
+    },
+    {
+     "month": "2025-12",
+     "close": 102.8
+    },
+    {
+     "month": "2026-01",
+     "close": 97.2
+    },
+    {
+     "month": "2026-02",
+     "close": 81.15
+    },
+    {
+     "month": "2026-03",
+     "close": 82.95
+    },
+    {
+     "month": "2026-04",
+     "close": 83.25
+    },
+    {
+     "month": "2026-05",
+     "close": 73.45
+    },
+    {
+     "month": "2026-06",
+     "close": 68.5
+    },
+    {
+     "month": "2026-07",
+     "close": 92.5
+    },
+    {
+     "month": "2026-08",
+     "close": 78.9
+    },
+    {
+     "month": "2026-09",
+     "close": 71.7
+    },
+    {
+     "month": "2026-10",
+     "close": 75.45
+    }
+   ]
+  },
+  {
+   "symbol": "1810.HK",
+   "name": "Xiaomi",
+   "longName": "Xiaomi Corporation",
+   "aliases": [
+    "xiaomi",
+    "1810"
+   ],
+   "sector": "Technology",
+   "industry": "Consumer Electronics",
+   "employees": 52876,
+   "currency": "HKD",
+   "financialCurrency": "CNY",
+   "price": 27.08,
+   "changePct": 2.6535285,
+   "marketCapHkdB": 697.2,
+   "trailingPE": 19.911764,
+   "forwardPE": 17.67325,
+   "dividendYield": 0,
+   "priceToBook": 2.2008014,
+   "change52wPct": -46.685528,
+   "high52": 49.86,
+   "low52": 21.3,
+   "analystRating": "1.8 - Buy",
+   "financials": [
+    {
+     "year": 2022,
+     "revenueHkdB": 328.1,
+     "netIncomeHkdB": 2.9
+    },
+    {
+     "year": 2023,
+     "revenueHkdB": 317.47,
+     "netIncomeHkdB": 20.47
+    },
+    {
+     "year": 2024,
+     "revenueHkdB": 428.7,
+     "netIncomeHkdB": 27.62
+    },
+    {
+     "year": 2025,
+     "revenueHkdB": 535.76,
+     "netIncomeHkdB": 48.79
+    }
+   ],
+   "series": [
+    {
+     "month": "2021-11",
+     "close": 19.28
+    },
+    {
+     "month": "2021-12",
+     "close": 18.9
+    },
+    {
+     "month": "2022-01",
+     "close": 16.38
+    },
+    {
+     "month": "2022-02",
+     "close": 14.66
+    },
+    {
+     "month": "2022-03",
+     "close": 13.94
+    },
+    {
+     "month": "2022-04",
+     "close": 12.2
+    },
+    {
+     "month": "2022-05",
+     "close": 12.14
+    },
+    {
+     "month": "2022-06",
+     "close": 13.64
+    },
+    {
+     "month": "2022-07",
+     "close": 12.34
+    },
+    {
+     "month": "2022-08",
+     "close": 11.56
+    },
+    {
+     "month": "2022-09",
+     "close": 8.96
+    },
+    {
+     "month": "2022-10",
+     "close": 8.81
+    },
+    {
+     "month": "2022-11",
+     "close": 10.32
+    },
+    {
+     "month": "2022-12",
+     "close": 10.94
+    },
+    {
+     "month": "2023-01",
+     "close": 12.92
+    },
+    {
+     "month": "2023-02",
+     "close": 11.86
+    },
+    {
+     "month": "2023-03",
+     "close": 12.1
+    },
+    {
+     "month": "2023-04",
+     "close": 11.06
+    },
+    {
+     "month": "2023-05",
+     "close": 10.34
+    },
+    {
+     "month": "2023-06",
+     "close": 10.72
+    },
+    {
+     "month": "2023-07",
+     "close": 12.28
+    },
+    {
+     "month": "2023-08",
+     "close": 12.36
+    },
+    {
+     "month": "2023-09",
+     "close": 12.34
+    },
+    {
+     "month": "2023-10",
+     "close": 14.02
+    },
+    {
+     "month": "2023-11",
+     "close": 15.62
+    },
+    {
+     "month": "2023-12",
+     "close": 15.6
+    },
+    {
+     "month": "2024-01",
+     "close": 12.32
+    },
+    {
+     "month": "2024-02",
+     "close": 13.22
+    },
+    {
+     "month": "2024-03",
+     "close": 14.94
+    },
+    {
+     "month": "2024-04",
+     "close": 17.32
+    },
+    {
+     "month": "2024-05",
+     "close": 17.48
+    },
+    {
+     "month": "2024-06",
+     "close": 16.48
+    },
+    {
+     "month": "2024-07",
+     "close": 16.84
+    },
+    {
+     "month": "2024-08",
+     "close": 19.5
+    },
+    {
+     "month": "2024-09",
+     "close": 22.5
+    },
+    {
+     "month": "2024-10",
+     "close": 26.7
+    },
+    {
+     "month": "2024-11",
+     "close": 27.75
+    },
+    {
+     "month": "2024-12",
+     "close": 34.65
+    },
+    {
+     "month": "2025-01",
+     "close": 38.15
+    },
+    {
+     "month": "2025-02",
+     "close": 51.85
+    },
+    {
+     "month": "2025-03",
+     "close": 49.2
+    },
+    {
+     "month": "2025-04",
+     "close": 49.95
+    },
+    {
+     "month": "2025-05",
+     "close": 50.95
+    },
+    {
+     "month": "2025-06",
+     "close": 59.95
+    },
+    {
+     "month": "2025-07",
+     "close": 53.15
+    },
+    {
+     "month": "2025-08",
+     "close": 52.85
+    },
+    {
+     "month": "2025-09",
+     "close": 54
+    },
+    {
+     "month": "2025-10",
+     "close": 43.2
+    },
+    {
+     "month": "2025-11",
+     "close": 41.02
+    },
+    {
+     "month": "2025-12",
+     "close": 39.2
+    },
+    {
+     "month": "2026-01",
+     "close": 35.5
+    },
+    {
+     "month": "2026-02",
+     "close": 34.9
+    },
+    {
+     "month": "2026-03",
+     "close": 31.76
+    },
+    {
+     "month": "2026-04",
+     "close": 29.02
+    },
+    {
+     "month": "2026-05",
+     "close": 28.04
+    },
+    {
+     "month": "2026-06",
+     "close": 21.64
+    },
+    {
+     "month": "2026-07",
+     "close": 28.78
+    },
+    {
+     "month": "2026-08",
+     "close": 27.62
+    },
+    {
+     "month": "2026-09",
+     "close": 25.24
+    },
+    {
+     "month": "2026-10",
+     "close": 27.08
+    }
+   ]
+  },
+  {
+   "symbol": "0388.HK",
+   "name": "HKEX",
+   "longName": "Hong Kong Exchanges and Clearing Limited",
+   "aliases": [
+    "hkex",
+    "hong kong exchanges",
+    "exchange operator",
+    "0388"
+   ],
+   "sector": "Financial Services",
+   "industry": "Financial Data & Stock Exchanges",
+   "employees": 2566,
+   "currency": "HKD",
+   "financialCurrency": "HKD",
+   "price": 371.4,
+   "changePct": -0.5888684,
+   "marketCapHkdB": 469.4,
+   "trailingPE": 23.761995,
+   "forwardPE": 23.04066,
+   "dividendYield": 3.98,
+   "priceToBook": 7.739596,
+   "change52wPct": -12.669474,
+   "high52": 444.8,
+   "low52": 360,
+   "analystRating": "1.5 - Strong Buy",
+   "financials": [
+    {
+     "year": 2022,
+     "revenueHkdB": 18.46,
+     "netIncomeHkdB": 10.08
+    },
+    {
+     "year": 2023,
+     "revenueHkdB": 20.52,
+     "netIncomeHkdB": 11.86
+    },
+    {
+     "year": 2024,
+     "revenueHkdB": 22.37,
+     "netIncomeHkdB": 13.05
+    },
+    {
+     "year": 2025,
+     "revenueHkdB": 29.16,
+     "netIncomeHkdB": 17.75
+    }
+   ],
+   "series": [
+    {
+     "month": "2021-11",
+     "close": 372.118
+    },
+    {
+     "month": "2021-12",
+     "close": 394.099
+    },
+    {
+     "month": "2022-01",
+     "close": 380.772
+    },
+    {
+     "month": "2022-02",
+     "close": 326.771
+    },
+    {
+     "month": "2022-03",
+     "close": 325.402
+    },
+    {
+     "month": "2022-04",
+     "close": 295.963
+    },
+    {
+     "month": "2022-05",
+     "close": 297.19
+    },
+    {
+     "month": "2022-06",
+     "close": 338.194
+    },
+    {
+     "month": "2022-07",
+     "close": 314.538
+    },
+    {
+     "month": "2022-08",
+     "close": 281.463
+    },
+    {
+     "month": "2022-09",
+     "close": 238.774
+    },
+    {
+     "month": "2022-10",
+     "close": 185.103
+    },
+    {
+     "month": "2022-11",
+     "close": 271.013
+    },
+    {
+     "month": "2022-12",
+     "close": 298.645
+    },
+    {
+     "month": "2023-01",
+     "close": 312.107
+    },
+    {
+     "month": "2023-02",
+     "close": 278.629
+    },
+    {
+     "month": "2023-03",
+     "close": 311.798
+    },
+    {
+     "month": "2023-04",
+     "close": 290.128
+    },
+    {
+     "month": "2023-05",
+     "close": 256.638
+    },
+    {
+     "month": "2023-06",
+     "close": 264.338
+    },
+    {
+     "month": "2023-07",
+     "close": 291.739
+    },
+    {
+     "month": "2023-08",
+     "close": 276.404
+    },
+    {
+     "month": "2023-09",
+     "close": 266.038
+    },
+    {
+     "month": "2023-10",
+     "close": 250.036
+    },
+    {
+     "month": "2023-11",
+     "close": 252.036
+    },
+    {
+     "month": "2023-12",
+     "close": 243.672
+    },
+    {
+     "month": "2024-01",
+     "close": 215.122
+    },
+    {
+     "month": "2024-02",
+     "close": 220.759
+    },
+    {
+     "month": "2024-03",
+     "close": 210.414
+    },
+    {
+     "month": "2024-04",
+     "close": 232.398
+    },
+    {
+     "month": "2024-05",
+     "close": 242.743
+    },
+    {
+     "month": "2024-06",
+     "close": 231.105
+    },
+    {
+     "month": "2024-07",
+     "close": 214.109
+    },
+    {
+     "month": "2024-08",
+     "close": 222.053
+    },
+    {
+     "month": "2024-09",
+     "close": 306.956
+    },
+    {
+     "month": "2024-10",
+     "close": 292.465
+    },
+    {
+     "month": "2024-11",
+     "close": 272.704
+    },
+    {
+     "month": "2024-12",
+     "close": 277.785
+    },
+    {
+     "month": "2025-01",
+     "close": 285.125
+    },
+    {
+     "month": "2025-02",
+     "close": 329.352
+    },
+    {
+     "month": "2025-03",
+     "close": 329.066
+    },
+    {
+     "month": "2025-04",
+     "close": 325.248
+    },
+    {
+     "month": "2025-05",
+     "close": 377.739
+    },
+    {
+     "month": "2025-06",
+     "close": 399.689
+    },
+    {
+     "month": "2025-07",
+     "close": 407.515
+    },
+    {
+     "month": "2025-08",
+     "close": 430.42
+    },
+    {
+     "month": "2025-09",
+     "close": 427.48
+    },
+    {
+     "month": "2025-10",
+     "close": 409.684
+    },
+    {
+     "month": "2025-11",
+     "close": 397.498
+    },
+    {
+     "month": "2025-12",
+     "close": 394.403
+    },
+    {
+     "month": "2026-01",
+     "close": 418.002
+    },
+    {
+     "month": "2026-02",
+     "close": 405.235
+    },
+    {
+     "month": "2026-03",
+     "close": 381.81
+    },
+    {
+     "month": "2026-04",
+     "close": 405.194
+    },
+    {
+     "month": "2026-05",
+     "close": 392.814
+    },
+    {
+     "month": "2026-06",
+     "close": 356.657
+    },
+    {
+     "month": "2026-07",
+     "close": 401.46
+    },
+    {
+     "month": "2026-08",
+     "close": 417.77
+    },
+    {
+     "month": "2026-09",
+     "close": 387.8
+    },
+    {
+     "month": "2026-10",
+     "close": 371.4
+    }
+   ]
+  },
+  {
+   "symbol": "2318.HK",
+   "name": "Ping An",
+   "longName": "Ping An Insurance (Group) Company of China, Ltd.",
+   "aliases": [
+    "ping an",
+    "pingan",
+    "2318"
+   ],
+   "sector": "Financial Services",
+   "industry": "Insurance - Life",
+   "employees": 258806,
+   "currency": "HKD",
+   "financialCurrency": "CNY",
+   "price": 50.4,
+   "changePct": -0.3952509,
+   "marketCapHkdB": 912.6,
+   "trailingPE": 5.419355,
+   "forwardPE": 4.751715,
+   "dividendYield": 6.21,
+   "priceToBook": 0.7569309,
+   "change52wPct": -7.5799108,
+   "high52": 74.7,
+   "low52": 49.86,
+   "analystRating": "1.3 - Strong Buy",
+   "financials": [
+    {
+     "year": 2022,
+     "revenueHkdB": 869.82,
+     "netIncomeHkdB": 98.15
+    },
+    {
+     "year": 2023,
+     "revenueHkdB": 1070.6,
+     "netIncomeHkdB": 100.37
+    },
+    {
+     "year": 2024,
+     "revenueHkdB": 645.77,
+     "netIncomeHkdB": 148.33
+    },
+    {
+     "year": 2025,
+     "revenueHkdB": 655.51,
+     "netIncomeHkdB": 157.91
+    }
+   ],
+   "series": [
+    {
+     "month": "2021-11",
+     "close": 40.348
+    },
+    {
+     "month": "2021-12",
+     "close": 41.916
+    },
+    {
+     "month": "2022-01",
+     "close": 45.723
+    },
+    {
+     "month": "2022-02",
+     "close": 45.089
+    },
+    {
+     "month": "2022-03",
+     "close": 41.543
+    },
+    {
+     "month": "2022-04",
+     "close": 38.37
+    },
+    {
+     "month": "2022-05",
+     "close": 37.549
+    },
+    {
+     "month": "2022-06",
+     "close": 41.307
+    },
+    {
+     "month": "2022-07",
+     "close": 35.771
+    },
+    {
+     "month": "2022-08",
+     "close": 35.887
+    },
+    {
+     "month": "2022-09",
+     "close": 31.085
+    },
+    {
+     "month": "2022-10",
+     "close": 24.899
+    },
+    {
+     "month": "2022-11",
+     "close": 37.865
+    },
+    {
+     "month": "2022-12",
+     "close": 40.957
+    },
+    {
+     "month": "2023-01",
+     "close": 48.134
+    },
+    {
+     "month": "2023-02",
+     "close": 42.266
+    },
+    {
+     "month": "2023-03",
+     "close": 40.521
+    },
+    {
+     "month": "2023-04",
+     "close": 44.962
+    },
+    {
+     "month": "2023-05",
+     "close": 39.411
+    },
+    {
+     "month": "2023-06",
+     "close": 40.819
+    },
+    {
+     "month": "2023-07",
+     "close": 46.059
+    },
+    {
+     "month": "2023-08",
+     "close": 38.444
+    },
+    {
+     "month": "2023-09",
+     "close": 37.519
+    },
+    {
+     "month": "2023-10",
+     "close": 33.546
+    },
+    {
+     "month": "2023-11",
+     "close": 30.116
+    },
+    {
+     "month": "2023-12",
+     "close": 29.572
+    },
+    {
+     "month": "2024-01",
+     "close": 27.355
+    },
+    {
+     "month": "2024-02",
+     "close": 29.363
+    },
+    {
+     "month": "2024-03",
+     "close": 27.648
+    },
+    {
+     "month": "2024-04",
+     "close": 30.074
+    },
+    {
+     "month": "2024-05",
+     "close": 33.086
+    },
+    {
+     "month": "2024-06",
+     "close": 30.867
+    },
+    {
+     "month": "2024-07",
+     "close": 29.777
+    },
+    {
+     "month": "2024-08",
+     "close": 32.611
+    },
+    {
+     "month": "2024-09",
+     "close": 44.981
+    },
+    {
+     "month": "2024-10",
+     "close": 43.187
+    },
+    {
+     "month": "2024-11",
+     "close": 40.183
+    },
+    {
+     "month": "2024-12",
+     "close": 41.349
+    },
+    {
+     "month": "2025-01",
+     "close": 39.196
+    },
+    {
+     "month": "2025-02",
+     "close": 41.214
+    },
+    {
+     "month": "2025-03",
+     "close": 41.528
+    },
+    {
+     "month": "2025-04",
+     "close": 41.797
+    },
+    {
+     "month": "2025-05",
+     "close": 42.922
+    },
+    {
+     "month": "2025-06",
+     "close": 46.363
+    },
+    {
+     "month": "2025-07",
+     "close": 50.176
+    },
+    {
+     "month": "2025-08",
+     "close": 52.362
+    },
+    {
+     "month": "2025-09",
+     "close": 50.253
+    },
+    {
+     "month": "2025-10",
+     "close": 53.19
+    },
+    {
+     "month": "2025-11",
+     "close": 53.711
+    },
+    {
+     "month": "2025-12",
+     "close": 61.858
+    },
+    {
+     "month": "2026-01",
+     "close": 68.868
+    },
+    {
+     "month": "2026-02",
+     "close": 64.415
+    },
+    {
+     "month": "2026-03",
+     "close": 56.316
+    },
+    {
+     "month": "2026-04",
+     "close": 59.679
+    },
+    {
+     "month": "2026-05",
+     "close": 56.884
+    },
+    {
+     "month": "2026-06",
+     "close": 50.03
+    },
+    {
+     "month": "2026-07",
+     "close": 57.479
+    },
+    {
+     "month": "2026-08",
+     "close": 55.421
+    },
+    {
+     "month": "2026-09",
+     "close": 52.75
+    },
+    {
+     "month": "2026-10",
+     "close": 50.4
+    }
+   ]
+  },
+  {
+   "symbol": "0939.HK",
+   "name": "CCB",
+   "longName": "China Construction Bank Corporation",
+   "aliases": [
+    "ccb",
+    "china construction bank",
+    "construction bank",
+    "0939"
+   ],
+   "sector": "Financial Services",
+   "industry": "Banks - Diversified",
+   "employees": 373430,
+   "currency": "HKD",
+   "financialCurrency": "CNY",
+   "price": 9.975,
+   "changePct": 1.2176646,
+   "marketCapHkdB": 2609.5,
+   "trailingPE": 6.8793106,
+   "forwardPE": 6.118718,
+   "dividendYield": 4.45,
+   "priceToBook": 0.6214796,
+   "change52wPct": 31.57543,
+   "high52": 9.975,
+   "low52": 7.37,
+   "analystRating": "1.3 - Strong Buy",
+   "financials": [
+    {
+     "year": 2022,
+     "revenueHkdB": 888.25,
+     "netIncomeHkdB": 374.12
+    },
+    {
+     "year": 2023,
+     "revenueHkdB": 873.56,
+     "netIncomeHkdB": 383.75
+    },
+    {
+     "year": 2024,
+     "revenueHkdB": 853.59,
+     "netIncomeHkdB": 384.83
+    },
+    {
+     "year": 2025,
+     "revenueHkdB": 868,
+     "netIncomeHkdB": 397.06
+    }
+   ],
+   "series": [
+    {
+     "month": "2021-11",
+     "close": 3.523
+    },
+    {
+     "month": "2021-12",
+     "close": 3.745
+    },
+    {
+     "month": "2022-01",
+     "close": 4.147
+    },
+    {
+     "month": "2022-02",
+     "close": 4.064
+    },
+    {
+     "month": "2022-03",
+     "close": 4.085
+    },
+    {
+     "month": "2022-04",
+     "close": 3.877
+    },
+    {
+     "month": "2022-05",
+     "close": 4.05
+    },
+    {
+     "month": "2022-06",
+     "close": 3.95
+    },
+    {
+     "month": "2022-07",
+     "close": 3.755
+    },
+    {
+     "month": "2022-08",
+     "close": 3.651
+    },
+    {
+     "month": "2022-09",
+     "close": 3.403
+    },
+    {
+     "month": "2022-10",
+     "close": 3.126
+    },
+    {
+     "month": "2022-11",
+     "close": 3.531
+    },
+    {
+     "month": "2022-12",
+     "close": 3.666
+    },
+    {
+     "month": "2023-01",
+     "close": 3.808
+    },
+    {
+     "month": "2023-02",
+     "close": 3.598
+    },
+    {
+     "month": "2023-03",
+     "close": 3.815
+    },
+    {
+     "month": "2023-04",
+     "close": 3.935
+    },
+    {
+     "month": "2023-05",
+     "close": 3.755
+    },
+    {
+     "month": "2023-06",
+     "close": 3.8
+    },
+    {
+     "month": "2023-07",
+     "close": 3.709
+    },
+    {
+     "month": "2023-08",
+     "close": 3.438
+    },
+    {
+     "month": "2023-09",
+     "close": 3.619
+    },
+    {
+     "month": "2023-10",
+     "close": 3.635
+    },
+    {
+     "month": "2023-11",
+     "close": 3.7
+    },
+    {
+     "month": "2023-12",
+     "close": 3.807
+    },
+    {
+     "month": "2024-01",
+     "close": 3.799
+    },
+    {
+     "month": "2024-02",
+     "close": 3.995
+    },
+    {
+     "month": "2024-03",
+     "close": 3.864
+    },
+    {
+     "month": "2024-04",
+     "close": 4.175
+    },
+    {
+     "month": "2024-05",
+     "close": 4.536
+    },
+    {
+     "month": "2024-06",
+     "close": 4.724
+    },
+    {
+     "month": "2024-07",
+     "close": 4.844
+    },
+    {
+     "month": "2024-08",
+     "close": 4.889
+    },
+    {
+     "month": "2024-09",
+     "close": 5.208
+    },
+    {
+     "month": "2024-10",
+     "close": 5.34
+    },
+    {
+     "month": "2024-11",
+     "close": 5.181
+    },
+    {
+     "month": "2024-12",
+     "close": 5.748
+    },
+    {
+     "month": "2025-01",
+     "close": 5.806
+    },
+    {
+     "month": "2025-02",
+     "close": 6.034
+    },
+    {
+     "month": "2025-03",
+     "close": 6.3
+    },
+    {
+     "month": "2025-04",
+     "close": 6.039
+    },
+    {
+     "month": "2025-05",
+     "close": 6.664
+    },
+    {
+     "month": "2025-06",
+     "close": 7.497
+    },
+    {
+     "month": "2025-07",
+     "close": 7.62
+    },
+    {
+     "month": "2025-08",
+     "close": 7.109
+    },
+    {
+     "month": "2025-09",
+     "close": 7.081
+    },
+    {
+     "month": "2025-10",
+     "close": 7.289
+    },
+    {
+     "month": "2025-11",
+     "close": 7.734
+    },
+    {
+     "month": "2025-12",
+     "close": 7.447
+    },
+    {
+     "month": "2026-01",
+     "close": 7.68
+    },
+    {
+     "month": "2026-02",
+     "close": 7.758
+    },
+    {
+     "month": "2026-03",
+     "close": 8.146
+    },
+    {
+     "month": "2026-04",
+     "close": 8.525
+    },
+    {
+     "month": "2026-05",
+     "close": 8.244
+    },
+    {
+     "month": "2026-06",
+     "close": 7.836
+    },
+    {
+     "month": "2026-07",
+     "close": 9.21
+    },
+    {
+     "month": "2026-08",
+     "close": 9.5
+    },
+    {
+     "month": "2026-09",
+     "close": 9.82
+    },
+    {
+     "month": "2026-10",
+     "close": 9.975
+    }
+   ]
+  },
+  {
+   "symbol": "1398.HK",
+   "name": "ICBC",
+   "longName": "Industrial and Commercial Bank of China Limited",
+   "aliases": [
+    "icbc",
+    "industrial and commercial bank",
+    "1398"
+   ],
+   "sector": "Financial Services",
+   "industry": "Banks - Diversified",
+   "employees": 402548,
+   "currency": "HKD",
+   "financialCurrency": "CNY",
+   "price": 7.695,
+   "changePct": 1.6512549,
+   "marketCapHkdB": 2742.5,
+   "trailingPE": 6.809735,
+   "forwardPE": 6.0633364,
+   "dividendYield": 4.91,
+   "priceToBook": 0.5902167,
+   "change52wPct": 28.741491,
+   "high52": 7.77,
+   "low52": 5.73,
+   "analystRating": "1.6 - Buy",
+   "financials": [
+    {
+     "year": 2022,
+     "revenueHkdB": 985.83,
+     "netIncomeHkdB": 422.34
+    },
+    {
+     "year": 2023,
+     "revenueHkdB": 944.85,
+     "netIncomeHkdB": 426.45
+    },
+    {
+     "year": 2024,
+     "revenueHkdB": 921.03,
+     "netIncomeHkdB": 428.65
+    },
+    {
+     "year": 2025,
+     "revenueHkdB": 982.12,
+     "netIncomeHkdB": 431.81
+    }
+   ],
+   "series": [
+    {
+     "month": "2021-11",
+     "close": 2.856
+    },
+    {
+     "month": "2021-12",
+     "close": 3.05
+    },
+    {
+     "month": "2022-01",
+     "close": 3.272
+    },
+    {
+     "month": "2022-02",
+     "close": 3.238
+    },
+    {
+     "month": "2022-03",
+     "close": 3.335
+    },
+    {
+     "month": "2022-04",
+     "close": 3.286
+    },
+    {
+     "month": "2022-05",
+     "close": 3.265
+    },
+    {
+     "month": "2022-06",
+     "close": 3.231
+    },
+    {
+     "month": "2022-07",
+     "close": 3.106
+    },
+    {
+     "month": "2022-08",
+     "close": 2.994
+    },
+    {
+     "month": "2022-09",
+     "close": 2.754
+    },
+    {
+     "month": "2022-10",
+     "close": 2.552
+    },
+    {
+     "month": "2022-11",
+     "close": 2.926
+    },
+    {
+     "month": "2022-12",
+     "close": 3.008
+    },
+    {
+     "month": "2023-01",
+     "close": 3.136
+    },
+    {
+     "month": "2023-02",
+     "close": 2.934
+    },
+    {
+     "month": "2023-03",
+     "close": 3.128
+    },
+    {
+     "month": "2023-04",
+     "close": 3.158
+    },
+    {
+     "month": "2023-05",
+     "close": 3.136
+    },
+    {
+     "month": "2023-06",
+     "close": 3.128
+    },
+    {
+     "month": "2023-07",
+     "close": 3.091
+    },
+    {
+     "month": "2023-08",
+     "close": 2.929
+    },
+    {
+     "month": "2023-09",
+     "close": 3.067
+    },
+    {
+     "month": "2023-10",
+     "close": 3.059
+    },
+    {
+     "month": "2023-11",
+     "close": 3.043
+    },
+    {
+     "month": "2023-12",
+     "close": 3.108
+    },
+    {
+     "month": "2024-01",
+     "close": 3.108
+    },
+    {
+     "month": "2024-02",
+     "close": 3.287
+    },
+    {
+     "month": "2024-03",
+     "close": 3.205
+    },
+    {
+     "month": "2024-04",
+     "close": 3.441
+    },
+    {
+     "month": "2024-05",
+     "close": 3.596
+    },
+    {
+     "month": "2024-06",
+     "close": 3.775
+    },
+    {
+     "month": "2024-07",
+     "close": 3.802
+    },
+    {
+     "month": "2024-08",
+     "close": 3.934
+    },
+    {
+     "month": "2024-09",
+     "close": 4.065
+    },
+    {
+     "month": "2024-10",
+     "close": 4.083
+    },
+    {
+     "month": "2024-11",
+     "close": 3.995
+    },
+    {
+     "month": "2024-12",
+     "close": 4.573
+    },
+    {
+     "month": "2025-01",
+     "close": 4.777
+    },
+    {
+     "month": "2025-02",
+     "close": 4.966
+    },
+    {
+     "month": "2025-03",
+     "close": 5.003
+    },
+    {
+     "month": "2025-04",
+     "close": 4.804
+    },
+    {
+     "month": "2025-05",
+     "close": 5.156
+    },
+    {
+     "month": "2025-06",
+     "close": 5.617
+    },
+    {
+     "month": "2025-07",
+     "close": 5.595
+    },
+    {
+     "month": "2025-08",
+     "close": 5.363
+    },
+    {
+     "month": "2025-09",
+     "close": 5.335
+    },
+    {
+     "month": "2025-10",
+     "close": 5.595
+    },
+    {
+     "month": "2025-11",
+     "close": 5.986
+    },
+    {
+     "month": "2025-12",
+     "close": 5.946
+    },
+    {
+     "month": "2026-01",
+     "close": 6.184
+    },
+    {
+     "month": "2026-02",
+     "close": 6.146
+    },
+    {
+     "month": "2026-03",
+     "close": 6.537
+    },
+    {
+     "month": "2026-04",
+     "close": 6.699
+    },
+    {
+     "month": "2026-05",
+     "close": 6.507
+    },
+    {
+     "month": "2026-06",
+     "close": 6.302
+    },
+    {
+     "month": "2026-07",
+     "close": 7.36
+    },
+    {
+     "month": "2026-08",
+     "close": 7.419
+    },
+    {
+     "month": "2026-09",
+     "close": 7.556
+    },
+    {
+     "month": "2026-10",
+     "close": 7.695
+    }
+   ]
+  },
+  {
+   "symbol": "1211.HK",
+   "name": "BYD",
+   "longName": "BYD Company Limited",
+   "aliases": [
+    "byd",
+    "1211"
+   ],
+   "sector": "Consumer Cyclical",
+   "industry": "Auto Manufacturers",
+   "employees": 911900,
+   "currency": "HKD",
+   "financialCurrency": "CNY",
+   "price": 72.95,
+   "changePct": 0.13726628,
+   "marketCapHkdB": 665.1,
+   "trailingPE": 20.377094,
+   "forwardPE": 11.485204,
+   "dividendYield": 0.56,
+   "priceToBook": 2.3549495,
+   "change52wPct": -32.918964,
+   "high52": 113.4,
+   "low52": 71.4,
+   "analystRating": "1.5 - Buy",
+   "financials": [
+    {
+     "year": 2022,
+     "revenueHkdB": 496.83,
+     "netIncomeHkdB": 19.47
+    },
+    {
+     "year": 2023,
+     "revenueHkdB": 705.67,
+     "netIncomeHkdB": 35.2
+    },
+    {
+     "year": 2024,
+     "revenueHkdB": 910.45,
+     "netIncomeHkdB": 47.16
+    },
+    {
+     "year": 2025,
+     "revenueHkdB": 941.93,
+     "netIncomeHkdB": 38.22
+    }
+   ],
+   "series": [
+    {
+     "month": "2021-11",
+     "close": 98.508
+    },
+    {
+     "month": "2021-12",
+     "close": 85.712
+    },
+    {
+     "month": "2022-01",
+     "close": 71.309
+    },
+    {
+     "month": "2022-02",
+     "close": 76.324
+    },
+    {
+     "month": "2022-03",
+     "close": 72.145
+    },
+    {
+     "month": "2022-04",
+     "close": 75.81
+    },
+    {
+     "month": "2022-05",
+     "close": 90.02
+    },
+    {
+     "month": "2022-06",
+     "close": 100.991
+    },
+    {
+     "month": "2022-07",
+     "close": 91.857
+    },
+    {
+     "month": "2022-08",
+     "close": 77.898
+    },
+    {
+     "month": "2022-09",
+     "close": 62.524
+    },
+    {
+     "month": "2022-10",
+     "close": 56.51
+    },
+    {
+     "month": "2022-11",
+     "close": 61.592
+    },
+    {
+     "month": "2022-12",
+     "close": 61.945
+    },
+    {
+     "month": "2023-01",
+     "close": 78.799
+    },
+    {
+     "month": "2023-02",
+     "close": 67.928
+    },
+    {
+     "month": "2023-03",
+     "close": 73.91
+    },
+    {
+     "month": "2023-04",
+     "close": 75.904
+    },
+    {
+     "month": "2023-05",
+     "close": 76.033
+    },
+    {
+     "month": "2023-06",
+     "close": 80.805
+    },
+    {
+     "month": "2023-07",
+     "close": 89.08
+    },
+    {
+     "month": "2023-08",
+     "close": 79.448
+    },
+    {
+     "month": "2023-09",
+     "close": 78.219
+    },
+    {
+     "month": "2023-10",
+     "close": 76.733
+    },
+    {
+     "month": "2023-11",
+     "close": 67.876
+    },
+    {
+     "month": "2023-12",
+     "close": 69.299
+    },
+    {
+     "month": "2024-01",
+     "close": 56.337
+    },
+    {
+     "month": "2024-02",
+     "close": 62.479
+    },
+    {
+     "month": "2024-03",
+     "close": 65.161
+    },
+    {
+     "month": "2024-04",
+     "close": 69.686
+    },
+    {
+     "month": "2024-05",
+     "close": 70.979
+    },
+    {
+     "month": "2024-06",
+     "close": 76.125
+    },
+    {
+     "month": "2024-07",
+     "close": 74.812
+    },
+    {
+     "month": "2024-08",
+     "close": 79.143
+    },
+    {
+     "month": "2024-09",
+     "close": 93.121
+    },
+    {
+     "month": "2024-10",
+     "close": 92.334
+    },
+    {
+     "month": "2024-11",
+     "close": 83.212
+    },
+    {
+     "month": "2024-12",
+     "close": 87.478
+    },
+    {
+     "month": "2025-01",
+     "close": 89.512
+    },
+    {
+     "month": "2025-02",
+     "close": 121.93
+    },
+    {
+     "month": "2025-03",
+     "close": 128.887
+    },
+    {
+     "month": "2025-04",
+     "close": 121.471
+    },
+    {
+     "month": "2025-05",
+     "close": 128.887
+    },
+    {
+     "month": "2025-06",
+     "close": 121.918
+    },
+    {
+     "month": "2025-07",
+     "close": 114.852
+    },
+    {
+     "month": "2025-08",
+     "close": 113.857
+    },
+    {
+     "month": "2025-09",
+     "close": 109.676
+    },
+    {
+     "month": "2025-10",
+     "close": 100.122
+    },
+    {
+     "month": "2025-11",
+     "close": 97.037
+    },
+    {
+     "month": "2025-12",
+     "close": 94.648
+    },
+    {
+     "month": "2026-01",
+     "close": 97.286
+    },
+    {
+     "month": "2026-02",
+     "close": 94.499
+    },
+    {
+     "month": "2026-03",
+     "close": 105.297
+    },
+    {
+     "month": "2026-04",
+     "close": 102.013
+    },
+    {
+     "month": "2026-05",
+     "close": 90.866
+    },
+    {
+     "month": "2026-06",
+     "close": 72.45
+    },
+    {
+     "month": "2026-07",
+     "close": 94.15
+    },
+    {
+     "month": "2026-08",
+     "close": 87.2
+    },
+    {
+     "month": "2026-09",
+     "close": 75.6
+    },
+    {
+     "month": "2026-10",
+     "close": 72.95
+    }
+   ]
+  },
+  {
+   "symbol": "9618.HK",
+   "name": "JD.com",
+   "longName": "JD.com, Inc.",
+   "aliases": [
+    "jd",
+    "jd.com",
+    "jingdong",
+    "9618"
+   ],
+   "sector": "Consumer Cyclical",
+   "industry": "Internet Retail",
+   "employees": 900000,
+   "currency": "HKD",
+   "financialCurrency": "CNY",
+   "price": 104.9,
+   "changePct": -1.1310055,
+   "marketCapHkdB": 286.5,
+   "trailingPE": 18.732143,
+   "forwardPE": 6.606347,
+   "dividendYield": 3.69,
+   "priceToBook": 1.0972809,
+   "change52wPct": -17.751938,
+   "high52": 134.8,
+   "low52": 95.8,
+   "analystRating": "1.5 - Buy",
+   "financials": [
+    {
+     "year": 2022,
+     "revenueHkdB": 1225.77,
+     "netIncomeHkdB": 12.16
+    },
+    {
+     "year": 2023,
+     "revenueHkdB": 1270.79,
+     "netIncomeHkdB": 28.31
+    },
+    {
+     "year": 2024,
+     "revenueHkdB": 1357.67,
+     "netIncomeHkdB": 48.46
+    },
+    {
+     "year": 2025,
+     "revenueHkdB": 1533.72,
+     "netIncomeHkdB": 23
+    }
+   ],
+   "series": [
+    {
+     "month": "2021-11",
+     "close": 334.392
+    },
+    {
+     "month": "2021-12",
+     "close": 269.64
+    },
+    {
+     "month": "2022-01",
+     "close": 275.15
+    },
+    {
+     "month": "2022-02",
+     "close": 274.757
+    },
+    {
+     "month": "2022-03",
+     "close": 230.276
+    },
+    {
+     "month": "2022-04",
+     "close": 261.373
+    },
+    {
+     "month": "2022-05",
+     "close": 223.065
+    },
+    {
+     "month": "2022-06",
+     "close": 249.517
+    },
+    {
+     "month": "2022-07",
+     "close": 230.764
+    },
+    {
+     "month": "2022-08",
+     "close": 243.595
+    },
+    {
+     "month": "2022-09",
+     "close": 196.021
+    },
+    {
+     "month": "2022-10",
+     "close": 143.216
+    },
+    {
+     "month": "2022-11",
+     "close": 215.959
+    },
+    {
+     "month": "2022-12",
+     "close": 217.34
+    },
+    {
+     "month": "2023-01",
+     "close": 228.592
+    },
+    {
+     "month": "2023-02",
+     "close": 171.444
+    },
+    {
+     "month": "2023-03",
+     "close": 169.766
+    },
+    {
+     "month": "2023-04",
+     "close": 134.381
+    },
+    {
+     "month": "2023-05",
+     "close": 124.492
+    },
+    {
+     "month": "2023-06",
+     "close": 130.92
+    },
+    {
+     "month": "2023-07",
+     "close": 158.013
+    },
+    {
+     "month": "2023-08",
+     "close": 127.36
+    },
+    {
+     "month": "2023-09",
+     "close": 113.813
+    },
+    {
+     "month": "2023-10",
+     "close": 98.684
+    },
+    {
+     "month": "2023-11",
+     "close": 105.507
+    },
+    {
+     "month": "2023-12",
+     "close": 111.242
+    },
+    {
+     "month": "2024-01",
+     "close": 85.83
+    },
+    {
+     "month": "2024-02",
+     "close": 88.054
+    },
+    {
+     "month": "2024-03",
+     "close": 106.694
+    },
+    {
+     "month": "2024-04",
+     "close": 113.915
+    },
+    {
+     "month": "2024-05",
+     "close": 113.022
+    },
+    {
+     "month": "2024-06",
+     "close": 102.503
+    },
+    {
+     "month": "2024-07",
+     "close": 103.198
+    },
+    {
+     "month": "2024-08",
+     "close": 106.373
+    },
+    {
+     "month": "2024-09",
+     "close": 165.811
+    },
+    {
+     "month": "2024-10",
+     "close": 154.301
+    },
+    {
+     "month": "2024-11",
+     "close": 142.691
+    },
+    {
+     "month": "2024-12",
+     "close": 134.852
+    },
+    {
+     "month": "2025-01",
+     "close": 155.789
+    },
+    {
+     "month": "2025-02",
+     "close": 159.362
+    },
+    {
+     "month": "2025-03",
+     "close": 159.56
+    },
+    {
+     "month": "2025-04",
+     "close": 127.329
+    },
+    {
+     "month": "2025-05",
+     "close": 128.324
+    },
+    {
+     "month": "2025-06",
+     "close": 127.329
+    },
+    {
+     "month": "2025-07",
+     "close": 122.351
+    },
+    {
+     "month": "2025-08",
+     "close": 117.274
+    },
+    {
+     "month": "2025-09",
+     "close": 137.881
+    },
+    {
+     "month": "2025-10",
+     "close": 127.03
+    },
+    {
+     "month": "2025-11",
+     "close": 115.979
+    },
+    {
+     "month": "2025-12",
+     "close": 110.902
+    },
+    {
+     "month": "2026-01",
+     "close": 111.898
+    },
+    {
+     "month": "2026-02",
+     "close": 103.934
+    },
+    {
+     "month": "2026-03",
+     "close": 112.694
+    },
+    {
+     "month": "2026-04",
+     "close": 116.3
+    },
+    {
+     "month": "2026-05",
+     "close": 113.5
+    },
+    {
+     "month": "2026-06",
+     "close": 99.25
+    },
+    {
+     "month": "2026-07",
+     "close": 127.1
+    },
+    {
+     "month": "2026-08",
+     "close": 112.2
+    },
+    {
+     "month": "2026-09",
+     "close": 104.3
+    },
+    {
+     "month": "2026-10",
+     "close": 104.9
+    }
+   ]
+  },
+  {
+   "symbol": "0883.HK",
+   "name": "CNOOC",
+   "longName": "CNOOC Limited",
+   "aliases": [
+    "cnooc",
+    "0883"
+   ],
+   "sector": "Energy",
+   "industry": "Oil & Gas E&P",
+   "employees": 22045,
+   "currency": "HKD",
+   "financialCurrency": "CNY",
+   "price": 24.2,
+   "changePct": -2.103554,
+   "marketCapHkdB": 1150.2,
+   "trailingPE": 7.423313,
+   "forwardPE": 6.7451386,
+   "dividendYield": 6.03,
+   "priceToBook": 1.1456923,
+   "change52wPct": 30.37975,
+   "high52": 30.98,
+   "low52": 18.59,
+   "analystRating": null,
+   "financials": [
+    {
+     "year": 2022,
+     "revenueHkdB": 494.65,
+     "netIncomeHkdB": 166.02
+    },
+    {
+     "year": 2023,
+     "revenueHkdB": 488.1,
+     "netIncomeHkdB": 145.09
+    },
+    {
+     "year": 2024,
+     "revenueHkdB": 492.66,
+     "netIncomeHkdB": 161.61
+    },
+    {
+     "year": 2025,
+     "revenueHkdB": 466.55,
+     "netIncomeHkdB": 143.03
+    }
+   ],
+   "series": [
+    {
+     "month": "2021-11",
+     "close": 4.756
+    },
+    {
+     "month": "2021-12",
+     "close": 4.986
+    },
+    {
+     "month": "2022-01",
+     "close": 5.818
+    },
+    {
+     "month": "2022-02",
+     "close": 6.19
+    },
+    {
+     "month": "2022-03",
+     "close": 6.668
+    },
+    {
+     "month": "2022-04",
+     "close": 6.967
+    },
+    {
+     "month": "2022-05",
+     "close": 7.712
+    },
+    {
+     "month": "2022-06",
+     "close": 7.111
+    },
+    {
+     "month": "2022-07",
+     "close": 6.864
+    },
+    {
+     "month": "2022-08",
+     "close": 7.304
+    },
+    {
+     "month": "2022-09",
+     "close": 6.91
+    },
+    {
+     "month": "2022-10",
+     "close": 6.873
+    },
+    {
+     "month": "2022-11",
+     "close": 7.49
+    },
+    {
+     "month": "2022-12",
+     "close": 7.328
+    },
+    {
+     "month": "2023-01",
+     "close": 8.342
+    },
+    {
+     "month": "2023-02",
+     "close": 8.092
+    },
+    {
+     "month": "2023-03",
+     "close": 8.562
+    },
+    {
+     "month": "2023-04",
+     "close": 9.399
+    },
+    {
+     "month": "2023-05",
+     "close": 8.65
+    },
+    {
+     "month": "2023-06",
+     "close": 8.763
+    },
+    {
+     "month": "2023-07",
+     "close": 9.843
+    },
+    {
+     "month": "2023-08",
+     "close": 10.468
+    },
+    {
+     "month": "2023-09",
+     "close": 11.256
+    },
+    {
+     "month": "2023-10",
+     "close": 10.357
+    },
+    {
+     "month": "2023-11",
+     "close": 10.668
+    },
+    {
+     "month": "2023-12",
+     "close": 10.619
+    },
+    {
+     "month": "2024-01",
+     "close": 11.811
+    },
+    {
+     "month": "2024-02",
+     "close": 13.134
+    },
+    {
+     "month": "2024-03",
+     "close": 14.801
+    },
+    {
+     "month": "2024-04",
+     "close": 16.581
+    },
+    {
+     "month": "2024-05",
+     "close": 17.071
+    },
+    {
+     "month": "2024-06",
+     "close": 18.868
+    },
+    {
+     "month": "2024-07",
+     "close": 17.268
+    },
+    {
+     "month": "2024-08",
+     "close": 18.152
+    },
+    {
+     "month": "2024-09",
+     "close": 17.031
+    },
+    {
+     "month": "2024-10",
+     "close": 15.944
+    },
+    {
+     "month": "2024-11",
+     "close": 14.996
+    },
+    {
+     "month": "2024-12",
+     "close": 16.75
+    },
+    {
+     "month": "2025-01",
+     "close": 16.224
+    },
+    {
+     "month": "2025-02",
+     "close": 15.68
+    },
+    {
+     "month": "2025-03",
+     "close": 16.242
+    },
+    {
+     "month": "2025-04",
+     "close": 14.698
+    },
+    {
+     "month": "2025-05",
+     "close": 15.856
+    },
+    {
+     "month": "2025-06",
+     "close": 16.103
+    },
+    {
+     "month": "2025-07",
+     "close": 17.194
+    },
+    {
+     "month": "2025-08",
+     "close": 17.73
+    },
+    {
+     "month": "2025-09",
+     "close": 17.952
+    },
+    {
+     "month": "2025-10",
+     "close": 18.64
+    },
+    {
+     "month": "2025-11",
+     "close": 19.97
+    },
+    {
+     "month": "2025-12",
+     "close": 20.064
+    },
+    {
+     "month": "2026-01",
+     "close": 22.987
+    },
+    {
+     "month": "2026-02",
+     "close": 23.873
+    },
+    {
+     "month": "2026-03",
+     "close": 26.4
+    },
+    {
+     "month": "2026-04",
+     "close": 27.701
+    },
+    {
+     "month": "2026-05",
+     "close": 24.891
+    },
+    {
+     "month": "2026-06",
+     "close": 19.58
+    },
+    {
+     "month": "2026-07",
+     "close": 22.953
+    },
+    {
+     "month": "2026-08",
+     "close": 24.379
+    },
+    {
+     "month": "2026-09",
+     "close": 23.96
+    },
+    {
+     "month": "2026-10",
+     "close": 24.2
+    }
+   ]
+  },
+  {
+   "symbol": "0016.HK",
+   "name": "Sun Hung Kai Properties",
+   "longName": "Sun Hung Kai Properties Limited",
+   "aliases": [
+    "sun hung kai",
+    "shkp",
+    "0016"
+   ],
+   "sector": "Real Estate",
+   "industry": "Real Estate - Development",
+   "employees": 39000,
+   "currency": "HKD",
+   "financialCurrency": "HKD",
+   "price": 106.3,
+   "changePct": -1.0242071,
+   "marketCapHkdB": 308,
+   "trailingPE": 14.682322,
+   "forwardPE": 12.109861,
+   "dividendYield": 3.52,
+   "priceToBook": 0.4859451,
+   "change52wPct": 14.804912,
+   "high52": 148.8,
+   "low52": 92,
+   "analystRating": "1.8 - Buy",
+   "financials": [
+    {
+     "year": 2023,
+     "revenueHkdB": 71.19,
+     "netIncomeHkdB": 23.91
+    },
+    {
+     "year": 2024,
+     "revenueHkdB": 71.51,
+     "netIncomeHkdB": 19.05
+    },
+    {
+     "year": 2025,
+     "revenueHkdB": 79.72,
+     "netIncomeHkdB": 19.28
+    },
+    {
+     "year": 2026,
+     "revenueHkdB": 94.19,
+     "netIncomeHkdB": 21.43
+    }
+   ],
+   "series": [
+    {
+     "month": "2021-11",
+     "close": 77.192
+    },
+    {
+     "month": "2021-12",
+     "close": 77.03
+    },
+    {
+     "month": "2022-01",
+     "close": 77.03
+    },
+    {
+     "month": "2022-02",
+     "close": 74.017
+    },
+    {
+     "month": "2022-03",
+     "close": 77.276
+    },
+    {
+     "month": "2022-04",
+     "close": 75.088
+    },
+    {
+     "month": "2022-05",
+     "close": 79.175
+    },
+    {
+     "month": "2022-06",
+     "close": 76.533
+    },
+    {
+     "month": "2022-07",
+     "close": 77.4
+    },
+    {
+     "month": "2022-08",
+     "close": 76.202
+    },
+    {
+     "month": "2022-09",
+     "close": 71.703
+    },
+    {
+     "month": "2022-10",
+     "close": 69.721
+    },
+    {
+     "month": "2022-11",
+     "close": 80.572
+    },
+    {
+     "month": "2022-12",
+     "close": 91.837
+    },
+    {
+     "month": "2023-01",
+     "close": 95.535
+    },
+    {
+     "month": "2023-02",
+     "close": 92.181
+    },
+    {
+     "month": "2023-03",
+     "close": 95.676
+    },
+    {
+     "month": "2023-04",
+     "close": 94.806
+    },
+    {
+     "month": "2023-05",
+     "close": 86.717
+    },
+    {
+     "month": "2023-06",
+     "close": 85.847
+    },
+    {
+     "month": "2023-07",
+     "close": 84.847
+    },
+    {
+     "month": "2023-08",
+     "close": 76.802
+    },
+    {
+     "month": "2023-09",
+     "close": 72.888
+    },
+    {
+     "month": "2023-10",
+     "close": 69.887
+    },
+    {
+     "month": "2023-11",
+     "close": 69.71
+    },
+    {
+     "month": "2023-12",
+     "close": 76.804
+    },
+    {
+     "month": "2024-01",
+     "close": 66.254
+    },
+    {
+     "month": "2024-02",
+     "close": 71.802
+    },
+    {
+     "month": "2024-03",
+     "close": 69.457
+    },
+    {
+     "month": "2024-04",
+     "close": 66.972
+    },
+    {
+     "month": "2024-05",
+     "close": 69.319
+    },
+    {
+     "month": "2024-06",
+     "close": 62.185
+    },
+    {
+     "month": "2024-07",
+     "close": 62.461
+    },
+    {
+     "month": "2024-08",
+     "close": 70.378
+    },
+    {
+     "month": "2024-09",
+     "close": 78.755
+    },
+    {
+     "month": "2024-10",
+     "close": 77.466
+    },
+    {
+     "month": "2024-11",
+     "close": 73.59
+    },
+    {
+     "month": "2024-12",
+     "close": 71.446
+    },
+    {
+     "month": "2025-01",
+     "close": 66.493
+    },
+    {
+     "month": "2025-02",
+     "close": 69.35
+    },
+    {
+     "month": "2025-03",
+     "close": 71.279
+    },
+    {
+     "month": "2025-04",
+     "close": 71.038
+    },
+    {
+     "month": "2025-05",
+     "close": 81.262
+    },
+    {
+     "month": "2025-06",
+     "close": 86.856
+    },
+    {
+     "month": "2025-07",
+     "close": 90.184
+    },
+    {
+     "month": "2025-08",
+     "close": 88.351
+    },
+    {
+     "month": "2025-09",
+     "close": 89.894
+    },
+    {
+     "month": "2025-10",
+     "close": 91.1
+    },
+    {
+     "month": "2025-11",
+     "close": 97.907
+    },
+    {
+     "month": "2025-12",
+     "close": 93.687
+    },
+    {
+     "month": "2026-01",
+     "close": 124.817
+    },
+    {
+     "month": "2026-02",
+     "close": 144.974
+    },
+    {
+     "month": "2026-03",
+     "close": 129.2
+    },
+    {
+     "month": "2026-04",
+     "close": 135.8
+    },
+    {
+     "month": "2026-05",
+     "close": 131.7
+    },
+    {
+     "month": "2026-06",
+     "close": 112.3
+    },
+    {
+     "month": "2026-07",
+     "close": 123.2
+    },
+    {
+     "month": "2026-08",
+     "close": 116.2
+    },
+    {
+     "month": "2026-09",
+     "close": 108.5
+    },
+    {
+     "month": "2026-10",
+     "close": 106.3
+    }
+   ]
+  },
+  {
+   "symbol": "0002.HK",
+   "name": "CLP Holdings",
+   "longName": "CLP Holdings Limited",
+   "aliases": [
+    "clp",
+    "0002"
+   ],
+   "sector": "Utilities",
+   "industry": "Utilities - Regulated Electric",
+   "employees": 8437,
+   "currency": "HKD",
+   "financialCurrency": "HKD",
+   "price": 77.4,
+   "changePct": 0.91265273,
+   "marketCapHkdB": 195.5,
+   "trailingPE": 18.084112,
+   "forwardPE": 15.319119,
+   "dividendYield": 3.29,
+   "priceToBook": 1.7702758,
+   "change52wPct": 16.124153,
+   "high52": 79.8,
+   "low52": 65.65,
+   "analystRating": "2.3 - Buy",
+   "financials": [
+    {
+     "year": 2022,
+     "revenueHkdB": 100.66,
+     "netIncomeHkdB": 0.92
+    },
+    {
+     "year": 2023,
+     "revenueHkdB": 87.17,
+     "netIncomeHkdB": 6.66
+    },
+    {
+     "year": 2024,
+     "revenueHkdB": 90.96,
+     "netIncomeHkdB": 11.74
+    },
+    {
+     "year": 2025,
+     "revenueHkdB": 88.02,
+     "netIncomeHkdB": 10.47
+    }
+   ],
+   "series": [
+    {
+     "month": "2021-11",
+     "close": 60.4
+    },
+    {
+     "month": "2021-12",
+     "close": 62.776
+    },
+    {
+     "month": "2022-01",
+     "close": 62.377
+    },
+    {
+     "month": "2022-02",
+     "close": 63.414
+    },
+    {
+     "month": "2022-03",
+     "close": 61.813
+    },
+    {
+     "month": "2022-04",
+     "close": 61.935
+    },
+    {
+     "month": "2022-05",
+     "close": 63.351
+    },
+    {
+     "month": "2022-06",
+     "close": 53.133
+    },
+    {
+     "month": "2022-07",
+     "close": 54.276
+    },
+    {
+     "month": "2022-08",
+     "close": 55.255
+    },
+    {
+     "month": "2022-09",
+     "close": 48.895
+    },
+    {
+     "month": "2022-10",
+     "close": 43.416
+    },
+    {
+     "month": "2022-11",
+     "close": 46.629
+    },
+    {
+     "month": "2022-12",
+     "close": 47.437
+    },
+    {
+     "month": "2023-01",
+     "close": 48.479
+    },
+    {
+     "month": "2023-02",
+     "close": 46.271
+    },
+    {
+     "month": "2023-03",
+     "close": 48.243
+    },
+    {
+     "month": "2023-04",
+     "close": 49.689
+    },
+    {
+     "month": "2023-05",
+     "close": 48.54
+    },
+    {
+     "month": "2023-06",
+     "close": 52.399
+    },
+    {
+     "month": "2023-07",
+     "close": 54.593
+    },
+    {
+     "month": "2023-08",
+     "close": 52.915
+    },
+    {
+     "month": "2023-09",
+     "close": 50.377
+    },
+    {
+     "month": "2023-10",
+     "close": 49.768
+    },
+    {
+     "month": "2023-11",
+     "close": 52.811
+    },
+    {
+     "month": "2023-12",
+     "close": 56.629
+    },
+    {
+     "month": "2024-01",
+     "close": 54.608
+    },
+    {
+     "month": "2024-02",
+     "close": 57.332
+    },
+    {
+     "month": "2024-03",
+     "close": 55.819
+    },
+    {
+     "month": "2024-04",
+     "close": 55.237
+    },
+    {
+     "month": "2024-05",
+     "close": 55.931
+    },
+    {
+     "month": "2024-06",
+     "close": 57.062
+    },
+    {
+     "month": "2024-07",
+     "close": 60.634
+    },
+    {
+     "month": "2024-08",
+     "close": 63.211
+    },
+    {
+     "month": "2024-09",
+     "close": 62.828
+    },
+    {
+     "month": "2024-10",
+     "close": 60.273
+    },
+    {
+     "month": "2024-11",
+     "close": 59.588
+    },
+    {
+     "month": "2024-12",
+     "close": 60.261
+    },
+    {
+     "month": "2025-01",
+     "close": 59.57
+    },
+    {
+     "month": "2025-02",
+     "close": 59.386
+    },
+    {
+     "month": "2025-03",
+     "close": 59.551
+    },
+    {
+     "month": "2025-04",
+     "close": 62.275
+    },
+    {
+     "month": "2025-05",
+     "close": 62.509
+    },
+    {
+     "month": "2025-06",
+     "close": 62.68
+    },
+    {
+     "month": "2025-07",
+     "close": 64.624
+    },
+    {
+     "month": "2025-08",
+     "close": 62.443
+    },
+    {
+     "month": "2025-09",
+     "close": 61.705
+    },
+    {
+     "month": "2025-10",
+     "close": 63.476
+    },
+    {
+     "month": "2025-11",
+     "close": 65.103
+    },
+    {
+     "month": "2025-12",
+     "close": 67.063
+    },
+    {
+     "month": "2026-01",
+     "close": 71.46
+    },
+    {
+     "month": "2026-02",
+     "close": 71.701
+    },
+    {
+     "month": "2026-03",
+     "close": 72.292
+    },
+    {
+     "month": "2026-04",
+     "close": 73.865
+    },
+    {
+     "month": "2026-05",
+     "close": 75.242
+    },
+    {
+     "month": "2026-06",
+     "close": 72.608
+    },
+    {
+     "month": "2026-07",
+     "close": 77.468
+    },
+    {
+     "month": "2026-08",
+     "close": 78.063
+    },
+    {
+     "month": "2026-09",
+     "close": 76.7
+    },
+    {
+     "month": "2026-10",
+     "close": 77.4
+    }
+   ]
+  },
+  {
+   "symbol": "0001.HK",
+   "name": "CK Hutchison",
+   "longName": "CK Hutchison Holdings Limited",
+   "aliases": [
+    "ck hutchison",
+    "ckh",
+    "hutchison",
+    "0001"
+   ],
+   "sector": "Industrials",
+   "industry": "Conglomerates",
+   "employees": 322555,
+   "currency": "HKD",
+   "financialCurrency": "HKD",
+   "price": 65,
+   "changePct": -2.0346625,
+   "marketCapHkdB": 249,
+   "trailingPE": 6.5856133,
+   "forwardPE": 9.778112,
+   "dividendYield": 3.54,
+   "priceToBook": 0.4303581,
+   "change52wPct": 30.738914,
+   "high52": 74.4,
+   "low52": 50.1,
+   "analystRating": "1.5 - Strong Buy",
+   "financials": [
+    {
+     "year": 2022,
+     "revenueHkdB": 457.23,
+     "netIncomeHkdB": 36.68
+    },
+    {
+     "year": 2023,
+     "revenueHkdB": 461.56,
+     "netIncomeHkdB": 23.5
+    },
+    {
+     "year": 2024,
+     "revenueHkdB": 476.68,
+     "netIncomeHkdB": 17.09
+    },
+    {
+     "year": 2025,
+     "revenueHkdB": 507.3,
+     "netIncomeHkdB": 11.84
+    }
+   ],
+   "series": [
+    {
+     "month": "2021-11",
+     "close": 37.961
+    },
+    {
+     "month": "2021-12",
+     "close": 39.088
+    },
+    {
+     "month": "2022-01",
+     "close": 42.896
+    },
+    {
+     "month": "2022-02",
+     "close": 42.546
+    },
+    {
+     "month": "2022-03",
+     "close": 44.722
+    },
+    {
+     "month": "2022-04",
+     "close": 42.896
+    },
+    {
+     "month": "2022-05",
+     "close": 44.76
+    },
+    {
+     "month": "2022-06",
+     "close": 42.631
+    },
+    {
+     "month": "2022-07",
+     "close": 41.827
+    },
+    {
+     "month": "2022-08",
+     "close": 40.782
+    },
+    {
+     "month": "2022-09",
+     "close": 35.471
+    },
+    {
+     "month": "2022-10",
+     "close": 31.875
+    },
+    {
+     "month": "2022-11",
+     "close": 37.024
+    },
+    {
+     "month": "2022-12",
+     "close": 38.291
+    },
+    {
+     "month": "2023-01",
+     "close": 40.702
+    },
+    {
+     "month": "2023-02",
+     "close": 38.25
+    },
+    {
+     "month": "2023-03",
+     "close": 39.803
+    },
+    {
+     "month": "2023-04",
+     "close": 42.909
+    },
+    {
+     "month": "2023-05",
+     "close": 40.35
+    },
+    {
+     "month": "2023-06",
+     "close": 40.776
+    },
+    {
+     "month": "2023-07",
+     "close": 40.989
+    },
+    {
+     "month": "2023-08",
+     "close": 36.43
+    },
+    {
+     "month": "2023-09",
+     "close": 36.349
+    },
+    {
+     "month": "2023-10",
+     "close": 34.31
+    },
+    {
+     "month": "2023-11",
+     "close": 33.963
+    },
+    {
+     "month": "2023-12",
+     "close": 36.305
+    },
+    {
+     "month": "2024-01",
+     "close": 35.047
+    },
+    {
+     "month": "2024-02",
+     "close": 34.483
+    },
+    {
+     "month": "2024-03",
+     "close": 32.792
+    },
+    {
+     "month": "2024-04",
+     "close": 33.182
+    },
+    {
+     "month": "2024-05",
+     "close": 34.531
+    },
+    {
+     "month": "2024-06",
+     "close": 33.896
+    },
+    {
+     "month": "2024-07",
+     "close": 37.159
+    },
+    {
+     "month": "2024-08",
+     "close": 39.017
+    },
+    {
+     "month": "2024-09",
+     "close": 41.19
+    },
+    {
+     "month": "2024-10",
+     "close": 37.688
+    },
+    {
+     "month": "2024-11",
+     "close": 37.319
+    },
+    {
+     "month": "2024-12",
+     "close": 38.287
+    },
+    {
+     "month": "2025-01",
+     "close": 36.214
+    },
+    {
+     "month": "2025-02",
+     "close": 35.799
+    },
+    {
+     "month": "2025-03",
+     "close": 40.314
+    },
+    {
+     "month": "2025-04",
+     "close": 40.36
+    },
+    {
+     "month": "2025-05",
+     "close": 42.103
+    },
+    {
+     "month": "2025-06",
+     "close": 46.06
+    },
+    {
+     "month": "2025-07",
+     "close": 49.016
+    },
+    {
+     "month": "2025-08",
+     "close": 48.969
+    },
+    {
+     "month": "2025-09",
+     "close": 49.544
+    },
+    {
+     "month": "2025-10",
+     "close": 49.786
+    },
+    {
+     "month": "2025-11",
+     "close": 53.121
+    },
+    {
+     "month": "2025-12",
+     "close": 51.042
+    },
+    {
+     "month": "2026-01",
+     "close": 61.144
+    },
+    {
+     "month": "2026-02",
+     "close": 62.256
+    },
+    {
+     "month": "2026-03",
+     "close": 57.616
+    },
+    {
+     "month": "2026-04",
+     "close": 62.885
+    },
+    {
+     "month": "2026-05",
+     "close": 69.687
+    },
+    {
+     "month": "2026-06",
+     "close": 65.533
+    },
+    {
+     "month": "2026-07",
+     "close": 72.803
+    },
+    {
+     "month": "2026-08",
+     "close": 69.737
+    },
+    {
+     "month": "2026-09",
+     "close": 68.65
+    },
+    {
+     "month": "2026-10",
+     "close": 65
+    }
+   ]
+  },
+  {
+   "symbol": "2020.HK",
+   "name": "ANTA Sports",
+   "longName": "ANTA Sports Products Limited",
+   "aliases": [
+    "anta",
+    "2020"
+   ],
+   "sector": "Consumer Cyclical",
+   "industry": "Leisure",
+   "employees": 67400,
+   "currency": "HKD",
+   "financialCurrency": "CNY",
+   "price": 75.45,
+   "changePct": 1.2072352,
+   "marketCapHkdB": 209,
+   "trailingPE": 11.938291,
+   "forwardPE": 11.331515,
+   "dividendYield": 3.47,
+   "priceToBook": 2.510354,
+   "change52wPct": -13.010502,
+   "high52": 89.3,
+   "low52": 66.85,
+   "analystRating": "1.3 - Strong Buy",
+   "financials": [
+    {
+     "year": 2022,
+     "revenueHkdB": 62.86,
+     "netIncomeHkdB": 8.89
+    },
+    {
+     "year": 2023,
+     "revenueHkdB": 73.06,
+     "netIncomeHkdB": 11.99
+    },
+    {
+     "year": 2024,
+     "revenueHkdB": 82.98,
+     "netIncomeHkdB": 18.27
+    },
+    {
+     "year": 2025,
+     "revenueHkdB": 93.98,
+     "netIncomeHkdB": 15.92
+    }
+   ],
+   "series": [
+    {
+     "month": "2021-11",
+     "close": 109.671
+    },
+    {
+     "month": "2021-12",
+     "close": 103.225
+    },
+    {
+     "month": "2022-01",
+     "close": 103.69
+    },
+    {
+     "month": "2022-02",
+     "close": 105.284
+    },
+    {
+     "month": "2022-03",
+     "close": 87.131
+    },
+    {
+     "month": "2022-04",
+     "close": 81.331
+    },
+    {
+     "month": "2022-05",
+     "close": 79.879
+    },
+    {
+     "month": "2022-06",
+     "close": 86.038
+    },
+    {
+     "month": "2022-07",
+     "close": 77.068
+    },
+    {
+     "month": "2022-08",
+     "close": 84.699
+    },
+    {
+     "month": "2022-09",
+     "close": 74.767
+    },
+    {
+     "month": "2022-10",
+     "close": 62.006
+    },
+    {
+     "month": "2022-11",
+     "close": 81.686
+    },
+    {
+     "month": "2022-12",
+     "close": 91.931
+    },
+    {
+     "month": "2023-01",
+     "close": 106.399
+    },
+    {
+     "month": "2023-02",
+     "close": 92.919
+    },
+    {
+     "month": "2023-03",
+     "close": 102.445
+    },
+    {
+     "month": "2023-04",
+     "close": 86.988
+    },
+    {
+     "month": "2023-05",
+     "close": 72.422
+    },
+    {
+     "month": "2023-06",
+     "close": 72.512
+    },
+    {
+     "month": "2023-07",
+     "close": 82.703
+    },
+    {
+     "month": "2023-08",
+     "close": 80.031
+    },
+    {
+     "month": "2023-09",
+     "close": 80.598
+    },
+    {
+     "month": "2023-10",
+     "close": 80.78
+    },
+    {
+     "month": "2023-11",
+     "close": 74.472
+    },
+    {
+     "month": "2023-12",
+     "close": 69.26
+    },
+    {
+     "month": "2024-01",
+     "close": 60.025
+    },
+    {
+     "month": "2024-02",
+     "close": 70.174
+    },
+    {
+     "month": "2024-03",
+     "close": 76.072
+    },
+    {
+     "month": "2024-04",
+     "close": 82.015
+    },
+    {
+     "month": "2024-05",
+     "close": 77.079
+    },
+    {
+     "month": "2024-06",
+     "close": 69.44
+    },
+    {
+     "month": "2024-07",
+     "close": 64.904
+    },
+    {
+     "month": "2024-08",
+     "close": 71.107
+    },
+    {
+     "month": "2024-09",
+     "close": 88.837
+    },
+    {
+     "month": "2024-10",
+     "close": 78.02
+    },
+    {
+     "month": "2024-11",
+     "close": 72.33
+    },
+    {
+     "month": "2024-12",
+     "close": 73.506
+    },
+    {
+     "month": "2025-01",
+     "close": 77.503
+    },
+    {
+     "month": "2025-02",
+     "close": 82.112
+    },
+    {
+     "month": "2025-03",
+     "close": 80.325
+    },
+    {
+     "month": "2025-04",
+     "close": 86.486
+    },
+    {
+     "month": "2025-05",
+     "close": 90.918
+    },
+    {
+     "month": "2025-06",
+     "close": 90.013
+    },
+    {
+     "month": "2025-07",
+     "close": 85.727
+    },
+    {
+     "month": "2025-08",
+     "close": 91.442
+    },
+    {
+     "month": "2025-09",
+     "close": 90.359
+    },
+    {
+     "month": "2025-10",
+     "close": 78.279
+    },
+    {
+     "month": "2025-11",
+     "close": 82
+    },
+    {
+     "month": "2025-12",
+     "close": 77.603
+    },
+    {
+     "month": "2026-01",
+     "close": 75.621
+    },
+    {
+     "month": "2026-02",
+     "close": 82.193
+    },
+    {
+     "month": "2026-03",
+     "close": 73.157
+    },
+    {
+     "month": "2026-04",
+     "close": 78.424
+    },
+    {
+     "month": "2026-05",
+     "close": 74.291
+    },
+    {
+     "month": "2026-06",
+     "close": 69.636
+    },
+    {
+     "month": "2026-07",
+     "close": 77.378
+    },
+    {
+     "month": "2026-08",
+     "close": 76.153
+    },
+    {
+     "month": "2026-09",
+     "close": 73.75
+    },
+    {
+     "month": "2026-10",
+     "close": 75.45
+    }
+   ]
+  },
+  {
+   "symbol": "9999.HK",
+   "name": "NetEase",
+   "longName": "NetEase, Inc.",
+   "aliases": [
+    "netease",
+    "9999"
+   ],
+   "sector": "Communication Services",
+   "industry": "Electronic Gaming & Multimedia",
+   "employees": 25382,
+   "currency": "HKD",
+   "financialCurrency": "CNY",
+   "price": 196.2,
+   "changePct": -0.5070994,
+   "marketCapHkdB": 628.2,
+   "trailingPE": 17.455517,
+   "forwardPE": 11.715356,
+   "dividendYield": 1.53,
+   "priceToBook": 3.207022,
+   "change52wPct": -14.999998,
+   "high52": 243,
+   "low52": 168.8,
+   "analystRating": "1.4 - Strong Buy",
+   "financials": [
+    {
+     "year": 2022,
+     "revenueHkdB": 113.05,
+     "netIncomeHkdB": 23.83
+    },
+    {
+     "year": 2023,
+     "revenueHkdB": 121.22,
+     "netIncomeHkdB": 34.46
+    },
+    {
+     "year": 2024,
+     "revenueHkdB": 123.36,
+     "netIncomeHkdB": 34.79
+    },
+    {
+     "year": 2025,
+     "revenueHkdB": 131.95,
+     "netIncomeHkdB": 39.55
+    }
+   ],
+   "series": [
+    {
+     "month": "2021-11",
+     "close": 166.303
+    },
+    {
+     "month": "2021-12",
+     "close": 155.354
+    },
+    {
+     "month": "2022-01",
+     "close": 151.803
+    },
+    {
+     "month": "2022-02",
+     "close": 150.422
+    },
+    {
+     "month": "2022-03",
+     "close": 141.928
+    },
+    {
+     "month": "2022-04",
+     "close": 151.995
+    },
+    {
+     "month": "2022-05",
+     "close": 167.984
+    },
+    {
+     "month": "2022-06",
+     "close": 142.279
+    },
+    {
+     "month": "2022-07",
+     "close": 142.872
+    },
+    {
+     "month": "2022-08",
+     "close": 140.081
+    },
+    {
+     "month": "2022-09",
+     "close": 117.063
+    },
+    {
+     "month": "2022-10",
+     "close": 84.562
+    },
+    {
+     "month": "2022-11",
+     "close": 107.975
+    },
+    {
+     "month": "2022-12",
+     "close": 113.202
+    },
+    {
+     "month": "2023-01",
+     "close": 138.116
+    },
+    {
+     "month": "2023-02",
+     "close": 119.727
+    },
+    {
+     "month": "2023-03",
+     "close": 136.49
+    },
+    {
+     "month": "2023-04",
+     "close": 137.083
+    },
+    {
+     "month": "2023-05",
+     "close": 131.149
+    },
+    {
+     "month": "2023-06",
+     "close": 151.028
+    },
+    {
+     "month": "2023-07",
+     "close": 167.754
+    },
+    {
+     "month": "2023-08",
+     "close": 162.113
+    },
+    {
+     "month": "2023-09",
+     "close": 157.962
+    },
+    {
+     "month": "2023-10",
+     "close": 166.677
+    },
+    {
+     "month": "2023-11",
+     "close": 174.698
+    },
+    {
+     "month": "2023-12",
+     "close": 139.322
+    },
+    {
+     "month": "2024-01",
+     "close": 150.123
+    },
+    {
+     "month": "2024-02",
+     "close": 174.599
+    },
+    {
+     "month": "2024-03",
+     "close": 161.525
+    },
+    {
+     "month": "2024-04",
+     "close": 149.123
+    },
+    {
+     "month": "2024-05",
+     "close": 136.522
+    },
+    {
+     "month": "2024-06",
+     "close": 148.037
+    },
+    {
+     "month": "2024-07",
+     "close": 145.157
+    },
+    {
+     "month": "2024-08",
+     "close": 126.789
+    },
+    {
+     "month": "2024-09",
+     "close": 149.532
+    },
+    {
+     "month": "2024-10",
+     "close": 123.004
+    },
+    {
+     "month": "2024-11",
+     "close": 133.621
+    },
+    {
+     "month": "2024-12",
+     "close": 138.393
+    },
+    {
+     "month": "2025-01",
+     "close": 160.067
+    },
+    {
+     "month": "2025-02",
+     "close": 153.903
+    },
+    {
+     "month": "2025-03",
+     "close": 157.33
+    },
+    {
+     "month": "2025-04",
+     "close": 166.292
+    },
+    {
+     "month": "2025-05",
+     "close": 190.021
+    },
+    {
+     "month": "2025-06",
+     "close": 210.249
+    },
+    {
+     "month": "2025-07",
+     "close": 203.672
+    },
+    {
+     "month": "2025-08",
+     "close": 211.756
+    },
+    {
+     "month": "2025-09",
+     "close": 236.082
+    },
+    {
+     "month": "2025-10",
+     "close": 216.342
+    },
+    {
+     "month": "2025-11",
+     "close": 213.351
+    },
+    {
+     "month": "2025-12",
+     "close": 214.46
+    },
+    {
+     "month": "2026-01",
+     "close": 204.485
+    },
+    {
+     "month": "2026-02",
+     "close": 178.75
+    },
+    {
+     "month": "2026-03",
+     "close": 170.287
+    },
+    {
+     "month": "2026-04",
+     "close": 178.777
+    },
+    {
+     "month": "2026-05",
+     "close": 193.858
+    },
+    {
+     "month": "2026-06",
+     "close": 202.297
+    },
+    {
+     "month": "2026-07",
+     "close": 207.694
+    },
+    {
+     "month": "2026-08",
+     "close": 192.302
+    },
+    {
+     "month": "2026-09",
+     "close": 192.6
+    },
+    {
+     "month": "2026-10",
+     "close": 196.2
+    }
+   ]
+  },
+  {
+   "symbol": "1024.HK",
+   "name": "Kuaishou",
+   "longName": "Kuaishou Technology",
+   "aliases": [
+    "kuaishou",
+    "1024"
+   ],
+   "sector": "Communication Services",
+   "industry": "Internet Content & Information",
+   "employees": 24202,
+   "currency": "HKD",
+   "financialCurrency": "CNY",
+   "price": 28.58,
+   "changePct": -3.1842835,
+   "marketCapHkdB": 122.9,
+   "trailingPE": 7.162907,
+   "forwardPE": 9.989809,
+   "dividendYield": 2.34,
+   "priceToBook": 1.2780491,
+   "change52wPct": -61.157894,
+   "high52": 85.2,
+   "low52": 28.24,
+   "analystRating": "2.1 - Buy",
+   "financials": [
+    {
+     "year": 2022,
+     "revenueHkdB": 110.34,
+     "netIncomeHkdB": -16.04
+    },
+    {
+     "year": 2023,
+     "revenueHkdB": 132.94,
+     "netIncomeHkdB": 7.49
+    },
+    {
+     "year": 2024,
+     "revenueHkdB": 148.67,
+     "netIncomeHkdB": 17.97
+    },
+    {
+     "year": 2025,
+     "revenueHkdB": 167.28,
+     "netIncomeHkdB": 21.81
+    }
+   ],
+   "series": [
+    {
+     "month": "2021-11",
+     "close": 82.97
+    },
+    {
+     "month": "2021-12",
+     "close": 70.371
+    },
+    {
+     "month": "2022-01",
+     "close": 85.754
+    },
+    {
+     "month": "2022-02",
+     "close": 87.463
+    },
+    {
+     "month": "2022-03",
+     "close": 72.471
+    },
+    {
+     "month": "2022-04",
+     "close": 65.195
+    },
+    {
+     "month": "2022-05",
+     "close": 74.229
+    },
+    {
+     "month": "2022-06",
+     "close": 85.363
+    },
+    {
+     "month": "2022-07",
+     "close": 77.159
+    },
+    {
+     "month": "2022-08",
+     "close": 67.197
+    },
+    {
+     "month": "2022-09",
+     "close": 49.763
+    },
+    {
+     "month": "2022-10",
+     "close": 31.547
+    },
+    {
+     "month": "2022-11",
+     "close": 55.232
+    },
+    {
+     "month": "2022-12",
+     "close": 69.394
+    },
+    {
+     "month": "2023-01",
+     "close": 67.05
+    },
+    {
+     "month": "2023-02",
+     "close": 51.277
+    },
+    {
+     "month": "2023-03",
+     "close": 59.041
+    },
+    {
+     "month": "2023-04",
+     "close": 50.105
+    },
+    {
+     "month": "2023-05",
+     "close": 51.765
+    },
+    {
+     "month": "2023-06",
+     "close": 52.302
+    },
+    {
+     "month": "2023-07",
+     "close": 65.634
+    },
+    {
+     "month": "2023-08",
+     "close": 62.704
+    },
+    {
+     "month": "2023-09",
+     "close": 61.385
+    },
+    {
+     "month": "2023-10",
+     "close": 49.177
+    },
+    {
+     "month": "2023-11",
+     "close": 56.355
+    },
+    {
+     "month": "2023-12",
+     "close": 51.716
+    },
+    {
+     "month": "2024-01",
+     "close": 38.189
+    },
+    {
+     "month": "2024-02",
+     "close": 43.463
+    },
+    {
+     "month": "2024-03",
+     "close": 47.907
+    },
+    {
+     "month": "2024-04",
+     "close": 54.646
+    },
+    {
+     "month": "2024-05",
+     "close": 54.158
+    },
+    {
+     "month": "2024-06",
+     "close": 45.075
+    },
+    {
+     "month": "2024-07",
+     "close": 42.779
+    },
+    {
+     "month": "2024-08",
+     "close": 39.361
+    },
+    {
+     "month": "2024-09",
+     "close": 53.572
+    },
+    {
+     "month": "2024-10",
+     "close": 44.83
+    },
+    {
+     "month": "2024-11",
+     "close": 47.077
+    },
+    {
+     "month": "2024-12",
+     "close": 40.484
+    },
+    {
+     "month": "2025-01",
+     "close": 41.217
+    },
+    {
+     "month": "2025-02",
+     "close": 49.421
+    },
+    {
+     "month": "2025-03",
+     "close": 53.084
+    },
+    {
+     "month": "2025-04",
+     "close": 50.398
+    },
+    {
+     "month": "2025-05",
+     "close": 52.058
+    },
+    {
+     "month": "2025-06",
+     "close": 61.825
+    },
+    {
+     "month": "2025-07",
+     "close": 75.206
+    },
+    {
+     "month": "2025-08",
+     "close": 73.594
+    },
+    {
+     "month": "2025-09",
+     "close": 83.172
+    },
+    {
+     "month": "2025-10",
+     "close": 71.129
+    },
+    {
+     "month": "2025-11",
+     "close": 66.656
+    },
+    {
+     "month": "2025-12",
+     "close": 62.674
+    },
+    {
+     "month": "2026-01",
+     "close": 78.797
+    },
+    {
+     "month": "2026-02",
+     "close": 61.789
+    },
+    {
+     "month": "2026-03",
+     "close": 44.358
+    },
+    {
+     "month": "2026-04",
+     "close": 42.176
+    },
+    {
+     "month": "2026-05",
+     "close": 44.771
+    },
+    {
+     "month": "2026-06",
+     "close": 41.6
+    },
+    {
+     "month": "2026-07",
+     "close": 43.7
+    },
+    {
+     "month": "2026-08",
+     "close": 33.58
+    },
+    {
+     "month": "2026-09",
+     "close": 30.94
+    },
+    {
+     "month": "2026-10",
+     "close": 28.58
+    }
+   ]
+  }
+ ]
+}
