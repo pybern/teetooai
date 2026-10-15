@@ -64,3 +64,10 @@ describe("numbers are computed from the data", () => {
     expect(r.headline).toContain("2020");
   });
 });
+
+describe("registry", () => {
+  it("ALL_DATASET_IDS matches DATASETS", async () => {
+    const { DATASETS, ALL_DATASET_IDS } = await import("../data");
+    expect([...ALL_DATASET_IDS].sort()).toEqual(DATASETS.map((d) => d.id).sort());
+  });
+});
