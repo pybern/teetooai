@@ -1,32 +1,27 @@
-import { Database, LayoutDashboard, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { USE_CASES } from "@/lib/usecases";
-import { UseCaseIcon } from "./use-case-icon";
+import { ThemeToggle } from "./theme";
 
 export function MobileNav() {
   return (
-    <div className="sticky top-0 z-20 border-b border-white/[0.06] bg-slate-950/80 backdrop-blur lg:hidden">
-      <div className="flex items-center gap-3 px-4 py-3">
-        <Link href="/" className="flex items-center gap-2 font-semibold text-white">
-          <Sparkles className="h-4 w-4 text-sky-400" /> Insightful
+    <div className="sticky top-0 z-20 border-b border-slate-700 bg-slate-900 lg:hidden">
+      <div className="flex items-center gap-4 px-4 py-3">
+        <Link href="/" className="font-mono text-[13px] font-semibold uppercase tracking-[0.24em] text-white">
+          Insightful
         </Link>
-        <div className="ml-auto flex gap-1">
-          <Link href="/dashboard" className="rounded-lg p-2 text-slate-400 hover:text-white" aria-label="Dashboard">
-            <LayoutDashboard className="h-4 w-4" />
+        <div className="meta ml-auto flex gap-4 text-slate-400">
+          <Link href="/dashboard" className="py-1 hover:text-white">
+            Dashboard
           </Link>
-          <Link href="/datasets" className="rounded-lg p-2 text-slate-400 hover:text-white" aria-label="Data catalog">
-            <Database className="h-4 w-4" />
+          <Link href="/datasets" className="py-1 hover:text-white">
+            Data
           </Link>
         </div>
+        <ThemeToggle />
       </div>
       <div className="flex gap-2 overflow-x-auto px-4 pb-3">
         {USE_CASES.map((u) => (
-          <Link
-            key={u.id}
-            href={`/?uc=${u.id}`}
-            className="flex shrink-0 items-center gap-1.5 rounded-full border border-white/10 px-3 py-1 text-xs text-slate-300"
-          >
-            <UseCaseIcon icon={u.icon} className="h-3.5 w-3.5" style={{ color: u.accent }} />
+          <Link key={u.id} href={`/?uc=${u.id}`} className="shrink-0 border border-slate-700 px-3 py-1.5 text-xs text-slate-300 hover:border-slate-500 hover:text-white">
             {u.name}
           </Link>
         ))}

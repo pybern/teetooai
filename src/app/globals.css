@@ -1,35 +1,133 @@
 @import "tailwindcss";
 
 :root {
-  --background: #070a12;
-  --foreground: #e2e8f0;
+  --background: #f6f7f9;
+  --foreground: #1c2127;
+  --accent: #2d72d2;
+  --hair: rgba(17, 20, 24, 0.1);
+  --wash: rgba(17, 20, 24, 0.03);
+  --s50: #111418;
+  --s100: #1c2127;
+  --s200: #252a31;
+  --s300: #404854;
+  --s400: #5f6b7c;
+  --s500: #738091;
+  --s600: #8f99a8;
+  --s700: #dce0e5;
+  --s800: #edeff2;
+  --s900: #f6f7f9;
+  --s950: #ffffff;
+  --sky-text: #215db0;
+  --sky-strong: #184a90;
+  --sky: #2d72d2;
+  --sky-hover: #215db0;
+  --pos-text: #1c6e42;
+  --pos: #238551;
+  --neg-text: #ac2f33;
+  --neg: #cd4246;
+  --warn-text: #935610;
+  --warn: #c87619;
+  color-scheme: light;
+}
+
+[data-theme="dark"] {
+  --background: #111418;
+  --foreground: #f6f7f9;
+  --accent: #4c90f0;
+  --hair: rgba(255, 255, 255, 0.08);
+  --wash: rgba(255, 255, 255, 0.03);
+  --s50: #f6f7f9;
+  --s100: #e5e8eb;
+  --s200: #d3d8de;
+  --s300: #abb3bf;
+  --s400: #8f99a8;
+  --s500: #738091;
+  --s600: #5f6b7c;
+  --s700: #2f343c;
+  --s800: #252a31;
+  --s900: #111418;
+  --s950: #1c2127;
+  --sky-text: #8abbff;
+  --sky-strong: #8abbff;
+  --sky: #2d72d2;
+  --sky-hover: #215db0;
+  --pos-text: #72ca9b;
+  --pos: #32a467;
+  --neg-text: #fa999c;
+  --neg: #e76a6e;
+  --warn-text: #fbd065;
+  --warn: #d1980b;
   color-scheme: dark;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  /* "white" means high-contrast ink so text-white, hover:text-white, bg-white/5 etc. follow the theme. */
+  --color-white: var(--foreground);
+  --color-slate-50: var(--s50);
+  --color-slate-100: var(--s100);
+  --color-slate-200: var(--s200);
+  --color-slate-300: var(--s300);
+  --color-slate-400: var(--s400);
+  --color-slate-500: var(--s500);
+  --color-slate-600: var(--s600);
+  --color-slate-700: var(--s700);
+  --color-slate-800: var(--s800);
+  --color-slate-900: var(--s900);
+  --color-slate-950: var(--s950);
+  --color-sky-200: var(--sky-strong);
+  --color-sky-300: var(--sky-text);
+  --color-sky-400: var(--accent);
+  --color-sky-500: var(--sky);
+  --color-sky-600: var(--sky-hover);
+  --color-sky-700: var(--sky-strong);
+  --color-emerald-300: var(--pos-text);
+  --color-emerald-400: var(--pos-text);
+  --color-emerald-600: var(--pos);
+  --color-rose-300: var(--neg-text);
+  --color-rose-400: var(--neg-text);
+  --color-rose-600: var(--neg);
+  --color-rose-700: var(--neg-text);
+  --color-amber-300: var(--warn-text);
+  --color-amber-400: var(--warn-text);
+  --color-amber-500: var(--warn);
+  --radius-sm: 1px;
+  --radius-md: 2px;
+  --radius-lg: 2px;
+  --radius-xl: 2px;
+  --radius-2xl: 2px;
+  --radius-3xl: 2px;
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
 body {
-  background:
-    radial-gradient(60rem 40rem at 85% -10%, rgba(56, 189, 248, 0.08), transparent 60%),
-    radial-gradient(50rem 40rem at -10% 110%, rgba(129, 140, 248, 0.07), transparent 60%),
-    var(--background);
-  background-attachment: fixed;
+  background-color: var(--background);
   color: var(--foreground);
   font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  font-feature-settings: "tnum" 1;
+}
+
+.meta {
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+:focus-visible {
+  outline: 1px solid var(--accent);
+  outline-offset: 1px;
 }
 
 ::selection {
-  background: rgba(56, 189, 248, 0.3);
+  background: color-mix(in srgb, var(--accent) 25%, transparent);
 }
 
 * {
   scrollbar-width: thin;
-  scrollbar-color: rgba(148, 163, 184, 0.2) transparent;
+  scrollbar-color: var(--hair) transparent;
 }
 
 .recharts-wrapper:focus,
@@ -48,8 +146,47 @@ body {
   }
 }
 
+@keyframes reveal {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.reveal {
+  animation: reveal 320ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+.caret::after {
+  content: "";
+  display: inline-block;
+  width: 2px;
+  height: 1em;
+  margin-left: 3px;
+  vertical-align: -0.15em;
+  background: var(--accent);
+  animation: blink 1s steps(1) infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal,
+  .caret::after {
+    animation: none;
+  }
+}
+
 .shimmer {
-  background: linear-gradient(90deg, rgba(255, 255, 255, 0.03) 25%, rgba(255, 255, 255, 0.08) 50%, rgba(255, 255, 255, 0.03) 75%);
+  background: linear-gradient(90deg, var(--wash) 25%, var(--hair) 50%, var(--wash) 75%);
   background-size: 200% 100%;
   animation: shimmer 1.6s linear infinite;
 }

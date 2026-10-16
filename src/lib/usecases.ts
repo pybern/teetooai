@@ -11,7 +11,7 @@ export const USE_CASES: UseCase[] = [
     scenario:
       "You run an Asia equity income fund and the Monday investment meeting starts in an hour. You need a read on how the Hang Seng has moved, which blue chips look cheap, where the dividend yield is, and whose earnings are actually growing.",
     icon: "candlestick",
-    accent: "#f87171",
+    accent: "#2d72d2",
     datasetIds: ["hk-indices", "hk-valuations", "hk-prices", "hk-financials"],
     questions: [
       { q: "How has the Hang Seng Index performed over the last 5 years?", tag: "Trend" },
@@ -36,7 +36,7 @@ export const USE_CASES: UseCase[] = [
     scenario:
       "You're drafting the quarterly macro outlook for the investment committee. They want to know how the post-pandemic inflation shock played out, how the Fed responded, and where the world's economic weight sits today.",
     icon: "landmark",
-    accent: "#60a5fa",
+    accent: "#2d72d2",
     datasetIds: ["us-macro", "world-economy"],
     questions: [
       { q: "How has US inflation trended since 2015?", tag: "Trend" },
@@ -57,7 +57,7 @@ export const USE_CASES: UseCase[] = [
     scenario:
       "The board asked for a one-page climate briefing: how fast the planet is warming, who the biggest emitters are, and how much of the world's power is already clean.",
     icon: "leaf",
-    accent: "#34d399",
+    accent: "#2d72d2",
     datasetIds: ["climate-signals", "co2-emitters", "electricity-mix", "renewables-growth"],
     questions: [
       { q: "How has the global temperature anomaly changed since 2000?", tag: "Trend" },
@@ -78,7 +78,7 @@ export const USE_CASES: UseCase[] = [
     scenario:
       "Your company is deciding where to build its next battery-component plant. Leadership wants to see how fast EV adoption is compounding, where demand is concentrated, and what volumes to plan for by 2030.",
     icon: "zap",
-    accent: "#fbbf24",
+    accent: "#2d72d2",
     datasetIds: ["ev-global", "ev-regions", "renewables-growth"],
     questions: [
       { q: "How fast are global EV sales growing?", tag: "Growth" },
@@ -98,7 +98,7 @@ export const USE_CASES: UseCase[] = [
     scenario:
       "Ahead of earnings season you need a fast read on the Magnificent 7: who is growing fastest, who converts revenue into profit best, and how the AI cycle shows up in the numbers.",
     icon: "cpu",
-    accent: "#a78bfa",
+    accent: "#2d72d2",
     datasetIds: ["big-tech"],
     questions: [
       { q: "Rank big tech by revenue in 2024", tag: "Ranking" },
@@ -119,7 +119,7 @@ export const USE_CASES: UseCase[] = [
     scenario:
       "No brief — just curiosity. Ask about any indicator and the engine will pick the right dataset, choose an analysis, and build the visuals.",
     icon: "globe",
-    accent: "#f472b6",
+    accent: "#2d72d2",
     datasetIds: ALL_DATASET_IDS,
     questions: [
       { q: "Most populous countries", tag: "Ranking" },

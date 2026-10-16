@@ -11,6 +11,8 @@ export type Entry = {
   startedAt: number;
   report?: InsightReport;
   error?: string;
+  live?: boolean;
+  plan?: number[];
 };
 
 type Store = {
@@ -19,6 +21,7 @@ type Store = {
   pinned: InsightReport[];
   ask: (question: string, useCaseId: string) => void;
   remove: (id: string) => void;
+  settle: (id: string) => void;
   clear: () => void;
   togglePin: (report: InsightReport) => void;
   isPinned: (id: string) => boolean;
@@ -26,7 +29,8 @@ type Store = {
 
 const KEY = "insightful:v1";
 const MAX_ENTRIES = 25;
-const MIN_THINK_MS = 1400;
+// Base duration (ms) of each agent step; jittered per request so runs don't look canned.
+const STEP_MS = [450, 650, 850, 1300, 650, 900];
 
 const Ctx = createContext<Store | null>(null);
 
@@ -53,7 +57,10 @@ export function InsightStoreProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (!hydrated) return;
-    const done = entries.filter((e) => e.status === "done").slice(0, MAX_ENTRIES);
+    const done = entries
+      .filter((e) => e.status === "done")
+      .slice(0, MAX_ENTRIES)
+      .map((e) => ({ ...e, live: undefined, plan: undefined }));
     try {
       localStorage.setItem(KEY, JSON.stringify({ entries: done, pinned }));
     } catch {
@@ -65,8 +72,9 @@ export function InsightStoreProvider({ children }: { children: ReactNode }) {
     const q = question.trim();
     if (!q) return;
     const id = `e${Date.now()}-${seq.current++}`;
-    setEntries((prev) => [{ id, question: q, useCaseId, status: "loading", startedAt: Date.now() }, ...prev]);
-    const minDelay = new Promise((r) => setTimeout(r, MIN_THINK_MS));
+    const plan = STEP_MS.map((ms) => Math.round(ms * (0.7 + Math.random() * 0.7)));
+    setEntries((prev) => [{ id, question: q, useCaseId, status: "loading", startedAt: Date.now(), live: true, plan }, ...prev]);
+    const minDelay = new Promise((r) => setTimeout(r, plan.reduce((a, b) => a + b, 0)));
     fetch("/api/insight", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -85,6 +93,7 @@ export function InsightStoreProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const remove = useCallback((id: string) => setEntries((prev) => prev.filter((e) => e.id !== id)), []);
+  const settle = useCallback((id: string) => setEntries((prev) => prev.map((e) => (e.id === id && e.live ? { ...e, live: false } : e))), []);
   const clear = useCallback(() => setEntries([]), []);
   const togglePin = useCallback((report: InsightReport) => {
     setPinned((prev) => (prev.some((p) => p.id === report.id) ? prev.filter((p) => p.id !== report.id) : [report, ...prev]));
@@ -92,8 +101,8 @@ export function InsightStoreProvider({ children }: { children: ReactNode }) {
   const isPinned = useCallback((id: string) => pinned.some((p) => p.id === id), [pinned]);
 
   const value = useMemo(
-    () => ({ hydrated, entries, pinned, ask, remove, clear, togglePin, isPinned }),
-    [hydrated, entries, pinned, ask, remove, clear, togglePin, isPinned],
+    () => ({ hydrated, entries, pinned, ask, remove, settle, clear, togglePin, isPinned }),
+    [hydrated, entries, pinned, ask, remove, settle, clear, togglePin, isPinned],
   );
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }

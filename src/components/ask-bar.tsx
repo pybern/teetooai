@@ -1,13 +1,24 @@
 "use client";
 
 import clsx from "clsx";
-import { ArrowUp, CornerDownLeft, Search } from "lucide-react";
 import { useMemo, useRef, useState } from "react";
 import { USE_CASES } from "@/lib/usecases";
 
 const ALL_QUESTIONS = Array.from(new Set(USE_CASES.flatMap((u) => u.questions.map((q) => q.q))));
 
-export function AskBar({ onAsk, suggestions, accent, busy }: { onAsk: (q: string) => void; suggestions: string[]; accent: string; busy?: boolean }) {
+export function AskBar({
+  onAsk,
+  suggestions,
+  accent,
+  busy,
+  placement = "down",
+}: {
+  onAsk: (q: string) => void;
+  suggestions: string[];
+  accent: string;
+  busy?: boolean;
+  placement?: "up" | "down";
+}) {
   const [value, setValue] = useState("");
   const [open, setOpen] = useState(false);
   const [cursor, setCursor] = useState(-1);
@@ -37,10 +48,12 @@ export function AskBar({ onAsk, suggestions, accent, busy }: { onAsk: (q: string
           e.preventDefault();
           submit(cursor >= 0 && open ? matches[cursor] : value);
         }}
-        className="group flex items-center gap-3 rounded-2xl border border-white/10 bg-slate-900/80 px-4 py-3 shadow-2xl shadow-black/40 ring-1 ring-transparent backdrop-blur transition focus-within:border-white/20"
+        className="group flex items-center gap-3 border border-slate-700 bg-slate-950 py-1.5 pl-4 pr-1.5 transition focus-within:border-sky-400"
         style={{ ["--accent" as string]: accent }}
       >
-        <Search className="h-5 w-5 shrink-0 text-slate-500" />
+        <span className="font-mono text-sm text-slate-500" aria-hidden>
+          &gt;
+        </span>
         <input
           ref={inputRef}
           value={value}
@@ -64,23 +77,27 @@ export function AskBar({ onAsk, suggestions, accent, busy }: { onAsk: (q: string
               setOpen(false);
             }
           }}
-          placeholder="Ask a question about the data — e.g. “Which blue chips have the highest dividend yield?”"
-          className="min-w-0 flex-1 bg-transparent text-[15px] text-white placeholder:text-slate-500 focus:outline-none"
+          placeholder="Query the insight agent…"
+          className="min-w-0 flex-1 bg-transparent py-1.5 text-[15px] text-white placeholder:text-slate-600 focus:outline-none"
           aria-label="Ask a question"
         />
         <button
           type="submit"
           disabled={!value.trim() && cursor < 0}
-          className="grid h-9 w-9 shrink-0 place-items-center rounded-xl text-white transition disabled:opacity-30"
+          className={clsx("meta min-h-9 shrink-0 px-4 text-[#ffffff] transition hover:brightness-110 disabled:opacity-30", busy && "animate-pulse")}
           style={{ background: accent }}
-          aria-label="Ask"
         >
-          <ArrowUp className={clsx("h-4 w-4", busy && "animate-pulse")} />
+          {busy ? "Running" : "Run"}
         </button>
       </form>
 
       {open && matches.length > 0 && (
-        <ul className="absolute inset-x-0 top-full z-30 mt-2 overflow-hidden rounded-xl border border-white/10 bg-slate-900/95 py-1 shadow-2xl backdrop-blur">
+        <ul
+          className={clsx(
+            "absolute inset-x-0 z-30 overflow-hidden border border-slate-700 bg-slate-950 py-1 shadow-lg shadow-black/10",
+            placement === "up" ? "bottom-full mb-2" : "top-full mt-2",
+          )}
+        >
           {matches.map((m, i) => (
             <li key={m}>
               <button
@@ -88,11 +105,10 @@ export function AskBar({ onAsk, suggestions, accent, busy }: { onAsk: (q: string
                 onMouseDown={(e) => e.preventDefault()}
                 onClick={() => submit(m)}
                 onMouseEnter={() => setCursor(i)}
-                className={clsx("flex w-full items-center gap-3 px-4 py-2 text-left text-sm", i === cursor ? "bg-white/[0.06] text-white" : "text-slate-300")}
+                className={clsx("flex w-full items-center gap-3 px-4 py-2.5 text-left text-sm", i === cursor ? "bg-slate-800 text-white" : "text-slate-300")}
               >
-                <Search className="h-3.5 w-3.5 text-slate-500" />
                 <span className="flex-1">{m}</span>
-                {i === cursor && <CornerDownLeft className="h-3.5 w-3.5 text-slate-500" />}
+                {i === cursor && <span className="meta text-slate-500">Enter</span>}
               </button>
             </li>
           ))}

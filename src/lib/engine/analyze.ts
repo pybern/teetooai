@@ -30,10 +30,10 @@ import {
   type Fit,
 } from "./stats";
 
-export const PALETTE = ["#60a5fa", "#f472b6", "#34d399", "#fbbf24", "#a78bfa", "#f87171", "#22d3ee", "#fb923c", "#4ade80", "#e879f9"];
-const POS = "#34d399";
-const NEG = "#f87171";
-const MUTED = "#475569";
+export const PALETTE = ["#252a31", "#8f99a8", "#5f6b7c", "#c5cbd3", "#404854", "#abb3bf", "#738091", "#111418", "#dce0e5", "#2f343c"];
+const POS = "#238551";
+const NEG = "#cd4246";
+const MUTED = "#c5cbd3";
 
 type Draft = Omit<InsightReport, "id" | "createdAt" | "question" | "useCaseId" | "interpretation" | "source" | "asOf" | "steps"> & {
   steps?: string[];
@@ -1767,6 +1767,7 @@ export function analyze(it: Interpretation, useCaseId: string): InsightReport {
     useCaseId,
     interpretation: it,
     steps,
+    followUps: [...new Set(draft.followUps)],
     source: ds.source,
     asOf: ds.asOf,
   };
