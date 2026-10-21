@@ -1,0 +1,861 @@
+board,trading_date,stock_code,stock_name,short_selling_shares,short_selling_value,total_traded_shares,total_turnover,trading_currency,source_url
+Main Board,2026-10-20,00001,CKH HOLDINGS,880500,57647825,4945718,323709152,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00002,CLP HOLDINGS,1322000,101106500,4137789,316618525,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00003,HK & CHINA GAS,3678000,26589250,22338253,161507385,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00004,WHARF HOLDINGS,202000,4041090,1512828,30219747,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00005,HSBC HOLDINGS,3178400,462093040,14020198,2038732515,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00006,POWER ASSETS,343000,20655800,2922011,175940755,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00008,PCCW,1089000,5610665,4580183,23589983,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00010,HANG LUNG GROUP,30000,363740,430000,5214417,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00012,HENDERSON LAND,3341000,91195740,8251467,225146932,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00013,HUTCHMED,803500,18456060,7357687,169091336,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00014,HYSAN DEV,176000,2774520,1012000,15949260,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00016,SHK PPT,679500,72192400,5024579,533831848,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00017,NEW WORLD DEV,945000,4684640,7518234,37199213,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00019,SWIRE PACIFIC A,308500,32158550,1181618,123191308,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00020,SENSETIME-W,61936000,70985275,246622885,282670405,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00023,BANK OF E ASIA,997800,18335474,2382693,43811208,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00027,GALAXY ENT,4290000,142823880,8992443,299509033,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00034,KOWLOON DEV,1000,4330,124000,537695,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00038,FIRST TRACTOR,272000,2114590,4626000,35993728,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00041,GREAT EAGLE H,10000,138690,473202,6567210,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00045,HK&S HOTELS,73000,363297,478500,2379305,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00066,MTR CORPORATION,1529500,49699990,3872656,125768667,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00068,MANYCORE TECH,301000,1251822,80483330,324803748,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00081,CH OVS G OCEANS,617000,1876165,3413000,10350655,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00083,SINO LAND,2818000,29668800,12738179,134053701,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00086,SUN HUNG KAI CO,9000,35145,58000,226170,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00087,SWIRE PACIFIC B,77500,1200550,1526324,23615500,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00100,MINIMAX-W,1094160,190434918,10945708,1908790596,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00101,HANG LUNG PPT,1608000,10300405,6630137,42460749,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00107,SICHUAN EXPRESS,230000,1140700,922000,4578212,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00108,SR MEDICAL,54000,155780,2480000,7220310,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00116,CHOW SANG SANG,40000,528220,729500,9661209,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00119,POLY PROPERTY,4029000,4753440,16361000,19312933,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00123,YUEXIU PROPERTY,310000,983285,2946852,9389210,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00133,CHINA MERCHANTS,16000,343560,110000,2356120,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00135,KUNLUN ENERGY,790000,5978960,4644001,35099105,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00136,CHINA RUYI,13512000,19797780,82808000,120715356,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00142,FIRST PACIFIC,530000,2477240,7286000,34186292,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00144,CHINA MER PORT,136000,2335380,4977147,85390151,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00148,KINGBOARD HLDG,986500,48325250,13133280,642863267,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00151,WANT WANT CHINA,3770000,10896285,12189000,35216314,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00152,SHENZHEN INT'L,640000,3375895,2965934,15630532,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00165,CHINA EB LTD,602000,3348350,7350000,40741610,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00168,TSINGTAO BREW,572500,23222950,4664368,189345203,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00173,K. WAH INT'L,136000,258740,1152000,2182235,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00175,GEELY AUTO,7736000,115763070,28533385,426800572,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00177,JIANGSU EXPRESS,1002000,11320720,2265055,25659516,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00178,SA SA INT'L,462000,583600,8292000,10433210,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00179,JOHNSON ELEC H,521500,7202230,5115400,70642171,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00182,CONCORD NE,950000,284350,3830042,1146033,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00189,DONGYUE GROUP,524000,5222525,11174200,111349271,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00200,MELCO INT'L DEV,597000,1543275,2363000,6116514,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00215,HUTCHTEL HK,32000,35360,1450000,1599060,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00220,U-PRESID CHINA,1767000,13437240,12305232,93488145,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00241,ALI HEALTH,12002000,36466190,58664233,178310244,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00257,EB ENVIRONMENT,2106000,10147990,8007500,38587306,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00267,CITIC,2455000,30680210,17666989,220415332,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00268,KINGDEE INT'L,5993000,52900775,48909991,431601007,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00270,GUANGDONG INV,1832000,16352320,11451621,102296851,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00272,SHUI ON LAND,253500,105370,2495500,1035821,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00285,BYD ELECTRONIC,2750500,61246980,9994027,222859944,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00288,WH GROUP,11825500,76417892,38411717,248180568,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00289,WING ON CO,1000,12800,85000,1088160,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00290,GOFINTECH QUANT,467500,682280,15279500,22128313,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00291,CHINA RES BEER,1169500,22809385,10607656,207241811,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00293,CATHAY PAC AIR,865000,11428700,10064995,132993204,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00297,SINOFERT,3248000,4029590,18998000,23609550,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00300,MIDEA GROUP,1290600,121338355,4346438,408538900,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00303,VTECH HOLDINGS,58400,3025265,942506,48848806,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00308,CHINA TRAVEL HK,144000,165740,2106000,2419610,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00315,SMARTONE TELE,4000,19382,176500,853985,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00316,OOIL,267000,41643100,1287292,201117833,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00317,COMEC,68000,911660,6376000,84747440,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00322,TINGYI,2000000,24765820,10872970,134626662,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00323,MAANSHAN IRON,220000,314920,1912000,2737640,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00325,BLOKS,290700,20300805,3361730,234852175,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00326,CHINA STAR ENT,440000,3272700,4764695,35124904,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00327,PAX GLOBAL,30000,101455,385468,1301269,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00336,HUABAO INTL,404000,1306230,2442000,7889825,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00338,SHANGHAI PECHEM,414000,467260,5915000,6676410,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00340,TONGGUAN GOLD,4000000,9995530,18694000,46637402,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00341,CAFE DE CORAL H,14000,76710,785562,4284632,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00345,VITASOY INT'L,86000,584750,1217800,8279167,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00347,ANGANG STEEL,2930000,3095030,12376000,13125590,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00354,CHINASOFT INT'L,1414000,5243900,16436341,60956203,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00358,JIANGXI COPPER,2492000,75620480,12680634,385688134,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00363,SHANGHAI IND H,50000,669320,453000,6060460,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00371,BJ ENT WATER,2082000,3130680,20290000,30445200,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00373,ALLIED GROUP,6000,10710,186000,340630,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00376,YUNFENG FIN,738000,1482460,10280000,20624255,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00384,CHINA GAS HOLD,7354400,36983501,21641725,108786318,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00386,SINOPEC CORP,12038000,53685460,85585809,381760798,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00388,HKEX,782400,291235660,3001441,1117139582,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00390,CHINA RAILWAY,3281000,10544605,15839000,50943346,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00392,BEIJING ENT,231000,6935920,879953,26440241,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00400,INGDAN,65000,250345,968000,3712848,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00405,YUEXIU REIT,275000,163470,6516771,3874024,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00412,SDHG,76000,34650,3905024,1770010,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00425,MINTH GROUP,878500,20330254,4923655,113903682,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00435,SUNLIGHT REIT,24000,49680,587019,1214609,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00440,DAH SING,18000,778856,198936,8593560,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00451,DYNASTY DIGITAL,24000,9260,2959862,1141292,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00460,SIHUAN PHARM,1466000,1041555,14073000,10004212,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00467,UNITEDENERGY GP,8746000,3894620,53092000,23667070,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00470,WUXI LEAD,249000,5172142,4134600,85852816,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00501,OMNIVISION,51600,3435765,445650,29704900,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00506,CHINA FOODS,12000,45470,1046000,3959936,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00512,GRAND PHARMA,232000,1079687,4826500,22461055,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00517,COSCO SHIP INTL,214000,1491030,1040224,7240955,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00521,CWT INT'L,170000,33780,23110000,4618400,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00522,ASMPT,122100,16537590,2372606,318773783,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00525,GUANGSHEN RAIL,40000,90930,3620000,8203648,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00546,FUFENG GROUP,2779000,11491650,8291000,34286730,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00548,SHENZHENEXPRESS,60000,392970,490000,3206560,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00551,YUE YUEN IND,654000,9483005,3016271,43739998,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00552,CHINACOMSERVICE,556000,2176560,3788000,14863632,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00564,ZCZL,45800,508326,649600,7197682,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00565,ART GROUP HOLD,1715000,6079925,9335000,33074500,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00570,TRAD CHI MED,858000,1035300,5934000,7150692,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00576,ZHEJIANGEXPRESS,2780000,16750080,5835300,35175263,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00579,JNCEC,1986000,3144340,6176966,9774382,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00580,SUN.KING TECH,654000,624560,9096000,8673850,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00581,CHINA ORIENTAL,122000,110790,1272000,1159800,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00586,CONCH VENTURE,1155500,8724457,4262500,32154064,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00590,LUK FOOK HOLD,149000,3276600,1156500,25422798,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00598,SINOTRANS,1922000,8402740,6228175,27239288,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00604,SHENZHEN INVEST,1812000,994570,5656000,3098530,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00622,OSHIDORI,4323000,13201005,82894862,252995229,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00625,SHEIN-W,179800,6670036,766468,28403319,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00631,SANY INT'L,2564000,19429395,9239387,70038559,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00636,KLN,8500,48982,337000,1939451,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00639,SHOUGANG RES,670000,1779860,9512000,25124398,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00656,FOSUN INTL,497000,2452195,3445954,16970248,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00659,CTF SERVICES,422000,3723180,1887242,16660780,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00666,REPT BATTERO,144800,1114143,4959642,38268029,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00667,CHINA EAST EDU,1107000,4704767,5265000,22339722,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00669,TECHTRONIC-100,444700,57679030,4459507,578970116,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00670,CHINA EAST AIR,520000,1203400,10536320,24403475,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00683,KERRY PPT,76000,1354075,1071775,19093306,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00688,CHINA OVERSEAS,10006500,127433220,29196837,372011624,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00694,BEIJING AIRPORT,826000,1145350,4176000,5777919,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00696,TRAVELSKY TECH,415000,3786290,3366931,30815432,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00697,SHOUCHENG,1360000,1691730,19175164,23841441,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00699,JOYSON ELEC,193500,2083835,4736500,50965740,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00700,TENCENT,4279800,1754388360,22840013,9371898154,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00710,BOE VARITRONIX,379000,1406110,1320000,4899720,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00728,CHINA TELECOM,6118000,28079680,47199014,216652958,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00732,TRULY INT'L,130000,108290,888000,739690,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00751,SKYWORTH GROUP,182000,564290,2272000,7033900,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00752,PICO FAR EAST,2000,4170,448000,936760,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00753,AIR CHINA,3342000,11709640,14792690,51792231,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00762,CHINA UNICOM,2962000,16509800,38807404,216181034,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00763,ZTE,772000,15127066,5074722,99440047,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00772,CHINA LIT,3260200,74410184,11498769,262467106,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00775,CKLIFE SCIENCES,134000,68650,868000,444510,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00777,NETDRAGON,493500,3864762,929382,7280498,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00778,FORTUNE REIT,512000,2233960,2780000,12092801,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00780,TONGCHENGTRAVEL,2980000,29811016,8940878,89473169,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00788,CHINA TOWER,3404500,30975042,10928958,99437842,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00799,IGG,60000,174645,935117,2713806,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00800,WERIDE-W,334900,3702768,806920,8933406,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00806,VALUE PARTNERS,159000,289670,1542977,2804088,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00807,SIICENVIRONMENT,29000,27765,1133000,1084270,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00808,PROSPERITY REIT,5000,6750,545000,734525,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00811,XINHUA WINSHARE,89000,737800,2344000,19448621,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00817,CHINA JINMAO,7024000,8520220,71166370,85751533,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00819,TIANNENG POWER,360000,1276020,4393016,15574314,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00823,LINK REIT,1736900,66376842,7948623,304177398,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00826,TIANGONG INT'L,1920000,4889280,9614800,24477624,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00836,CHINA RES POWER,1834000,35564700,8655706,167898236,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00839,CHINA EDU GROUP,798000,1509500,2625395,4971727,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00855,CHINA WATER,170000,713200,1188000,4974070,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00856,VSTECS,188000,1535590,2143000,17517471,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00857,PETROCHINA,18486000,185393610,95079606,952022004,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00861,DC HOLDINGS,7000,13610,188504,366438,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00863,OSL GROUP,238500,2399882,2588566,25906237,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00866,CHINA QINFA,190000,350130,1462000,2716710,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00867,CMS,413000,4299350,4907000,51036246,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00868,XINYI GLASS,1448000,11752945,6522513,52958440,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00874,BAIYUNSHAN PH,180000,2380280,1242100,16404750,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00880,SJM HOLDINGS,1421000,1699840,7496250,8977106,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00881,ZHONGSHENG HLDG,905500,2161670,6731100,16054102,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00883,CNOOC,16137000,393280760,144879266,3532215993,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00901,SDMC,700,42295,264500,15999025,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00902,HUANENG POWER,5720000,33721400,32494504,191669203,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00914,CONCH CEMENT,4262500,69571750,8487170,138525579,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00916,CHINA LONGYUAN,6642000,35382975,19116092,102065636,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00917,QUNABOX GROUP,33100,209826,5637500,35508755,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00921,HISENSE HA,146000,2902480,1457000,29130063,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00934,SINOPEC KANTONS,70000,268510,730000,2800330,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00939,CCB,32335000,317897665,159751945,1570449646,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00941,CHINA MOBILE,1755000,141416775,9106165,733666167,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00945,MANULIFE-S,900,310720,23232,8019612,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00956,CHINA SUNTIEN,3750000,12415945,6786000,22480310,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00960,LONGFOR GROUP,16845500,84185105,33232000,166018414,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00966,CHINA TAIPING,2962800,49802432,12507938,210405732,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00968,XINYI SOLAR,5800000,10955530,26044987,49038079,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00975,MONGOL MINING,84000,647310,2013000,15445537,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00981,SMIC,8798000,452416500,57860269,2969107820,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00990,DEEP SOURCE,280000,157250,3170000,1766760,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00991,DATANG POWER,3540000,9410810,26908000,71736918,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00992,LENOVO GROUP,24258000,625870480,148886438,3850558020,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00995,ANHUIEXPRESSWAY,106000,1739780,632000,10319676,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00998,CITIC BANK,2966000,25024030,29142024,245784590,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,00999,XIAOCAIYUAN,4000,32840,2083493,17038132,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01021,HUAYAN ROBOTICS,127200,916595,5149200,36844698,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01024,KUAISHOU-W,15196800,434796936,41984196,1201916530,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01028,C.BANNER,14000,10940,927000,728075,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01030,SEAZEN,4308000,5877970,20334000,27763980,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01033,SINOPEC SSC,1854000,1145360,16009000,9859550,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01038,CKI HOLDINGS,251000,16876875,884627,59555103,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01044,HENGAN INT'L,1685000,33329930,4013966,79442842,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01050,KARRIE INT'L,412000,719340,3122000,5482960,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01052,YUEXIUTRANSPORT,554000,1864720,2148006,7229550,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01055,CHINA SOUTH AIR,1352000,3696060,11190830,30524587,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01060,DAMAI ENT,12880000,5604100,63940451,27833846,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01066,WEIGAO GROUP,688400,2308524,6309600,21160877,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01070,TCL ELECTRONICS,1538000,26428950,8723526,149640692,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01071,HUADIAN POWER,1190000,5142570,9246596,39958588,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01072,DONGFANG ELEC,626200,10188904,3536119,57501308,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01083,TG SMART ENERGY,81000,246010,2679020,8097535,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01088,CHINA SHENHUA,4425000,185415960,14497556,606796827,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01093,CSPC PHARMA,12254000,108714370,47651416,422786926,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01099,SINOPHARM,1445600,22426488,5519440,85492631,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01109,CHINA RES LAND,5661500,172475630,14431373,439709999,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01112,H&H INTL HLDG,313000,6441995,7110527,146462463,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01113,CK ASSET,1029000,46223240,5604614,251655943,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01114,BRILLIANCE CHI,2332000,4244950,14267013,25960760,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01115,5100 XIZANG,530000,247600,2810000,1311950,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01117,CH MODERN D,831000,1156265,11405000,15853432,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01126,DREAM INT'L,26000,144577,418500,2318548,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01128,WYNN MACAU,2679200,13266952,7029038,34798377,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01133,HARBIN ELECTRIC,288000,3439320,2156500,25798140,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01138,COSCO SHIP ENGY,2944000,50548120,26370000,453049818,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01157,ZOOMLION,806200,4243191,10092758,52982595,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01164,CGN MINING,5920000,11959575,33820133,68528106,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01167,JACOBIO-B,120600,635122,571800,3011309,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01171,YANKUANG ENERGY,4964000,53441820,83836932,903698619,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01177,SBP GROUP,10449000,56195200,53301124,286269854,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01179,HWORLD-S,76700,2781662,2346940,84974709,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01186,CHINA RAIL CONS,188000,822132,2070000,8997708,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01193,CHINA RES GAS,287000,4764517,1534900,25469109,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01196,REALORD TEC-NEW,1389000,4471330,28905155,93120346,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01199,COSCO SHIP PORT,1196000,7627860,6934000,44207258,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01205,CITIC RESOURCES,432000,210230,3820000,1852704,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01208,MMG,11168000,84057080,43298713,325212133,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01209,CHINA RES MIXC,441000,17330584,1820371,71525317,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01211,BYD COMPANY,3234200,238478870,13690566,1009300810,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01223,SYMPHONY HOLD,30000,36550,6360000,7729600,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01234,CHINA LILANG,10000,27160,435000,1175740,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01258,CHINFMINING,653000,8801730,16874869,227246603,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01276,HENGRUI PHARMA,969200,47666620,6006280,295129911,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01277,KINETIC DEV,1068000,1905420,11056000,19699134,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01286,IMPRO PRECISION,304000,1862100,3966984,24234606,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01288,ABC,32068000,216155370,119074224,802073602,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01299,AIA,3037000,221060420,18703621,1359371273,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01302,LIFETECH SCI,5004000,7348970,28484000,41929690,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01304,FORTIOR,17600,1841690,256600,26822230,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01308,SITC,1458000,71885640,5292525,260843594,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01310,HKBN,151000,873232,373084,2158707,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01313,CR BLDG MAT TEC,2928000,2840040,23748000,22987230,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01316,NEXTEER,344000,1530910,3143600,13964083,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01318,MAO GEPING,83500,3851132,1569633,72180412,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01330,DYNAGREEN ENV,349000,2133695,2985000,18281280,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01333,BRETON,5400,77786,2344200,34628616,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01336,NCI,5087800,205636444,15810666,636188763,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01339,PICC GROUP,15927000,78283165,68771138,337701897,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01347,HUA HONG GRACE,3929000,290155200,18454307,1363626150,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01357,MEITU,4529000,16493747,39625300,144176150,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01359,CHINA CINDA,15809000,13964130,70355000,62037647,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01361,361 DEGREES,609000,2978965,3202000,15666998,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01364,GUMING,776000,16870432,4254235,92126205,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01368,XTEP INT'L,3024000,11171982,11144668,41121860,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01375,CC SECURITIES,853000,1289870,6005000,9088760,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01378,CHINAHONGQIAO,8571000,162533525,43873188,832225843,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01384,DEEPEXI TECH,27200,422710,5988600,93958710,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01385,SHANGHAI FUDAN,622000,14828580,4446000,105916903,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01396,GBA AI COMP,447000,4903540,3011500,33039378,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01398,ICBC,40648000,305855435,189146083,1423779428,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01405,DPC DASH,96100,3104274,361400,11642751,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01415,COWELL,244000,5358180,2238509,49188947,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01428,BRIGHT SMART,276000,1690120,2596000,15965248,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01440,STAR SHINE HLDG,5000,79725,757500,12026838,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01456,GLMS SEC,20500,70657,2295500,7914508,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01477,OCUMENSION-B,26500,130300,122682,600974,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01478,Q TECH,271000,1290940,3377000,16085881,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01501,INT MEDICAL,4200,129648,165200,5100384,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01508,CHINA RE,1506000,1797680,12650353,15131825,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01513,LIVZON PHARMA,216300,4565632,1398753,29491662,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01515,CR MEDICAL,229500,545240,2324000,5515368,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01519,J&T EXPRESS-W,17681600,164112172,41088300,381323662,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01523,PLOVER BAY TECH,58000,442950,545000,4145440,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01530,3SBIO,1358000,19817815,14601232,213657864,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01548,GENSCRIPT B-1K,9430000,319900560,40274355,1362714587,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01579,YIHAI INTL,301000,4731070,4849772,76220510,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01585,YADEA,4334000,41045780,13018670,123562753,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01606,CDB LEASING,84000,128180,2200000,3343810,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01610,COFCO JOYCOME,442000,490930,17026765,18833632,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01618,MCC,749000,980865,5253000,6872585,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01635,DZUG,110000,212585,2244000,4349285,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01651,TSUGAMI CHINA,240500,9854110,2707167,110778712,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01658,PSBC,21237000,119547990,82967590,466783641,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01666,TONG REN TANG,15000,46850,479000,1494589,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01672,ASCLETIS-B,94000,552215,1427000,8400859,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01675,ASIAINFO TECH,136000,497378,1577600,5778465,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01681,CONSUN PHARMA,230000,3686040,2300000,36894998,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01686,SUNEVISION,636000,3306440,4426172,23057550,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01688,LINGYI ITECH,624360,3099383,15717240,78167473,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01691,JS GLOBAL LIFE,13000,23280,591000,1055960,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01698,TME-SW,382700,12827568,1232700,41331356,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01709,DL HOLDINGS GP,396000,322165,5883000,4780660,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01729,TIME INTERCON,1939000,25323490,9082742,118867303,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01735,CENTRAL NEW EGY,490000,4221670,21376769,183910436,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01762,WANKA ONLINE,1016000,727420,5552000,3983595,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01766,CRRC,6640000,35252280,25252500,134369379,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01768,BUSYMING,107500,34231460,514135,164890331,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01772,GANFENGLITHIUM,5365600,124734956,18157085,422542765,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01773,TIANLI INT HLDG,210000,152065,2346000,1695734,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01776,GF SEC,2259000,36922346,8195400,134051614,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01783,ENVISION GREEN,854000,4341360,7708000,39288164,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01787,SD GOLD,3763750,70056907,16308331,303291735,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01788,GUOTAI JUNAN I,1302000,3748160,20236000,58222263,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01789,AK MEDICAL,482000,2133870,5980000,26339694,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01797,EAST BUY,893500,25577340,7462548,213020964,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01798,DATANG RENEW,1191000,1163795,3903924,3808486,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01799,XINTE ENERGY,488000,1675336,1193200,4092015,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01800,CHINA COMM CONS,1024000,3408445,6725200,22387354,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01801,INNOVENT BIO,4601000,400463175,20256984,1762196921,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01810,XIAOMI-W,30554800,827013796,106176019,2875177048,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01811,CGN NEW ENERGY,790000,1650380,3110000,6503050,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01816,CGN POWER,22946000,76967790,137250763,458776797,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01818,ZHAOJIN MINING,7162500,127556385,19199000,341959145,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01828,FWD,73800,2319210,228123,7169623,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01833,PA GOODDOCTOR,1372100,7965930,9661000,56064505,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01836,STELLA HOLDINGS,346000,4495535,820800,10671465,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01848,CALC,1500,5155,152000,521215,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01857,CEB WATER,2000,2550,91000,116270,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01866,CHINA XLX FERT,348000,3435695,1887000,18588420,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01873,VIVA BIOTECH,988000,1348215,3591000,4901720,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01875,BIODLINK-B,6400,22398,50800,177736,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01876,BUD APAC,5742500,34815691,12177594,73859403,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01877,JUNSHI BIO,192400,3172988,1605000,26414042,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01879,XIZHI TECH-P,28875,5879511,275890,56868890,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01880,CTG DUTY-FREE,66300,2822484,830100,35328742,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01882,HAITIAN INT'L,765000,13432060,2230543,39200946,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01883,CITIC TELECOM,55000,129900,2140500,5051038,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01888,KB LAMINATES,6920000,278848310,54452591,2205717867,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01896,MAOYAN ENT,283800,1044053,7590825,27816396,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01898,CHINA COAL,7488000,75232510,26247902,263619072,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01907,CHINA RISUN GP,328000,528690,2261000,3638550,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01908,C&D INTL GROUP,2365000,31457250,4640500,61726623,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01910,SAMSONITE,447300,5981118,6696019,89385302,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01913,PRADA,385600,15187112,10628406,418201714,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01918,SUNAC,15999000,8803545,158457012,87093707,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01919,COSCO SHIP HOLD,1715500,28670265,14950711,249875463,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01921,DALIPAL HLDG,250000,741740,1238000,3665650,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01928,SANDS CHINA LTD,7714000,87611952,20922850,237804547,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01929,CHOW TAI FOOK,6517600,73627192,13725660,154967155,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01951,JXR,167500,371862,7354500,16329335,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01952,EVEREST MED,197500,6602770,6932970,232032865,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01956,WENGE AI-50,1000,65042,89750,5713528,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01958,BAIC MOTOR,377000,268292,4205500,2977691,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01963,BCQ,49500,401987,1506500,12229931,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01972,SWIREPROPERTIES,376400,9213556,3358346,82131542,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01988,MINSHENG BANK,17749500,57492070,39290054,127414355,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01989,DELTON,232700,19875800,2181700,186767564,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01995,ES SERVICES,2244000,3654090,5080000,8293720,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01997,WHARF REIC,926000,28369980,3889480,119068960,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,01999,MAN WAH HLDGS,662800,1528102,9718800,22266655,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02005,SSY GROUP,624000,1678450,1748000,4706330,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02007,COUNTRY GARDEN,35911000,6044195,204894049,34409362,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02009,BBMG,220000,132000,3898000,2330355,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02013,WEIMOB INC,1104000,786625,15508488,11050321,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02015,LI AUTO-W,2808300,127746388,8387942,381360265,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02016,CZBANK,271000,653990,3536000,8524990,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02018,AAC TECH,1463500,52441590,6211100,222356210,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02020,ANTA SPORTS,6188000,475438480,15312521,1174710438,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02026,PONY-W,96900,3869758,538400,21558610,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02038,FIH,112000,1385750,510000,6301482,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02039,CIMC,241100,1625002,3308696,22247136,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02050,SANHUA,556000,12622868,12735066,291251146,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02057,ZTO EXPRESS-W,295800,47167455,2018763,321537803,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02076,BOSS ZHIPIN-W,17900,1157625,72616,4691035,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02096,SIMCERE PHARMA,299000,3296960,2445000,26959428,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02097,MIXUE GROUP,1900,319640,170418,28676966,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02099,CHINAGOLDINTL,139400,28360630,1802528,365182033,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02105,LAEKNA-B,132000,840062,921000,5909773,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02128,CHINA LESSO,1002000,3030805,6706000,20261807,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02142,HBM HOLDINGS-B,1389000,14538370,8941000,93415244,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02145,CHICMAX,96500,2245976,1606700,37101335,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02155,MORIMATSU INTL,215000,1297430,3050603,18372972,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02156,C&D PROPERTY,59000,148250,218000,547510,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02157,LEPU BIO,234000,863360,18013222,68306844,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02158,YIDU TECH,464000,1327593,1246700,3558478,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02162,KEYMED BIO-B,226000,19303625,2941230,251236208,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02171,CARSGEN-B,55500,662365,1576821,18918153,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02186,LUYE PHARMA,2137500,3610450,19741500,33380033,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02190,ZYLOXTB,26000,527420,364106,7374897,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02191,SF REIT,64000,174860,1891000,5145705,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02192,MEDLIVE,43500,281810,434500,2807316,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02196,FOSUN PHARMA,230000,3934345,1685500,28828728,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02198,CHINA SANJIANG,148000,548475,709000,2629690,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02202,CHINA VANKE,5387700,12613581,35547140,83361282,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02208,GOLDWIND,512200,3833573,9713356,72952435,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02225,JINHAI MED TECH,50000,201450,1535000,6180100,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02228,XTALPI,13569000,82101570,52871833,320248316,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02232,CRYSTAL INTL,585500,4534142,5910500,45648078,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02233,WESTCHINACEMENT,1076000,1852480,5094000,8772720,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02238,GAC GROUP,2096000,4404530,10106243,21224283,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02245,LYGEND RESOURCE,44400,794900,1461000,26330158,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02255,HAICHANG HLDG,738000,157831,31549000,6776280,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02256,ABBISKO-B,166000,1270205,1180000,9048703,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02259,ZIJIN GOLD INTL,3456400,473462300,11007969,1507812713,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02268,WUXI XDC,301000,22900750,3881644,293158659,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02269,WUXI BIO,6218500,312121055,41457924,2080599366,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02273,GUSHENGTANG,62900,1682006,818864,21910388,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02276,CONANT OPTICAL,346000,12570782,1552700,56384871,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02282,MGM CHINA,936800,9091754,2921727,28358227,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02285,CHERVON,724100,25132264,3243430,112267923,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02291,SCIENTECH,1000,13550,158000,2146660,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02313,SHENZHOU INTL,2124300,78016356,7595874,279783844,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02314,LEE & MAN PAPER,248000,815360,4725225,15534176,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02315,BIOCYTOGEN-B,52500,2519300,3682680,175995315,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02318,PING AN,5922500,294086475,40822765,2023785645,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02319,MENGNIU DAIRY,5056000,95691270,16446052,311336628,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02328,PICC P&C,15818000,237806780,38645725,580183220,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02331,LI NING,4858500,64593565,18385686,244369567,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02333,GWMOTOR,456000,3213507,10507306,74172914,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02338,WEICHAI POWER,3651000,91930320,18101465,455236211,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02342,COMBA,1284000,1166860,14773554,13408613,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02343,PACIFIC BASIN,994000,3715485,21815500,81542352,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02356,DAHSING BANKING,157200,2135488,1528385,20789004,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02357,AVICHINA,3580000,11088845,16731022,51938523,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02359,WUXI APPTEC,2230100,438920880,5236813,1029563647,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02367,GIANT BIOGENE,639800,14617716,2529060,57827182,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02373,BEAUTYFARM MED,2000,33705,114000,1935200,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02378,PRU,3650,338710,37659,3494963,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02380,CHINA POWER,1295000,3502010,10478000,28339033,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02382,SUNNY OPTICAL,5255100,314602110,11559650,692039615,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02386,SINOPEC SEG,2386000,13001180,8058000,43886584,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02388,BOC HONG KONG,2588000,129907635,11737807,588757883,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02400,XD INC,134800,5481592,1153600,46902078,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02411,PAGODA GP,7500,10687,1493500,2119100,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02419,DEKON AGR,34600,1996805,976767,56118344,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02423,BEKE-W,1668000,77294982,7605922,352491131,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02432,DOBOT,105400,1837266,3290400,57618774,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02451,LUYUAN GP HLDG,21500,300095,128169,1793664,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02460,CR BEVERAGE,128400,923725,1042200,7470253,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02465,LOPAL TECH,85500,615807,3348000,24399348,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02475,LUXSHARE ICT,635500,30228822,3537165,168219742,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02476,VGT,885500,142171140,5813033,934573524,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02488,LAUNCH TECH,293000,1809150,779500,4818228,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02489,PERSISTENCEGOLD,10000,7800,135000,105625,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02490,LC HOLDING,2100,8764,391200,1627157,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02498,ROBOSENSE,710300,10923614,4239650,65311722,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02506,XUNFEIHEALTH,50,3275,41797,2752085,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02507,CIRRUS,8100,326540,798278,31971855,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02509,QYUNS-B,20000,319674,112200,1792032,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02510,TS LINES,268000,3581750,2190486,29486975,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02513,Z.AI,815700,400407180,5405040,2662680946,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02517,GUOQUAN,794400,1061312,10146000,13549576,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02525,HESAI-W,6428500,90482168,25629390,357309973,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02526,DIAGENS-B,100,22760,19500,4453310,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02533,BLACK SESAME,536700,4473117,3772406,31449163,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02552,HUA MEDICINE-B,186500,408210,964000,2096963,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02556,MARKETINGFORCE,133800,6329968,3886175,182562872,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02565,PEGBIO CO-B,19650,74303,5181700,19717495,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02570,REFIRE,4940,24214,110980,541433,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02575,XUANZHUBIO-B,3500,29400,708500,5920083,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02577,INNOSCIENCE,501800,16644288,3922262,130343954,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02579,CNGR,7600,142908,525090,9884154,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02580,AUX ELECTRIC,40400,319983,707800,5588739,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02583,HIPINE,4800,217944,1507300,70217600,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02585,MOKINGRAN,1600,58196,368200,13774795,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02586,DMALL,109100,926401,4630000,39237226,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02588,BOC AVIATION,204700,13807940,1179930,79623933,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02589,AUNTEA JENNY,330,19387,175270,10322795,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02590,GEEKPLUS-W,273000,1755177,9982800,64344995,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02591,INNOGEN-B,46400,164156,3946800,13992386,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02595,GENFLEET-B,227400,6699760,7586628,224416876,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02600,CHALCO,5580000,39463190,27746383,196351960,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02601,CPIC,1699400,44491136,11508365,301333110,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02602,ONEWO,108100,2102966,595400,11580160,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02607,SH PHARMA,32000,357799,1657500,18533664,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02609,BAYZED HEALTH,6600,17676,1133400,3040497,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02610,NANSHAN AL INTL,88400,2004014,310500,7031802,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02611,GTHT,1984600,27932184,16557370,231763319,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02616,CSTONE PHARMA-B,677500,3414505,3086408,15528985,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02617,TRANSTHERA-B,500,4597,1720500,15795440,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02618,JD LOGISTICS,1955400,20058915,8107558,83111327,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02628,CHINA LIFE,17600000,406691640,53290815,1234617339,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02631,SICC,36100,1995970,2817900,156441122,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02635,NUOBIKAN,12200,104417,17088000,141977956,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02638,HKELECTRIC-SS,9500,59192,1360969,8462112,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02643,CAOCAO INC,4300,46410,1517100,16259768,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02648,ANJOY FOOD,71000,4742505,910100,60796298,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02650,ZHIDA TECH,9500,56798,5653850,33494698,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02652,CF PHARMTECH,199800,1172955,1497800,8802060,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02655,GUOXIA TECH,16300,193026,789900,9364091,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02656,160 HEALTH,135000,339843,10685000,26860531,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02658,TIANYU SEMI,900,39853,51100,2253421,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02665,SEYOND,232000,304175,10483000,13717043,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02666,UNI MEDICAL,857000,3910840,3630000,16585442,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02669,CHINA OVS PPT,110000,368100,2910000,9720600,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02670,YUNJI-NEW,36900,151050,33698100,140919035,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02675,EDGE MEDICAL-B,231600,7353746,675800,21428164,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02676,NOVOSENSE,300,41070,158200,21089750,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02678,TEXHONG INTL GP,1500,8032,106000,566355,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02685,QUANTGROUP,148000,525655,16988000,59972043,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02688,ENN ENERGY,234200,11562770,2361520,116517578,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02689,ND PAPER,1299000,6450020,8382000,41581847,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02696,HENLIUS,96200,5043950,374822,19644535,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02698,SOFTCARE,183200,4860324,1577445,41871235,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02706,HAIZHI TECH GP,173800,5367132,2954400,90942726,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02714,MUYUAN,135300,4901356,1503800,54618486,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02718,MININGLAMP-W,7360,219253,567000,16680698,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02722,CHONGQING M&E,1060000,1540350,4350000,6328830,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02726,EPIWORLD,850,69010,95700,7782305,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02727,SH ELECTRIC,1216000,3186110,11066000,28934288,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02729,GALAXIS TECH,118400,2328596,558400,11038228,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02778,CHAMPION REIT,123000,266750,1696000,3692935,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02788,CHUANGXIN IND,955500,13338910,4869113,67915054,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02799,CITIC FAMC,8134000,4684790,43495000,25002500,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02800,TRACKER FUND,50309500,1238137220,438511944,10788596379,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02801,ISHARES CHINA,148400,3370732,182200,4140104,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02802,A CSOP HSCEICC,633200,4271854,6055599,40864203,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02805,CG BS CNASEAN,22000,208780,22000,208780,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02820,GX CN BIOTECH,50,3458,6300,444257,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02822,CSOP A50 ETF,231600,3274818,647345,9165557,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02823,ISHARES A50,1625100,24994033,2959134,45462405,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02824,EFUND GOLD MI,75200,739049,178900,1762238,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02826,GX CN CLOUD,150,7200,4150,200535,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02828,HSCEI ETF,10069800,832860216,58589822,4847032527,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02829,ISHARESCGB,770,49803,6370,411342,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02834,ISHARESND100,21000,11921984,40674,23109367,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02840,SPDR GOLD TRT,1727,5130948,8165,24241548,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02846,ISHARESCSI300,30800,1022450,74600,2477396,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02858,YIXIN,4923000,3921672,37383500,29802953,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02865,DRINDA,16800,170484,1288141,13075692,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02866,COSCO SHIP DEV,520000,457600,5906200,5199254,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02869,GREENTOWN SER,68000,281690,790000,3261870,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02877,SHINEWAY PHARM,308000,2301730,1318000,9846763,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02883,CHINA OILFIELD,2860000,21775410,10398000,79261202,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02888,STANCHART,60300,12928890,2013325,431407916,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02889,PATEO,2520,136200,521520,28152738,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02899,ZIJIN MINING,8682000,268336040,43930065,1356740802,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,02947,DEEPZERO,10000,511050,752000,39407180,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03008,BOS HSK BTC,2800,17640,56400,354107,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03010,ISHARES AXJ,100,8326,122996,10265423,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03032,HSTECH ETF,12175000,49262000,35321257,142966973,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03033,CSOP HS TECH,472238800,1874964110,1726465193,6856038247,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03037,CSOP HSI ETF,1000,24620,3500,86060,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03039,EFUNDHSIESG,70000,250040,176000,628952,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03042,CAM BTC,77100,764512,475000,4704590,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03046,CAM ETH,25900,146173,293100,1653328,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03053,A CSOP HKD MM,2,2387,4872,5817192,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03066,FA CSOP BTC,5900,150096,21400,544712,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03067,ISHARESHSTECH,5798000,49590735,12872186,110188202,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03069,CAM HSBIOTECH,5034300,76390016,7469400,113482357,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03070,PING AN HKDIV,88200,3717142,165100,6953206,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03081,VALUEGOLD ETF,1200,23364,459400,8950597,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03086,CAM NASDAQ100,59600,3588036,157269,9471531,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03088,CAM HS TECH,20000,103100,153000,789328,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03096,A CSOP USD MM,103,101001,3407,3340211,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03109,CSOP STAR 50,242200,3150334,594000,7725067,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03110,GX HS HIGHDIV,626200,18417192,854777,25142859,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03111,EFUNDMSCIA50,410000,1193300,1238810,3598308,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03115,ISHARESHSI,100,8944,6300,558404,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03116,GX AP HIGH DIV,475,49851,9945,1019602,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03119,GX ASIA SEMICON,4175,644466,77320,11919514,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03121,CSOP KOSPI,600,3216,5199500,28112409,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03132,SAMSUNG SEMICON,100,5990,20852,1248503,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03135,FA SAMSUNG BTC,200,5240,200,5240,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03137,A GX USD MM,1949,2227542,2032,2322370,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03145,CAM ASIA HIGHDV,351400,4665496,3205430,42521893,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03147,X CSOPCHINEXT,42400,481796,254800,2871980,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03153,CSOP NIKKEI225,1490,194998,4681,612673,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03170,HS GOLD ETF,177450,2315679,733700,9564132,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03174,CSOP HSBIOTECH,521100,1873154,1412900,5084538,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03175,F SAMSUNG OIL,168000,2178992,631400,8187134,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03179,HGI ETH,5000,27875,5200,29016,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03188,CAM CSI300,680200,34351568,1250136,63114125,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03191,GX CN SEMICON,28150,1881495,196503,13115435,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03193,CSOP CSI 5G,37400,512272,58400,806472,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03195,HS S&P500,723500,8840013,1269597,15516874,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03200,HANS CNC,9100,602870,1787000,118390207,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03288,HAITIAN FLAV,32100,841302,1317993,34469131,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03296,HUAQIN,348200,18893750,1421420,76928529,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03306,JNBY,132500,3083460,1383500,32158280,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03308,ZJ INNOLIGHT,190550,154425975,1486593,1202204700,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03310,VIEWTRIX TECH,9800,158808,546400,8867928,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03311,CHINA STATE CON,530000,4552450,3507886,30055679,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03316,BINJIANG SER,88500,1859860,184000,3866025,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03317,XUNCE,3000,206285,881557,60643329,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03319,A-LIVING,35000,70553,2113000,4257493,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03320,CHINARES PHARMA,1402000,6560607,9880500,46326330,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03323,CNBM,14238000,41815950,34773697,102091609,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03328,BANKCOMM,7697000,65554285,25354111,215808756,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03330,LINGBAO GOLD,1396200,25661485,16307600,298464609,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03336,JU TENG INTL,38000,79860,994839,2074694,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03337,ANTON OILFIELD,118000,87730,1886000,1398030,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03339,LONKING,115000,335465,4330000,12613247,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03347,TIGERMED,84500,3427716,1461900,59083778,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03355,FS.COM,20100,725224,931860,33590266,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03360,FE HORIZON,5684000,32954805,20139634,116763660,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03380,LOGAN GROUP,103000,118675,4720000,5421385,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03393,WASION HOLDINGS,126000,1547820,1354499,16643889,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03396,LEGENDHOLDING,675600,11684038,10283200,178096888,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03410,HS JAPAN TPX100,152100,1103109,179000,1299076,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03416,A GX HSCEICC,1742000,14003265,8433600,67785908,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03417,A GX HSTCC,6755700,44679710,8015675,53029293,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03418,CAM DIGI GOLD,450,15083,2550,85205,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03419,A GX HSICC,3206700,28946083,7429800,67039592,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03431,CSOP HKKRTECH,388600,3475744,1953100,17464486,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03439,HGI BTC,2900,28816,7500,74649,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03440,GX 0-3M UST,94500,5242385,133350,7397357,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03455,INVESCO QQQ,123,691752,3893,21957363,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03466,HS HIGH DIV,2734650,51710021,4376804,82803905,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03469,CSOP SCHIGHDIV,100,817,100,817,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03477,PA EW SELECT,116700,1981620,126200,2142631,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03479,CAM HKUS HALO,1700,15982,1700,15982,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03486,EFUND A SEMICON,223900,3475270,899800,14020165,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03533,XA GX GOLD CC,1275,83671,6700,440593,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03537,A CSOP KOSPICC,576700,4397231,3642369,27781765,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03555,AGX HSDIV ENH,88200,703930,730600,5841009,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03589,A HSTECHCC,500,3450,134800,930293,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03600,MODERN DENTAL,10000,74400,230000,1710200,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03606,FUYAO GLASS,551600,30591260,2942603,163227514,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03613,TONGRENTANGCM,263000,1529540,1024000,5962455,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03618,CQRC BANK,574000,3727975,10804763,70098025,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03633,ZHONGYU ENERGY,93000,251020,1165000,3141050,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03660,QFIN-S,2450,56762,51050,1178893,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03668,YANCOAL AUS,23600,771776,1469703,48045673,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03677,ZENERGY,55200,213016,1516500,5891247,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03690,MEITUAN-W,4054200,304880580,23678852,1779033535,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03692,HANSOH PHARMA,19802000,675385680,35431819,1208189703,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03696,INSILICO,1690000,66988340,11874708,469398622,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03698,HUISHANG BANK,1604000,7518410,5831000,27326301,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03709,EEKA FASHION,44000,168182,204500,786105,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03738,VOBILE GROUP,675000,1864925,24246000,66217320,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03750,CATL,2478200,1019738480,7319362,3014909334,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03759,PHARMARON,501200,13588224,5750525,156132105,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03788,HANKING GOLD,379000,1185900,2025000,6353875,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03800,GCL TECH,38854000,25067285,275022852,177396387,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03808,SINOTRUK,1514500,50459110,5981900,199231513,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03858,JIAXIN INTL RES,507600,19366248,3038298,115574024,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03866,BQD,450000,2168545,3479500,16763308,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03868,XINYI ENERGY,2186000,1662840,7486176,5683179,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03877,CSSC SHIPPING,632000,1527010,5798000,14005690,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03881,CIDI,3000,53303,211500,3740657,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03887,HASHKEY HLDGS,187200,373060,742800,1487408,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03888,KINGSOFT,988800,25399964,3940141,101114443,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03896,KINGSOFT CLOUD,5712000,26062960,28484981,129742711,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03898,TIMES ELECTRIC,764100,21159706,1841200,51011356,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03899,CIMC ENRIC,184000,1219740,3178000,21063560,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03900,GREENTOWN CHINA,340000,1983950,10467454,61029947,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03908,CICC,1434800,26704568,15939349,296626975,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03918,NAGACORP,356000,848640,4927195,11738576,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03928,CHINA NEXT-GEN,36500,1015230,484000,13474820,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03931,CALB,2911600,41599829,12525735,179413534,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03933,UNITED LAB,278000,2041080,5311000,39018315,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03939,WANGUO GOLD GP,4357500,57158500,20565596,269570032,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03958,DFZQ,1013600,5684114,9082400,50951984,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03968,CM BANK,4007500,213515825,10727927,571507043,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03969,CHINA CRSC,452000,1379555,2857000,8716490,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03978,BESTSTUDY EDU,57000,138080,289000,700165,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03983,CHINA BLUECHEM,90000,161070,5314356,9521317,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03986,GIGADEVICE,48100,16386660,1228219,421015326,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03988,BANK OF CHINA,37180000,228462685,134247908,824932023,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03990,MIDEA REAL EST,430600,999826,780600,1819149,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03993,CMOC,11751000,160201260,60761367,827714459,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03996,CH ENERGY ENG,2852000,2914670,12870000,13140870,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,03998,BOSIDENG,4786000,20841610,24726306,108246962,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,06030,CITIC SEC,2985000,65360300,22048941,484389232,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,06031,SANY HEAVY IND,692800,11498340,4583211,75883543,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,06049,POLY PPT SER,27600,749040,487000,13223759,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,06055,CTIHK,171000,4467260,4142000,108747970,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,06060,ZA ONLINE,769600,7217253,5016731,46995084,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,06066,CSC,419500,4570250,6602500,72074075,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,06069,SY HOLDINGS,735000,4926457,3972500,26579094,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,06078,HYGEIA HEALTH,94200,901578,1837600,17576059,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,06082,BIREN TECH,2802600,69844772,18468155,460265326,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,06088,FIT HON TENG,1420000,5770925,18258000,74235725,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,06098,CG SERVICES,231000,1189345,6035945,30915388,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,06099,CMSC,161800,2130096,4203300,55373112,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,06110,TOPSPORTS,1157000,1210160,9965000,10384338,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,06127,JOINN,547800,15355782,12771496,356754097,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,06160,BEONE MEDICINES,617900,139034460,2824117,634704812,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,06166,CIG,445850,36248587,10092616,828394674,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,06168,ZHOU LIU FU,180800,1999291,382900,4227183,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,06178,EB SECURITIES,264800,1790514,1248400,8456400,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,06181,LAOPU GOLD,141900,44400100,546136,170816074,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,06185,CANSINOBIO,78600,2309928,3548457,104111395,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,06186,CHINA FEIHE,4916000,12237245,25126000,62396050,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,06196,BANKOFZHENGZHOU,182000,154345,8741000,7449060,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,06198,QINGDAO PORT,143000,1132465,2163000,17125230,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,06600,ONEROBOTICS,2600,111380,238800,10181376,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,06613,LENS,1048400,18982800,9742427,176467197,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,06616,GLOBAL NEW MAT,338000,3166880,707000,6617215,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,06618,JD HEALTH,4916900,194217690,15794880,624588517,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,06636,EXTREME VISION,24600,1591972,195164,12573226,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,06651,51WORLD,81600,3793090,12730200,633958718,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,06655,HX BLDG MAT,589900,9334498,2700539,42585737,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,06656,SIGENERGY,38600,8175900,296197,62964868,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,06658,LIULIUMEI,2300,379460,478900,78966750,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,06669,ACOTEC-B,41000,238210,541511,3144513,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,06680,JLMAG,123400,1794026,3562219,52059939,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,06682,PHANCY,1238300,27635994,5494699,122653389,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,06683,STARPLUS LEGEND,101500,380675,5919800,22294260,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,06687,JST GROUP,44600,466413,312800,3277550,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,06690,HAIER SMARTHOME,4693200,92970044,13214022,261618571,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,06693,CHIFENG GOLD,565600,19201024,5430646,185523959,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,06699,ANGELALIGN,82400,6664930,248200,20064810,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,06806,SWHY,544800,1256984,12096000,27866684,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,06808,SUNART RETAIL,1965000,2235487,20358524,23150013,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,06809,MONTAGE TECH,424400,87798480,2828175,583468695,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,06810,SUNMI TECH-W,32300,1790335,1222366,68045580,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,06818,CEB BANK,5833000,16072835,15939782,43895553,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,06821,ASYMCHEM,23400,3258000,603400,84302875,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,06823,HKT-SS,377000,4564460,3226508,39067317,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,06831,GREEN TEA GROUP,43200,199616,855600,3940942,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,06855,ASCENTAGE,633000,19369546,2828700,86722669,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,06862,HAIDILAO,2259000,21499765,14803000,140712761,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,06865,FLAT GLASS,210000,1094440,1674138,8718008,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,06869,YOFC,1493500,190576500,20611859,2636060190,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,06880,MOMENTA-W,23260,3934152,76348,12913744,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,06881,CGS,1003500,7116452,17134500,120992093,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,06886,HTSC,4940800,77797346,12257210,193251249,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,06887,SUNSHINE PHARMA,24800,993034,428424,17217579,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,06936,SF HOLDING,67400,1974736,888200,25948948,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,06938,RIBOLIFE-B,36000,1909100,251201,13422042,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,06960,SHUANGDENG,5500,26730,132500,634555,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,06963,SUNSHINE INS,1987500,6804320,7964000,27222560,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,06969,SMOORE INTL,1129000,9317485,13640512,112152906,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,06979,ZJLD,80200,679681,3430000,29078896,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,06990,SKB BIO,110400,51505380,709561,330864081,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,06993,BLUE MOON GROUP,139500,360075,1038000,2686123,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,06996,ANTENGENE-B,166000,498547,948000,2842413,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,06998,EDDING GENOR,8500,14080,564000,935458,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,07200,FL2 CSOP HSI,21758400,110123393,52914400,267866144,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,07226,XL2CSOPHSTECH,131467000,323553050,275599400,679812264,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,07233,XL2CSOPCSI300,461100,1753034,875100,3332145,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,07234,XL2 BOS CHINEXT,938400,5339261,2768800,15732937,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,07261,FL2CAMNDQ100,4500,237648,27500,1440016,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,07288,FL2 CSOP HSCEI,477800,1272285,688800,1834484,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,07299,FL2CSOPGOLD,327000,6840970,630300,13189936,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,07300,FI CSOP HSI,30000,105300,695600,2437638,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,07311,XI2CSOPCOIN,100,615,265200,1607851,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,07366,XI2CSOPTSLA,500,4467,118130,1049408,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,07489,VOYAH AUTO,922000,1532505,3930626,6601752,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,07500,FI2 CSOP HSI,22441300,41701845,91539200,170190784,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,07552,XI2CSOPHSTECH,27560500,60734939,143732900,317165008,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,07568,FI2CSOPNASDAQ,4590300,10690538,11681400,27185006,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,07588,FI2 CSOP HSCEI,23600,38421,938300,1526717,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,07618,JD INDUSTRIALS,115000,1515880,940983,12424310,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,07666,METIS TECHBIO-P,934000,11088755,11203575,132377866,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,07709,XL2CSOPHYNIX,124847200,2205335051,208714630,3682889784,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,07711,XL2CSOPCOIN,500,10119,102000,2026612,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,07747,XL2CSOPSMSN,3243900,150779210,8696560,404444569,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,07766,XL2CSOPTSLA,18330,1521515,24980,2068218,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,07788,XL2CSOPNVDA,2280,367757,6730,1086896,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,07799,XL2CSOPMSTR,402360,1414296,1201060,4221313,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,09067,ISHARESHSTECH-U,8400,9167,25800,28119,USD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,09069,CAM HSBIOTECH-U,14300,27897,14300,27898,USD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,09188,CAM CSI300-U,8000,51400,16000,102880,USD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,09191,GX CN SEMICON-U,5500,46333,50875,433829,USD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,09195,HS S&P500-U,600,933,1100,1713,USD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,09415,A GXS&P500CC-U,2850,28500,21425,212967,USD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,09606,DUALITYBIO-B,161000,27063990,1037451,173644563,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,09618,JD-SW,1978550,206659350,4489408,469088719,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,09626,BILIBILI-W,706720,76886102,3364479,366004200,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,09633,NONGFU SPRING,1391200,58477496,6160230,258855529,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,09636,JF SMARTINVEST,20800,552540,656500,17393905,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,09658,SUPER HI,230000,1883355,688800,5637809,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,09660,HORIZONROBOT-W,66757800,251503137,191054999,719683803,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,09668,CBHB,346000,254985,2826000,2086975,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,09669,BEISEN HOLDING,99200,333572,1985400,6588365,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,09676,SHIYUE DAOTIAN,2700,11002,157800,640541,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,09678,UNISOUND,14220,886581,729020,45816941,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,09688,ZAI LAB,436300,8226464,2340500,44116833,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,09690,TUHU-W,77800,891546,481425,5518607,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,09696,TIANQI LITHIUM,251800,5979020,3040571,72252599,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,09698,GDS-SW,4813200,109023264,9890906,223763532,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,09699,SF INTRA-CITY,112200,927421,2425348,20024408,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,09805,CG BS CNASEAN-U,22000,26620,22000,26620,USD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,09810,PREMIAEMASEAN-U,500,4192,500,4193,USD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,09834,ISHARESND100-U,11970,865431,12000,867600,USD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,09846,ISHARESCSI300-U,14000,59086,61700,261139,USD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,09858,YOURAN DAIRY,1881000,6655605,11952000,42281104,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,09863,LEAPMOTOR,1182900,41575020,4047857,142336412,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,09866,NIO-SW,1827340,48099372,4960554,130628236,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,09868,XPENG-W,4889500,181454416,13527470,501855219,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,09878,HUITONGDA NET,10200,70434,94800,654380,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,09880,UBTECH ROBOTICS,1185000,81074605,9622710,662940931,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,09885,YSB,4600,16028,665000,2299121,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,09887,LEADS BIOLABS-B,49500,2124128,1408500,60989703,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,09888,BIDU-W,1104950,86575232,8462103,662891449,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,09889,DRCB,36000,103230,4550100,12797504,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,09890,TANWAN,415000,3489686,1296130,10922147,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,09896,MNSO,1079000,21626620,5363056,107525351,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,09898,WB-SW,14220,713483,118720,5954474,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,09899,NETEASE MUSIC,42350,3616900,731570,62226972,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,09901,NEW ORIENTAL-S,647800,31108846,7502300,359707493,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,09903,ILUVATAR COREX,839000,67642425,6640366,535887241,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,09911,NEWBORNTOWN,306000,2780030,2853286,25938645,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,09923,YEAHKA,3600,14026,264900,1011101,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,09926,AKESO,2267000,208294350,7558400,694020714,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,09927,SERES,186800,6311916,2760800,93094862,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,09936,XIMEI RESOURCES,103000,1036970,1339975,13526041,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,09959,LINKLOGIS-W,231000,549457,4362000,10410575,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,09961,TRIP.COM-S,647850,203394530,1536081,482309437,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,09966,ALPHAMAB-B,201000,1415485,1143000,8046159,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,09969,INNOCARE,516000,6501040,6068000,76270281,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,09973,CHERY AUTO,709900,17255984,4419057,106729370,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,09979,GREENTOWN MGMT,2000,3480,374000,651173,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,09980,EASTROC,143000,13404290,577900,54367694,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,09985,WL DELICIOUS,330600,2233498,1616800,10941174,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,09987,YUM CHINA,84500,29701460,542725,190737963,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,09988,BABA-W,9889100,1041354910,59859490,6302946386,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,09992,POP MART,7215600,989380620,23229062,3188963969,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,09993,RADIANCE HLDGS,50000,48335,14275000,13820020,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,09995,REMEGEN,404500,26163550,1707550,110360225,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,09996,PEIJIA-B,16000,68975,324000,1393410,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,09999,NTES,1419000,278580910,4693778,921943497,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,41599,GF HKUS TECH-U,21600,38966,43200,78062,USD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,80016,SHK PPT-R,4000,359200,4000,359200,CNY,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,80020,SENSETIME-WR,32000,31205,35000,34115,CNY,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,80175,GEELY AUTO-R,13000,165750,24000,305250,CNY,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,80291,CHINARES BEER-R,2000,33390,2000,33390,CNY,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,80388,HKEX-R,3900,1232620,4800,1517600,CNY,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,80700,TENCENT-R,7100,2483620,13300,4650300,CNY,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,80883,CNOOC-R,9000,186520,14000,290280,CNY,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,80941,CHINA MOBILE-R,1500,102825,23000,1576425,CNY,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,80992,LENOVO GROUP-R,136000,3026520,194000,4314560,CNY,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,81024,KUAISHOU-WR,18500,449532,32500,789810,CNY,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,81299,AIA-R,4400,274490,27200,1687370,CNY,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,81810,XIAOMI-WR,1200,27752,21000,487160,CNY,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,82318,PING AN-R,71000,3020230,146500,6207690,CNY,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,82331,LI NING-R,500,5645,1000,11275,CNY,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,82388,BOC HONG KONG-R,1000,42660,8000,342400,CNY,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,82800,TRACKER FUND-R,21000,439360,30500,637930,CNY,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,82805,CG BS CNASEAN-R,22000,177430,22000,177430,CNY,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,82822,CSOP A50 ETF-R,27600,331888,36800,442580,CNY,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,82823,ISHARES A50-R,126000,1639250,323600,4212455,CNY,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,82846,ISHARESCSI300-R,11600,326888,25900,733008,CNY,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,83110,GX HS HIGHDIV-R,26000,652300,26000,652300,CNY,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,83147,X CSOPCHINEXT-R,9800,93394,55800,533192,CNY,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,83188,CAM CSI300-R,101800,4367000,155030,6656713,CNY,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,83199,ICBCCSOP CGPB-R,20,2078,7880,819579,CNY,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,83418,CAM DIGI GOLD-R,10,284,10,284,CNY,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,83455,INVESCO QQQ-R,206,986640,1051,5035322,CNY,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,83590,CAM HKHIDIV-R,1000,8560,1000,8560,CNY,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,83690,MEITUAN-WR,1300,82100,4600,289945,CNY,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,86618,JD HEALTH-R,200,6732,1700,57362,CNY,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,89618,JD-SWR,100,8885,150,13385,CNY,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,89888,BIDU-WR,1250,82632,3900,259360,CNY,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+Main Board,2026-10-20,89988,BABA-WR,27500,2463250,33200,2973500,CNY,https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm
+GEM,2026-10-20,08137,HONBRIDGE,12000,5700,490000,230490,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/GEM/e_G261020.htm
+GEM,2026-10-20,08279,AGTECH HOLDINGS,240000,292980,12667000,15539100,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/GEM/e_G261020.htm
+GEM,2026-10-20,08299,GT GOLD,1752000,446760,15768000,3989160,HKD,https://www.hkex.com.hk/eng/stat/smstat/dayquot/GEM/e_G261020.htm

@@ -1,0 +1,75 @@
+{
+  "validated_at_utc": "2026-10-21T06:49:42.331236+00:00",
+  "historical_reports": [
+    {
+      "board": "Main Board",
+      "date": "2026-10-20",
+      "source_url": "https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm",
+      "rows": 857,
+      "currencies": {
+        "HKD": 814,
+        "USD": 11,
+        "CNY": 32
+      },
+      "checks": "PASS: row count, unique codes, both share totals, both monetary totals by currency, currency coverage, short-selling <= total",
+      "sample": {
+        "board": "Main Board",
+        "trading_date": "2026-10-20",
+        "stock_code": "00700",
+        "stock_name": "TENCENT",
+        "short_selling_shares": 4279800,
+        "short_selling_value": 1754388360,
+        "total_traded_shares": 22840013,
+        "total_turnover": 9371898154,
+        "trading_currency": "HKD",
+        "source_url": "https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm"
+      }
+    },
+    {
+      "board": "GEM",
+      "date": "2026-10-20",
+      "source_url": "https://www.hkex.com.hk/eng/stat/smstat/dayquot/GEM/e_G261020.htm",
+      "rows": 3,
+      "currencies": {
+        "HKD": 3
+      },
+      "checks": "PASS: row count, unique codes, both share totals, both monetary totals by currency, currency coverage, short-selling <= total",
+      "sample": {
+        "board": "GEM",
+        "trading_date": "2026-10-20",
+        "stock_code": "08137",
+        "stock_name": "HONBRIDGE",
+        "short_selling_shares": 12000,
+        "short_selling_value": 5700,
+        "total_traded_shares": 490000,
+        "total_turnover": 230490,
+        "trading_currency": "HKD",
+        "source_url": "https://www.hkex.com.hk/eng/stat/smstat/dayquot/GEM/e_G261020.htm"
+      }
+    }
+  ],
+  "morning_reports": [
+    {
+      "board": "Main Board",
+      "date": "2026-10-21",
+      "session": "morning only",
+      "rows": 793,
+      "row_count_check": "PASS"
+    },
+    {
+      "board": "GEM",
+      "date": "2026-10-21",
+      "session": "morning only",
+      "rows": 3,
+      "row_count_check": "PASS"
+    }
+  ],
+  "combined_full_day_rows": 860,
+  "caveats": [
+    "Stock Id requires the original catalog identifier definition.",
+    "Includes ETPs and other securities, not only ordinary shares.",
+    "Today full-day reports currently return a not-yet-available notice.",
+    "One historical date was validated; deep history, corrections processing and usage rights were not validated.",
+    "Source-access validation only; not an application integration."
+  ]
+}

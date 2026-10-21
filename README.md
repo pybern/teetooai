@@ -55,6 +55,54 @@ npm run prefetch
 
 This pulls five years of monthly prices, quotes, valuation ratios and annual financials from Yahoo Finance. Non-HKD financials are converted to HKD. The script then rewrites the snapshot JSON.
 
+### HKEX daily short-selling extracts
+
+[data/hkex/](./data/hkex/) contains standalone historical extracts from HKEX's
+public Main Board and GEM daily quotation reports. These files are **not yet
+connected to the application or data catalog**.
+
+| File | Contents |
+| --- | --- |
+| [hkex-short-selling.csv](./data/hkex/hkex-short-selling.csv) | 34,077 records across 40 trading days, 24 August through 20 October 2026, covering both boards |
+| [hkex-coverage.json](./data/hkex/hkex-coverage.json) | Requested twelve-month range, actual coverage, validation results and unavailable dates |
+| [hkex-fetch-log.jsonl](./data/hkex/hkex-fetch-log.jsonl) | Per-request results, including retries; the latest entry for each board/date is authoritative |
+| [hkex-short-selling-2026-10-20.csv](./data/hkex/hkex-short-selling-2026-10-20.csv) | Original validated one-day sample, also included in the combined extract |
+| [hkex-access-validation.json](./data/hkex/hkex-access-validation.json) | Initial source-access checks, including separately labelled morning-report results |
+
+Each CSV record contains the board, trading date, five-digit stock code, stock
+name, short-selling shares and value, total traded shares and turnover, trading
+currency, and source URL. Treat `stock_code` as text to retain leading zeros.
+The unique record key is `(trading_date, stock_code)`. Monetary amounts are in
+the row's trading currency; do not sum HKD, CNY and USD values together.
+
+The collector reconciles each included report's security count, share totals
+and monetary totals by currency. It requested 21 October 2025 through
+20 October 2026: 80 reports validated, four explicitly reported public-holiday
+closures, and 438 earlier weekday report URLs returned 404. A 404 does not
+establish whether a date was a trading holiday or outside public retention.
+Missing observations are not filled with zero.
+
+The extracts include ETPs and other securities, not just ordinary shares, and
+do not apply subsequent corrections. Technical access does not establish
+commercial-use or redistribution rights; confirm the applicable HKEX terms
+before such use.
+
+The [collector](./scripts/hkex-backfill.py) requires Python 3.9+ and only uses
+the standard library. Fetch a range into a new output directory:
+
+```bash
+python3 scripts/hkex-backfill.py \
+  --start 2025-10-21 --end 2026-10-20 \
+  --output data/hkex-refresh
+```
+
+Use `--resume` with the same range and output directory to reuse validated
+reports, 404 responses and explicit holiday closures, and retry failures.
+Only past dates are accepted so an unpublished or incomplete current-day
+report cannot be mistaken for a completed report. The collector exits nonzero
+for parsing, validation, network or unexpected HTTP failures; unavailable
+404s and explicit closures are recorded in the coverage report.
+
 ## Development
 
 ```bash
