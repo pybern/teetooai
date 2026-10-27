@@ -8,10 +8,13 @@ import { USE_CASE_BY_ID } from "@/lib/usecases";
 import { AskBar } from "./ask-bar";
 import { ChatTurn } from "./insight-card";
 import { useInsights } from "./insight-store";
+import { HkexAgentWorkspace } from "./hkex-agent-workspace";
+import { PdfExportButton } from "./pdf-export-button";
 
 export function Workspace({ marketStrip }: { marketStrip?: ReactNode }) {
   const params = useSearchParams();
   const uc = USE_CASE_BY_ID[params.get("uc") ?? "hk"] ?? USE_CASE_BY_ID.hk;
+  if (uc.execution === "database-agent") return <HkexAgentWorkspace key={uc.id} uc={uc} initialDraft={params.get("q") ?? ""} />;
   return <ChatSession key={uc.id} uc={uc} q={params.get("q")} marketStrip={marketStrip} />;
 }
 
@@ -28,64 +31,69 @@ function ChatSession({ uc, q, marketStrip }: { uc: UseCase; q: string | null; ma
     router.replace(`/?uc=${uc.id}`, { scroll: false });
   }, [hydrated, q, uc.id, ask, router]);
 
-  const follow = useRef(false);
   const threadRef = useRef<HTMLDivElement>(null);
-  const [atBottom, setAtBottom] = useState(true);
+  const [atLatest, setAtLatest] = useState(true);
+  const feed = entries.filter((e) => e.useCaseId === uc.id && e.startedAt >= sessionStart);
+  const conversation = [...feed].reverse();
+  const latestId = conversation.at(-1)?.id;
 
   useEffect(() => {
-    let lastY = window.scrollY;
+    const thread = threadRef.current;
+    if (!thread) return;
     const onScroll = () => {
-      const y = window.scrollY;
-      const near = window.innerHeight + y >= document.documentElement.scrollHeight - 160;
-      // Only an upward scroll by the user releases follow mode; programmatic smooth scrolls pass through far-from-bottom positions.
-      if (near) follow.current = true;
-      else if (y < lastY - 4) follow.current = false;
-      lastY = y;
-      setAtBottom(near);
+      const latest = thread.querySelector("article:last-child");
+      if (!latest) return;
+      const rect = latest.getBoundingClientRect();
+      const bounds = thread.getBoundingClientRect();
+      setAtLatest(rect.top < bounds.bottom && rect.bottom > bounds.top);
     };
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+    thread.addEventListener("scroll", onScroll, { passive: true });
+    return () => thread.removeEventListener("scroll", onScroll);
   }, []);
 
   useEffect(() => {
-    const el = threadRef.current;
-    if (!el) return;
-    const ro = new ResizeObserver(() => {
-      if (follow.current) window.scrollTo({ top: document.documentElement.scrollHeight });
+    if (!latestId) return;
+    const frame = requestAnimationFrame(() => {
+      scrollToLatest("instant");
     });
-    ro.observe(el);
-    return () => ro.disconnect();
-  }, []);
+    return () => cancelAnimationFrame(frame);
+  }, [latestId]);
+
+  function scrollToLatest(behavior: ScrollBehavior) {
+    const thread = threadRef.current;
+    const latest = thread?.querySelector("article:last-child");
+    if (!thread || !latest) return;
+    thread.scrollTo({ top: thread.scrollTop + latest.getBoundingClientRect().top - thread.getBoundingClientRect().top, behavior });
+  }
 
   const jumpToLatest = () => {
-    follow.current = true;
-    window.scrollTo({ top: document.documentElement.scrollHeight, behavior: "smooth" });
+    if (!latestId) return;
+    scrollToLatest(window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth");
   };
 
   const onAsk = (question: string) => {
     ask(question, uc.id);
-    jumpToLatest();
   };
-  const feed = entries.filter((e) => e.useCaseId === uc.id && e.startedAt >= sessionStart);
-  const conversation = [...feed].reverse();
   const busy = entries.some((e) => e.status === "loading");
   const newSession = () => {
     setSessionStart(Date.now());
-    window.scrollTo({ top: 0 });
+    threadRef.current?.scrollTo({ top: 0 });
+    setAtLatest(true);
   };
 
   return (
-    <div className="flex min-h-[calc(100dvh-6.5rem)] flex-col lg:min-h-screen">
-      <header className="border-b border-slate-700 bg-slate-900 px-4 md:px-10 lg:sticky lg:top-0 lg:z-20">
-        <div className="mx-auto flex min-h-12 w-full max-w-5xl items-center gap-3">
+    <div data-research-workspace className="flex min-h-0 flex-1 flex-col overflow-hidden">
+      <header className="shrink-0 border-b border-slate-700 bg-slate-900 px-4 md:px-10">
+        <div className="mx-auto flex min-h-12 w-full max-w-5xl flex-wrap items-center gap-3 py-2">
           <span className="meta min-w-0 flex-1 truncate text-slate-500">
-            Agent chat <span className="px-1 text-slate-600">/</span>
+            Research <span className="px-1 text-slate-600">/</span>
             <span className="text-white">{uc.name}</span>
             <span className="hidden sm:inline">
               <span className="px-1 text-slate-600">/</span>
               {conversation.length} {conversation.length === 1 ? "query" : "queries"} this session
             </span>
           </span>
+          <PdfExportButton target={threadRef} title={`${uc.name} Research`} reports={conversation.flatMap((entry) => entry.report ? [entry.report] : [])} disabled={!conversation.length || conversation.some((entry) => entry.status === "loading" || (entry.status === "done" && entry.live))} />
           {conversation.length > 0 && (
             <button
               onClick={newSession}
@@ -100,7 +108,7 @@ function ChatSession({ uc, q, marketStrip }: { uc: UseCase; q: string | null; ma
         </div>
       </header>
 
-      <div ref={threadRef} className="mx-auto w-full max-w-5xl flex-1 space-y-12 px-4 py-10 md:px-10">
+      <div ref={threadRef} role="region" aria-label="Research conversation" tabIndex={0} className="mx-auto min-h-0 w-full max-w-5xl flex-1 space-y-12 overflow-y-auto overscroll-contain px-4 py-10 md:px-10">
         {hydrated && (
           <Greeting uc={uc} onAsk={onAsk} showPrompts={feed.length === 0}>
             {marketStrip && uc.id === "hk" ? marketStrip : null}
@@ -120,9 +128,9 @@ function ChatSession({ uc, q, marketStrip }: { uc: UseCase; q: string | null; ma
         ))}
       </div>
 
-      <div className="sticky bottom-0 z-20 border-t border-slate-700 bg-slate-900 px-4 pb-3 pt-3 md:px-10">
+      <div className="z-20 shrink-0 border-t border-slate-700 bg-slate-900 px-4 pb-3 pt-3 md:px-10">
         <div className="relative mx-auto w-full max-w-5xl">
-          {!atBottom && conversation.length > 0 && (
+          {!atLatest && conversation.length > 0 && (
             <button
               onClick={jumpToLatest}
               className="meta absolute -top-12 left-1/2 flex min-h-8 -translate-x-1/2 items-center border border-slate-600 bg-slate-950 px-3 text-slate-200 transition hover:border-slate-400 hover:text-white"
@@ -131,7 +139,7 @@ function ChatSession({ uc, q, marketStrip }: { uc: UseCase; q: string | null; ma
             </button>
           )}
           <AskBar onAsk={onAsk} suggestions={uc.questions.map((x) => x.q)} accent={uc.accent} busy={busy} placement="up" />
-          <p className="meta mt-2 text-slate-500">Deterministic engine · curated datasets · every answer shows its tool calls, data and SQL</p>
+          <p className="meta mt-2 text-slate-500">Explore the data with charts, key findings and sources.</p>
         </div>
       </div>
     </div>

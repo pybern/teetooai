@@ -4,6 +4,23 @@ export const ALL_DATASET_IDS = ["hk-indices", "hk-valuations", "hk-prices", "hk-
 
 export const USE_CASES: UseCase[] = [
   {
+    id: "hkex-db",
+    execution: "database-agent",
+    name: "HKEX Short-Selling Research",
+    persona: "Short-selling insights",
+    tagline: "Explore HKEX short-selling activity",
+    scenario: "Discover the most shorted stocks, compare companies and follow market trends with clear charts, key findings and sources.",
+    icon: "candlestick",
+    accent: "#2d72d2",
+    datasetIds: [],
+    questions: [
+      { q: "Rank the top 10 HKD stocks by short-selling value on the latest stored trading day.", tag: "Ranking" },
+      { q: "Show Tencent's HKD short-selling turnover ratio over the latest 30 available calendar days.", tag: "Trend" },
+      { q: "Compare HSBC and AIA short-selling values over the latest 30 calendar days in HKD.", tag: "Compare" },
+      { q: "How has total HKD short-selling turnover changed over the latest 30 calendar days?", tag: "Market" },
+    ],
+  },
+  {
     id: "hk",
     name: "HK Equities Analyst",
     persona: "Portfolio manager at a Hong Kong fund house",

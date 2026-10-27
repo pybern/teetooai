@@ -24,9 +24,10 @@ export function Sidebar() {
     .slice(0, 8);
 
   const nav = [
-    { href: "/", label: "Agent chat", active: pathname === "/" },
+    { href: "/", label: "Ask a question", active: pathname === "/" },
     { href: "/dashboard", label: "Dashboard", active: pathname === "/dashboard", badge: pinned.length },
     { href: "/datasets", label: "Data catalog", active: pathname === "/datasets" },
+    { href: "/config", label: "Configuration", active: pathname === "/config" },
   ];
 
   return (
@@ -87,7 +88,7 @@ export function Sidebar() {
       </div>
 
       <div className="mx-5 mt-3 text-[11px] leading-relaxed text-slate-500">
-        Sources: Yahoo Finance, World Bank, BLS, NOAA, NASA, Ember, IEA, SEC filings. Deterministic engine, no LLM calls.
+        Explore the data. Find the story. Keep the insights that matter.
       </div>
     </aside>
   );

@@ -4,7 +4,7 @@ import clsx from "clsx";
 import { useMemo, useRef, useState } from "react";
 import { USE_CASES } from "@/lib/usecases";
 
-const ALL_QUESTIONS = Array.from(new Set(USE_CASES.flatMap((u) => u.questions.map((q) => q.q))));
+const ALL_QUESTIONS = Array.from(new Set(USE_CASES.filter((u) => u.execution !== "database-agent").flatMap((u) => u.questions.map((q) => q.q))));
 
 export function AskBar({
   onAsk,

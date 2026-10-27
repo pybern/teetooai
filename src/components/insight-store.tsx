@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 import type { InsightReport } from "@/lib/types";
 
 export type Entry = {
@@ -33,6 +33,9 @@ const MAX_ENTRIES = 25;
 const STEP_MS = [450, 650, 850, 1300, 650, 900];
 
 const Ctx = createContext<Store | null>(null);
+const subscribeToHydration = () => () => {};
+const clientHydrationSnapshot = () => true;
+const serverHydrationSnapshot = () => false;
 
 export function InsightStoreProvider({ children }: { children: ReactNode }) {
   const [entries, setEntries] = useState<Entry[]>([]);
@@ -109,6 +112,11 @@ export function InsightStoreProvider({ children }: { children: ReactNode }) {
 
 export function useInsights(): Store {
   const ctx = useContext(Ctx);
-  if (!ctx) throw new Error("useInsights must be used inside InsightStoreProvider");
-  return ctx;
+  const consumerHydrated = useSyncExternalStore(subscribeToHydration, clientHydrationSnapshot, serverHydrationSnapshot);
+  return useMemo(() => {
+    if (!ctx) throw new Error("useInsights must be used inside InsightStoreProvider");
+    // Suspense consumers can hydrate after the provider has restored browser data.
+    if (!consumerHydrated) return { ...ctx, hydrated: false, entries: [], pinned: [], isPinned: () => false };
+    return ctx;
+  }, [ctx, consumerHydrated]);
 }

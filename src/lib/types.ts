@@ -153,6 +153,14 @@ export type Insight = {
   tone?: "positive" | "negative" | "neutral" | "warning";
 };
 
+export type InsightSummary = {
+  title: string;
+  headline: string;
+  scope: string;
+  kpis: Kpi[];
+  insights: Insight[];
+};
+
 export type TableSpec = {
   columns: { key: string; label: string; format?: NumberFormat; align?: "left" | "right" }[];
   rows: ChartDatum[];
@@ -179,6 +187,7 @@ export type InsightReport = {
 
 export type UseCase = {
   id: string;
+  execution?: "database-agent";
   name: string;
   persona: string;
   tagline: string;

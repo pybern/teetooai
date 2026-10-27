@@ -27,7 +27,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <Suspense fallback={<div className="hidden w-64 shrink-0 lg:block" />}>
               <Sidebar />
             </Suspense>
-            <main className="min-w-0 flex-1">
+            <main className="app-main min-w-0 flex-1">
               <MobileNav />
               {children}
             </main>

@@ -4,6 +4,12 @@ const nextConfig: NextConfig = {
   /* config options here */
   cacheComponents: true,
   partialPrefetching: true,
+  outputFileTracingIncludes: {
+    "/api/config/database/initialize": [
+      "./data/hkex/hkex-short-selling.csv",
+      "./data/hkex/hkex-coverage.json",
+    ],
+  },
   turbopack: {
     rules: {
       "*.css": {

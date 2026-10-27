@@ -1,5 +1,6 @@
 "use client";
 
+import { useRef } from "react";
 import {
   Area,
   AreaChart,
@@ -134,10 +135,20 @@ function categoryInterval(n: number): number | "preserveStartEnd" {
 
 function refLabelPos(spec: ChartSpec, x: string | number): "insideTopLeft" | "insideTopRight" {
   const idx = spec.data.findIndex((d) => d[spec.xKey] === x);
-  return idx >= 0 && idx > spec.data.length * 0.8 ? "insideTopRight" : "insideTopLeft";
+  return idx >= 0 && (idx === spec.data.length - 1 || idx >= spec.data.length * 0.8) ? "insideTopRight" : "insideTopLeft";
 }
 
 export function ChartView({ spec, height }: { spec: ChartSpec; height?: number }) {
+  const container = useRef<HTMLDivElement>(null);
+  const animating = useRef(new Set<string>());
+  function onAnimationStart(key: string) {
+    animating.current.add(key);
+    if (container.current) container.current.dataset.pdfAnimating = "true";
+  }
+  function onAnimationEnd(key: string) {
+    animating.current.delete(key);
+    if (container.current) container.current.dataset.pdfAnimating = String(animating.current.size > 0);
+  }
   const theme = useTheme();
   const k = CHART[theme];
   const tone = toneFor(theme);
@@ -155,7 +166,7 @@ export function ChartView({ spec, height }: { spec: ChartSpec; height?: number }
     switch (spec.type) {
       case "area":
         return (
-          <AreaChart data={spec.data} margin={{ top: 10, right: 12, left: 0, bottom: 0 }}>
+          <AreaChart data={spec.data} margin={{ top: 32, right: 16, left: 8, bottom: 8 }}>
             <defs>
               {spec.series.map((s, i) => (
                 <linearGradient key={s.key} id={`g-${spec.id}-${i}`} x1="0" y1="0" x2="0" y2="1">
@@ -166,7 +177,7 @@ export function ChartView({ spec, height }: { spec: ChartSpec; height?: number }
             </defs>
             <CartesianGrid stroke={GRID} vertical={false} />
             <XAxis dataKey={spec.xKey} tick={AXIS} tickLine={false} axisLine={false} interval={categoryInterval(n)} minTickGap={12} />
-            <YAxis tick={AXIS} tickLine={false} axisLine={false} tickFormatter={tick(spec.format)} width={56} domain={["auto", "auto"]} />
+            <YAxis tick={AXIS} tickLine={false} axisLine={false} tickFormatter={tick(spec.format)} width="auto" domain={["auto", "auto"]} />
             {tooltip}
             {spec.referenceY?.map((r) => (
               <ReferenceLine key={r.label} y={r.value} stroke={MUTE} strokeDasharray="4 4" label={{ value: r.label, fill: INK, fontSize: 10, position: "insideTopRight" }} />
@@ -175,32 +186,32 @@ export function ChartView({ spec, height }: { spec: ChartSpec; height?: number }
               <ReferenceLine key={r.label} x={r.value} stroke={MARK} strokeDasharray="3 3" label={{ value: r.label, fill: MARK, fontSize: 10, position: refLabelPos(spec, r.value) }} />
             ))}
             {spec.series.map((s, i) => (
-              <Area key={s.key} type="monotone" dataKey={s.key} name={s.label} stroke={colorOf(s, i)} strokeWidth={1.75} fill={`url(#g-${spec.id}-${i})`} dot={n <= 16 ? { r: 2.5, fill: colorOf(s, i) } : false} activeDot={{ r: 4 }} />
+              <Area key={s.key} onAnimationStart={() => onAnimationStart(s.key)} onAnimationEnd={() => onAnimationEnd(s.key)} type="monotone" dataKey={s.key} name={s.label} stroke={colorOf(s, i)} strokeWidth={1.75} fill={`url(#g-${spec.id}-${i})`} dot={n <= 16 ? { r: 2.5, fill: colorOf(s, i) } : false} activeDot={{ r: 4 }} />
             ))}
           </AreaChart>
         );
       case "line":
         return (
-          <LineChart data={spec.data} margin={{ top: 10, right: 12, left: 0, bottom: 0 }}>
+          <LineChart data={spec.data} margin={{ top: 32, right: 16, left: 8, bottom: 8 }}>
             <CartesianGrid stroke={GRID} vertical={false} />
             <XAxis dataKey={spec.xKey} tick={AXIS} tickLine={false} axisLine={false} interval={categoryInterval(n)} minTickGap={12} />
-            <YAxis tick={AXIS} tickLine={false} axisLine={false} tickFormatter={tick(spec.format)} width={56} domain={["auto", "auto"]} />
+            <YAxis tick={AXIS} tickLine={false} axisLine={false} tickFormatter={tick(spec.format)} width="auto" domain={["auto", "auto"]} />
             {tooltip}
             {spec.series.length > 1 && <Legend iconType="square" iconSize={8} wrapperStyle={LEGEND} />}
             {spec.referenceY?.map((r) => (
               <ReferenceLine key={r.label} y={r.value} stroke={MUTE} strokeDasharray="4 4" />
             ))}
             {spec.series.map((s, i) => (
-              <Line key={s.key} type="monotone" dataKey={s.key} name={s.label} stroke={colorOf(s, i)} strokeWidth={1.75} dot={n <= 12 ? { r: 3 } : false} connectNulls strokeDasharray={s.dashed ? "6 4" : undefined} />
+              <Line key={s.key} onAnimationStart={() => onAnimationStart(s.key)} onAnimationEnd={() => onAnimationEnd(s.key)} type="monotone" dataKey={s.key} name={s.label} stroke={colorOf(s, i)} strokeWidth={1.75} dot={n <= 12 ? { r: 3 } : false} connectNulls strokeDasharray={s.dashed ? "6 4" : undefined} />
             ))}
           </LineChart>
         );
       case "bar":
         return (
-          <BarChart data={spec.data} margin={{ top: 10, right: 12, left: 0, bottom: 0 }}>
+          <BarChart data={spec.data} margin={{ top: 32, right: 16, left: 8, bottom: 8 }}>
             <CartesianGrid stroke={GRID} vertical={false} />
             <XAxis dataKey={spec.xKey} tick={AXIS} tickLine={false} axisLine={false} interval={categoryInterval(n)} minTickGap={6} />
-            <YAxis tick={AXIS} tickLine={false} axisLine={false} tickFormatter={tick(spec.format)} width={56} />
+            <YAxis tick={AXIS} tickLine={false} axisLine={false} tickFormatter={tick(spec.format)} width="auto" />
             {tooltip}
             {spec.series.length > 1 && <Legend iconType="square" iconSize={8} wrapperStyle={LEGEND} />}
             {spec.referenceY?.map((r) => (
@@ -208,7 +219,7 @@ export function ChartView({ spec, height }: { spec: ChartSpec; height?: number }
             ))}
             <ReferenceLine y={0} stroke={ZERO} />
             {spec.series.map((s, i) => (
-              <Bar key={s.key} dataKey={s.key} name={s.label} fill={colorOf(s, i)} maxBarSize={48}>
+              <Bar key={s.key} onAnimationStart={() => onAnimationStart(s.key)} onAnimationEnd={() => onAnimationEnd(s.key)} dataKey={s.key} name={s.label} fill={colorOf(s, i)} maxBarSize={48}>
                 {spec.colorByKey && spec.series.length === 1 && spec.data.map((d, j) => <Cell key={j} fill={dataColor(d[spec.colorByKey!], colorOf(s, i))} />)}
                 {n <= 8 && spec.series.length === 1 && (
                   <LabelList dataKey={s.key} position="top" formatter={(v: unknown) => fmtCompact(Number(v), s.format ?? spec.format)} style={{ fill: INK, fontSize: 10.5, fontFamily: "var(--font-geist-mono)" }} />
@@ -227,7 +238,7 @@ export function ChartView({ spec, height }: { spec: ChartSpec; height?: number }
             <YAxis type="category" dataKey={spec.xKey} tick={{ ...AXIS, fill: INK }} tickLine={false} axisLine={false} width={Math.min(170, Math.max(64, longest * 7))} interval={0} />
             {tooltip}
             <ReferenceLine x={0} stroke={ZERO} />
-            <Bar dataKey={s.key} name={s.label} fill={colorOf(s, 0)} maxBarSize={18}>
+            <Bar onAnimationStart={() => onAnimationStart(s.key)} onAnimationEnd={() => onAnimationEnd(s.key)} dataKey={s.key} name={s.label} fill={colorOf(s, 0)} maxBarSize={18}>
               {spec.data.map((d, j) => (
                 <Cell key={j} fill={dataColor(spec.colorByKey && d[spec.colorByKey], colorOf(s, 0))} />
               ))}
@@ -238,35 +249,21 @@ export function ChartView({ spec, height }: { spec: ChartSpec; height?: number }
       }
       case "donut": {
         const s = spec.series[0];
-        const total = spec.data.reduce((a, d) => a + Number(d[s.key] ?? 0), 0);
         return (
           <PieChart>
             {tooltip}
-            <Pie data={spec.data} dataKey={s.key} nameKey={spec.xKey} innerRadius="58%" outerRadius="88%" paddingAngle={1.5} stroke="none" cx="35%">
+            <Pie onAnimationStart={() => onAnimationStart(s.key)} onAnimationEnd={() => onAnimationEnd(s.key)} data={spec.data} dataKey={s.key} nameKey={spec.xKey} innerRadius="58%" outerRadius="80%" paddingAngle={1.5} stroke="none" cx="50%" cy="50%">
               {spec.data.map((d, j) => (
                 <Cell key={j} fill={dataColor(d.__color, PALETTE[j % PALETTE.length])} />
               ))}
             </Pie>
-            <Legend
-              layout="vertical"
-              align="right"
-              verticalAlign="middle"
-              iconType="square"
-              iconSize={8}
-              wrapperStyle={{ ...LEGEND, maxWidth: "50%" }}
-              formatter={(value: string, entry: { payload?: { value?: number } }) => (
-                <span className="text-slate-300">
-                  {value} <span className="text-slate-500">{total ? `${((Number(entry.payload?.value ?? 0) / total) * 100).toFixed(1)}%` : ""}</span>
-                </span>
-              )}
-            />
           </PieChart>
         );
       }
       case "composed": {
         const hasRight = spec.series.some((s) => s.axis === "right");
         return (
-          <ComposedChart data={spec.data} margin={{ top: 10, right: hasRight ? 4 : 12, left: 0, bottom: 0 }}>
+          <ComposedChart data={spec.data} margin={{ top: 32, right: 16, left: 8, bottom: 8 }}>
             <defs>
               {spec.series.map((s, i) => (
                 <linearGradient key={s.key} id={`cg-${spec.id}-${i}`} x1="0" y1="0" x2="0" y2="1">
@@ -277,14 +274,14 @@ export function ChartView({ spec, height }: { spec: ChartSpec; height?: number }
             </defs>
             <CartesianGrid stroke={GRID} vertical={false} />
             <XAxis dataKey={spec.xKey} tick={AXIS} tickLine={false} axisLine={false} interval={categoryInterval(n)} minTickGap={12} />
-            <YAxis yAxisId="left" tick={AXIS} tickLine={false} axisLine={false} tickFormatter={tick(spec.format)} width={56} domain={["auto", "auto"]} />
-            {hasRight && <YAxis yAxisId="right" orientation="right" tick={AXIS} tickLine={false} axisLine={false} tickFormatter={tick(spec.rightFormat)} width={52} domain={["auto", "auto"]} />}
+            <YAxis yAxisId="left" tick={AXIS} tickLine={false} axisLine={false} tickFormatter={tick(spec.format)} width="auto" domain={["auto", "auto"]} />
+            {hasRight && <YAxis yAxisId="right" orientation="right" tick={AXIS} tickLine={false} axisLine={false} tickFormatter={tick(spec.rightFormat)} width="auto" domain={["auto", "auto"]} />}
             {tooltip}
             <Legend iconType="square" iconSize={8} wrapperStyle={LEGEND} />
             {spec.band && (
               <>
                 <Area yAxisId="left" dataKey={spec.band.lowKey} stackId="band" stroke="none" fill="transparent" legendType="none" isAnimationActive={false} activeDot={false} />
-                <Area yAxisId="left" dataKey={spec.band.highKey} stackId="band" stroke="none" fill={MARK} fillOpacity={0.14} legendType="none" name="90% interval" activeDot={false} />
+                <Area onAnimationStart={() => onAnimationStart(spec.band!.highKey)} onAnimationEnd={() => onAnimationEnd(spec.band!.highKey)} yAxisId="left" dataKey={spec.band.highKey} stackId="band" stroke="none" fill={MARK} fillOpacity={0.14} legendType="none" name="90% interval" activeDot={false} />
               </>
             )}
             {spec.referenceX?.map((r) => (
@@ -293,10 +290,10 @@ export function ChartView({ spec, height }: { spec: ChartSpec; height?: number }
             {spec.series.map((s, i) => {
               const axis = s.axis === "right" ? "right" : "left";
               const c = colorOf(s, i);
-              if (s.kind === "bar") return <Bar key={s.key} yAxisId={axis} dataKey={s.key} name={s.label} fill={c} maxBarSize={40} fillOpacity={0.85} />;
-              if (s.kind === "area") return <Area key={s.key} yAxisId={axis} type="monotone" dataKey={s.key} name={s.label} stroke={c} strokeWidth={1.75} fill={`url(#cg-${spec.id}-${i})`} connectNulls={false} dot={false} />;
-              if (s.kind === "scatter") return <Scatter key={s.key} yAxisId={axis} dataKey={s.key} name={s.label} fill={c} shape="circle" />;
-              return <Line key={s.key} yAxisId={axis} type="monotone" dataKey={s.key} name={s.label} stroke={c} strokeWidth={2} strokeDasharray={s.dashed ? "6 4" : undefined} dot={n <= 16 ? { r: 3 } : false} connectNulls />;
+              if (s.kind === "bar") return <Bar key={s.key} onAnimationStart={() => onAnimationStart(s.key)} onAnimationEnd={() => onAnimationEnd(s.key)} yAxisId={axis} dataKey={s.key} name={s.label} fill={c} maxBarSize={40} fillOpacity={0.85} />;
+              if (s.kind === "area") return <Area key={s.key} onAnimationStart={() => onAnimationStart(s.key)} onAnimationEnd={() => onAnimationEnd(s.key)} yAxisId={axis} type="monotone" dataKey={s.key} name={s.label} stroke={c} strokeWidth={1.75} fill={`url(#cg-${spec.id}-${i})`} connectNulls={false} dot={false} />;
+              if (s.kind === "scatter") return <Scatter key={s.key} onAnimationStart={() => onAnimationStart(s.key)} onAnimationEnd={() => onAnimationEnd(s.key)} yAxisId={axis} dataKey={s.key} name={s.label} fill={c} shape="circle" />;
+              return <Line key={s.key} onAnimationStart={() => onAnimationStart(s.key)} onAnimationEnd={() => onAnimationEnd(s.key)} yAxisId={axis} type="monotone" dataKey={s.key} name={s.label} stroke={c} strokeWidth={2} strokeDasharray={s.dashed ? "6 4" : undefined} dot={n <= 16 ? { r: 3 } : false} connectNulls />;
             })}
           </ComposedChart>
         );
@@ -305,10 +302,10 @@ export function ChartView({ spec, height }: { spec: ChartSpec; height?: number }
         const [sx, sy] = spec.series;
         const line = spec.highlightKey ? (JSON.parse(spec.highlightKey) as { x1: number; y1: number; x2: number; y2: number }) : null;
         return (
-          <ScatterChart margin={{ top: 16, right: 20, left: 0, bottom: 8 }}>
+          <ScatterChart margin={{ top: 32, right: 32, left: 8, bottom: 12 }}>
             <CartesianGrid stroke={GRID} />
             <XAxis type="number" dataKey="x" name={sx.label} tick={AXIS} tickLine={false} axisLine={false} tickFormatter={tick(sx.format)} domain={["auto", "auto"]} label={{ value: sx.label, position: "insideBottom", offset: -4, fill: MUTE, fontSize: 11 }} />
-            <YAxis type="number" dataKey="y" name={sy.label} tick={AXIS} tickLine={false} axisLine={false} tickFormatter={tick(sy.format)} width={56} domain={["auto", "auto"]} />
+            <YAxis type="number" dataKey="y" name={sy.label} tick={AXIS} tickLine={false} axisLine={false} tickFormatter={tick(sy.format)} width="auto" domain={["auto", "auto"]} />
             {tooltip}
             {line && (
               <ReferenceLine
@@ -322,7 +319,7 @@ export function ChartView({ spec, height }: { spec: ChartSpec; height?: number }
                 ifOverflow="extendDomain"
               />
             )}
-            <Scatter data={spec.data} fill={PALETTE[0]}>
+            <Scatter onAnimationStart={() => onAnimationStart("scatter")} onAnimationEnd={() => onAnimationEnd("scatter")} data={spec.data} fill={PALETTE[0]}>
               {spec.data.map((d, j) => (
                 <Cell key={j} fill={dataColor(d.__color, PALETTE[0])} />
               ))}
@@ -333,14 +330,14 @@ export function ChartView({ spec, height }: { spec: ChartSpec; height?: number }
       }
       case "radar":
         return (
-          <RadarChart data={spec.data} outerRadius="72%">
+          <RadarChart data={spec.data} outerRadius="55%">
             <PolarGrid stroke={GRID} />
             <PolarAngleAxis dataKey={spec.xKey} tick={{ ...AXIS, fill: INK }} />
             <PolarRadiusAxis tick={false} axisLine={false} domain={[0, 100]} />
             {tooltip}
             <Legend iconType="square" iconSize={8} wrapperStyle={LEGEND} />
             {spec.series.map((s, i) => (
-              <Radar key={s.key} dataKey={s.key} name={s.label} stroke={colorOf(s, i)} fill={colorOf(s, i)} fillOpacity={s.key === "Median" ? 0.05 : 0.22} strokeWidth={2} strokeDasharray={s.key === "Median" ? "4 4" : undefined} />
+              <Radar key={s.key} onAnimationStart={() => onAnimationStart(s.key)} onAnimationEnd={() => onAnimationEnd(s.key)} dataKey={s.key} name={s.label} stroke={colorOf(s, i)} fill={colorOf(s, i)} fillOpacity={s.key === "Median" ? 0.05 : 0.22} strokeWidth={2} strokeDasharray={s.key === "Median" ? "4 4" : undefined} />
             ))}
           </RadarChart>
         );
@@ -355,11 +352,28 @@ export function ChartView({ spec, height }: { spec: ChartSpec; height?: number }
     }
   })();
 
+  const donutTotal = spec.type === "donut" ? spec.data.reduce((total, datum) => total + Number(datum[spec.series[0].key] ?? 0), 0) : 0;
+
   return (
-    <div style={{ height: h }} className="w-full">
-      <ResponsiveContainer width="100%" height="100%">
-        {body}
-      </ResponsiveContainer>
+    <div ref={container} className="min-w-0 w-full">
+      <div data-pdf-chart-container style={{ height: h }} className="min-w-0 w-full">
+        <ResponsiveContainer width="100%" height="100%" minWidth={0}>
+          {body}
+        </ResponsiveContainer>
+      </div>
+      {spec.type === "donut" && (
+        <ul aria-label="Chart legend" className="mt-2 grid gap-x-4 gap-y-2 text-xs sm:grid-cols-2">
+          {spec.data.map((datum, index) => (
+            <li key={index} className="flex min-w-0 items-start gap-2 text-slate-300">
+              <span className="mt-1 h-2 w-2 shrink-0" style={{ background: dataColor(datum.__color, PALETTE[index % PALETTE.length]) }} />
+              <span className="min-w-0 flex-1 break-words">{String(datum[spec.xKey] ?? "")}</span>
+              <span className="shrink-0 font-mono tabular-nums text-slate-500">
+                {donutTotal ? `${((Number(datum[spec.series[0].key] ?? 0) / donutTotal) * 100).toFixed(1)}%` : "0.0%"}
+              </span>
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }
@@ -379,26 +393,31 @@ type TreeCellProps = {
   surface: string;
 };
 
-function TreeCell(props: TreeCellProps) {
+export function TreeCell(props: TreeCellProps) {
   const { x = 0, y = 0, width = 0, height = 0, name, value, depth, format } = props;
-  if (depth === 0) return null;
+  if (depth === 0 || width <= 0 || height <= 0) return null;
   const fill = props.tone(props.__color ?? props.payload?.__color ?? LIGHT_PALETTE[0]);
   const label = isLight(fill) ? "#1c2127" : "#ffffff";
-  const showName = width > 56 && height > 26;
-  const showValue = width > 56 && height > 44;
+  const title = name ?? "";
+  const formatted = fmtCompact(Number(value), format);
+  const availableWidth = Math.max(0, width - 24);
+  const maxCharacters = Math.floor(availableWidth / 7);
+  const showName = width >= 72 && height >= 32;
+  const showValue = showName && height >= 52 && formatted.length * 7 <= availableWidth;
   return (
-    <g>
-      <rect x={x} y={y} width={width} height={height} fill={fill} fillOpacity={0.9} stroke={props.surface} strokeWidth={2} />
+    <svg x={x} y={y} width={width} height={height} overflow="hidden">
+      <title>{`${title}: ${formatted}`}</title>
+      <rect width={width} height={height} fill={fill} stroke={props.surface} strokeWidth={2} />
       {showName && (
-        <text x={x + 8} y={y + 18} fill={label} fontSize={12} fontWeight={600}>
-          {String(name).length * 7 > width - 12 ? `${String(name).slice(0, Math.max(3, Math.floor((width - 16) / 7)))}…` : name}
+        <text x={12} y={21} fill={label} stroke="none" fontSize={11} fontWeight={600} fontFamily={MONO}>
+          {title.length > maxCharacters ? `${title.slice(0, maxCharacters - 1)}…` : title}
         </text>
       )}
       {showValue && (
-        <text x={x + 8} y={y + 34} fill={label} fillOpacity={0.85} fontSize={11}>
-          {fmtCompact(Number(value), format)}
+        <text x={12} y={39} fill={label} stroke="none" fillOpacity={0.85} fontSize={11} fontFamily={MONO}>
+          {formatted}
         </text>
       )}
-    </g>
+    </svg>
   );
 }

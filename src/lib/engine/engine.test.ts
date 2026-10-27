@@ -6,7 +6,7 @@ import { parseQuestion } from "./parse";
 const ids = (useCase: string) => USE_CASES.find((u) => u.id === useCase)!.datasetIds;
 
 describe("every curated question produces a full report", () => {
-  for (const uc of USE_CASES) {
+  for (const uc of USE_CASES.filter((item) => item.execution !== "database-agent")) {
     for (const { q } of uc.questions) {
       it(`${uc.id}: ${q}`, () => {
         const r = runInsight(q, uc.id);

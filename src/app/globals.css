@@ -109,6 +109,13 @@ body {
   font-feature-settings: "tnum" 1;
 }
 
+.app-main:has([data-research-workspace]) {
+  display: flex;
+  height: 100dvh;
+  flex-direction: column;
+  overflow: hidden;
+}
+
 .meta {
   font-family: var(--font-geist-mono), ui-monospace, monospace;
   font-size: 10.5px;

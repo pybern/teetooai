@@ -7,6 +7,7 @@ function validate(question: unknown, useCaseId: unknown): { question: string; us
   if (typeof question !== "string" || !question.trim()) return "`question` must be a non-empty string";
   if (question.length > MAX_QUESTION) return `\`question\` must be at most ${MAX_QUESTION} characters`;
   const uc = typeof useCaseId === "string" && USE_CASE_BY_ID[useCaseId] ? useCaseId : "explore";
+  if (USE_CASE_BY_ID[uc].execution === "database-agent") return "HKEX database research uses the dedicated /api/hkex/chat endpoint.";
   return { question: question.trim(), useCaseId: uc };
 }
 

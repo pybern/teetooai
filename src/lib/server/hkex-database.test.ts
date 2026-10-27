@@ -1,0 +1,94 @@
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { DEFAULT_CONNECTIONS } from "@/lib/connections";
+import { buildHkexQuery, HkexDatabase, validateHkexQuery, type HkexQuery } from "./hkex-database";
+
+const pg = vi.hoisted(() => ({ connect: vi.fn(), query: vi.fn(), end: vi.fn(), on: vi.fn() }));
+vi.mock("pg", () => ({
+  Client: class {
+    connect = pg.connect; query = pg.query; end = pg.end; on = pg.on;
+  },
+}));
+
+const filters: HkexQuery = {
+  mode: "ranking", from: null, to: null, stockCodes: [], currency: "HKD", board: null,
+  metric: "short_selling_value", limit: 10,
+};
+const settings = { ...DEFAULT_CONNECTIONS.database, host: "test-db", database: "test", username: "reader", password: "db-secret" };
+
+beforeEach(() => {
+  vi.clearAllMocks();
+  pg.connect.mockResolvedValue(undefined);
+  pg.end.mockResolvedValue(undefined);
+  pg.query.mockResolvedValue({ rows: [] });
+});
+
+describe("bounded HKEX queries", () => {
+  it("builds fixed SQL with parameterized filters, exact numeric strings and weighted ratios", () => {
+    const result = buildHkexQuery({ ...filters, from: "2026-01-01", to: "2026-02-01", stockCodes: ["00700"], metric: "short_turnover_percent" });
+    expect(result.parameters).toEqual(["2026-01-01", "2026-02-01", "HKD", null, ["00700"], 11]);
+    expect(result.sql).toContain("sum(short_selling_value) / nullif(sum(total_turnover), 0)");
+    expect(result.sql).toContain("AND trading_currency = $3");
+    expect(result.sql).toContain("stock_code = ANY($5::text[])");
+    expect(result.sql).toContain("WHERE $2::date IS NULL AND trading_currency = $3");
+    expect(result.sql).not.toContain("00700");
+    expect(result.sql).not.toContain("avg(");
+  });
+  it.each([
+    { ...filters, stockCodes: ["700"] }, { ...filters, stockCodes: ["00700'); DROP TABLE x;--"] },
+    { ...filters, currency: "ANY" }, { ...filters, board: "other" }, { ...filters, limit: 101 },
+    { ...filters, limit: 0 }, { ...filters, metric: "pg_sleep(10)" }, { ...filters, mode: "sql" },
+    { ...filters, from: "2026-02-30", to: "2026-03-01" },
+    { ...filters, from: "2026-03-01", to: "2026-02-01" },
+    { ...filters, from: "2024-01-01", to: "2026-01-01" },
+    { ...filters, from: "2026-01-01" }, { ...filters, mode: "stock-trend" },
+  ])("rejects unsafe or invalid filters without a database call: %j", (query) => {
+    expect(() => validateHkexQuery(query as HkexQuery)).toThrow();
+    expect(pg.connect).not.toHaveBeenCalled();
+  });
+  it("reports truncation explicitly and brackets every query in a read-only transaction", async () => {
+    pg.query.mockImplementation(async (sql: string) => ({ rows: sql.startsWith("WITH latest") ? Array.from({ length: 11 }, (_, i) => ({ stock_code: String(i).padStart(5, "0") })) : [] }));
+    const result = await new HkexDatabase(settings, new AbortController().signal).query(filters);
+    expect(result.rows).toHaveLength(10);
+    expect(result.truncated).toBe(true);
+    expect(pg.query.mock.calls[0][0]).toBe("BEGIN READ ONLY; SET LOCAL statement_timeout = '5s'; SET LOCAL lock_timeout = '2s'");
+    expect(pg.query).toHaveBeenCalledTimes(3);
+    expect(pg.query.mock.calls.at(-1)![0]).toBe("ROLLBACK");
+    expect(pg.end).toHaveBeenCalledOnce();
+  });
+  it("normalizes short stock codes without interpreting SQL or wildcards", async () => {
+    const database = new HkexDatabase(settings, new AbortController().signal);
+    await database.findStocks("700");
+    expect(pg.query.mock.calls[1][1]).toEqual(["00700", "%700%"]);
+    await database.findStocks("50%_\\");
+    expect(pg.query.mock.calls[4][1]).toEqual([null, "%50\\%\\_\\\\%"]);
+  });
+  it("fails explicitly for missing tables, empty coverage and oversized evidence", async () => {
+    const database = new HkexDatabase(settings, new AbortController().signal);
+    await expect(database.inspect()).rejects.toThrow("missing or not accessible");
+    pg.query.mockImplementation(async (sql: string) => ({ rows: sql.includes("information_schema.columns") ? [{ column_name: "stock_code" }] : [] }));
+    await expect(database.inspect()).rejects.toThrow("existing HKEX table is empty");
+    pg.query.mockImplementation(async (sql: string) => ({ rows: sql.startsWith("WITH latest") ? [{ stock_name: "x".repeat(32001) }] : [] }));
+    await expect(database.query(filters)).rejects.toThrow("32,000");
+  });
+  it("sanitizes database failures, releases connections and bounds the number of reads", async () => {
+    const database = new HkexDatabase(settings, new AbortController().signal);
+    pg.query.mockRejectedValueOnce(Object.assign(new Error("password db-secret"), { code: "42501" }));
+    await expect(database.query(filters)).rejects.toThrow("SELECT access");
+    expect(pg.end).toHaveBeenCalledOnce();
+    pg.query.mockResolvedValue({ rows: [] });
+    for (let i = 0; i < 9; i++) await database.query(filters);
+    await expect(database.query(filters)).rejects.toThrow("ten-read limit");
+    expect(pg.connect).toHaveBeenCalledTimes(10);
+  });
+  it("propagates cancellation and closes the active client on stream abort", async () => {
+    const controller = new AbortController();
+    const database = new HkexDatabase(settings, new AbortController().signal);
+    database.attachSignal(controller.signal);
+    pg.query.mockImplementation(async () => {
+      controller.abort();
+      throw new Error("Connection terminated");
+    });
+    await expect(database.query(filters)).rejects.toThrow("cancelled");
+    expect(pg.end).toHaveBeenCalled();
+  });
+});
