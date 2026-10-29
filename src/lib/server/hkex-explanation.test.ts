@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { createHkexExplanationRunner, storeHkexExplanation } from "./hkex-explanation";
+import { createHkexExplanationRunner, explanationInstructions, storeHkexExplanation } from "./hkex-explanation";
 import type { DatabaseEvidence, HkexQuery } from "./hkex-database";
 
 const query: HkexQuery = { mode: "ranking", from: null, to: null, stockCodes: [], currency: "HKD", board: null, metric: "short_selling_value", limit: 10 };
@@ -26,3 +26,15 @@ describe("server-held explanation references", () => {
     expect(() => createHkexExplanationRunner(first)).toThrow("expired");
   });
 });
+
+describe("explanation instructions", () => {
+  it("adapts to the workspace and adds HKEX rules only for HKEX evidence", () => {
+    const hk = explanationInstructions({ workspace: { name: "HK Equities Analyst", persona: "Portfolio manager" }, results: [] });
+    expect(hk).toContain("HK Equities Analyst");
+    expect(hk).toContain("units");
+    expect(hk).toContain("recommendations");
+    expect(hk).not.toContain("short interest");
+    expect(explanationInstructions({ results: [{ query, result }] })).toContain("Short turnover ratio is not short interest");
+  });
+});
+

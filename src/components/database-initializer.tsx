@@ -40,7 +40,7 @@ export function DatabaseInitializer({ target, unsavedChanges, disabled, onInitia
         Create missing Insightful tables in the public schema and seed them with the curated datasets and bundled HKEX short-selling records.
         Migrate file-based API/model settings into the configuration table when it is created.
         Existing dataset tables are skipped entirely, even if empty. Existing configuration values are kept;
-        only a missing API settings row is imported. No existing rows are overwritten or deleted.
+        only a missing API settings row is imported. The table catalog is refreshed; no other existing rows are overwritten or deleted.
         All changes run in one transaction.
       </p>
       <p className="mt-3 break-words font-mono text-xs text-slate-300">
@@ -50,6 +50,7 @@ export function DatabaseInitializer({ target, unsavedChanges, disabled, onInitia
         <li>public.insightful_datasets: dataset catalog and source metadata</li>
         <li>public.insightful_dataset_rows: curated observations</li>
         <li>public.insightful_hkex_short_selling: dated records, currency and source URLs</li>
+        <li>public.insightful_table_catalog: searchable table descriptions, columns and sample rows for the research agent (refreshed each run)</li>
         <li>public.insightful_configuration: private API/model settings and saved API key</li>
       </ul>
       <p className="mt-3 text-xs leading-relaxed text-slate-500">

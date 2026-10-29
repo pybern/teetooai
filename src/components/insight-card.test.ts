@@ -8,7 +8,7 @@ import { ChatTurn, ReportBody } from "./insight-card";
 vi.mock("./chart-view", () => ({ ChartView: () => null }));
 
 const report = {
-  ...runInsight("Top 10 Hong Kong stocks by market cap", "hk"),
+  ...runInsight("Top 10 Hong Kong stocks by market cap", "explore"),
   headline: "The largest stocks lead the market.",
   insights: [
     { kind: "comparison" as const, title: "Leader", text: "Tencent leads by market capitalisation." },

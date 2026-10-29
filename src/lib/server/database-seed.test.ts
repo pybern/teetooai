@@ -5,6 +5,8 @@ import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } 
 import { DATASETS } from "@/lib/data";
 import { HKEX_COLUMNS, initializeSavedDatabase, loadHkexSeed, parseHkexSeed } from "./database-seed";
 import { POST } from "@/app/api/config/database/initialize/route";
+import { HKEX_COVERAGE } from "@/lib/hkex-coverage";
+import { USE_CASE_BY_ID } from "@/lib/usecases";
 
 const pg = vi.hoisted(() => ({
   connect: vi.fn(), query: vi.fn(), end: vi.fn(), on: vi.fn(), options: vi.fn(),
@@ -80,6 +82,14 @@ describe("HKEX seed validation", () => {
     expect(rows.filter((row) => row.board === "GEM")).toHaveLength(118);
     expect(rows.filter((row) => row.trading_currency === "USD")).toHaveLength(352);
   });
+  it("keeps the displayed use-case coverage in sync with the bundled seed", async () => {
+    const { rows, summary } = await loadHkexSeed();
+    expect(HKEX_COVERAGE).toEqual({ from: summary.from, to: summary.to, tradingDays: new Set(rows.map((row) => row.trading_date)).size });
+    const text = JSON.stringify(USE_CASE_BY_ID["hkex-db"]);
+    expect(text).toContain("24 Aug 2026");
+    expect(text).toContain("20 Oct 2026");
+    expect(text).not.toMatch(/30 (available )?calendar days|last 30/);
+  });
 });
 
 describe("transactional database initialization", () => {
@@ -103,6 +113,7 @@ describe("transactional database initialization", () => {
         { name: "public.insightful_datasets", status: "created", insertedRows: DATASETS.length },
         { name: "public.insightful_dataset_rows", status: "created", insertedRows: DATASETS.reduce((sum, ds) => sum + ds.rows.length, 0) },
         { name: "public.insightful_hkex_short_selling", status: "created", insertedRows: 34077 },
+        { name: "public.insightful_table_catalog", status: "created", insertedRows: DATASETS.length + 2 },
         { name: "public.insightful_configuration", status: "created", insertedRows: 0 },
       ],
     });
@@ -120,14 +131,22 @@ describe("transactional database initialization", () => {
     expect(pg.query.mock.calls.at(-1)?.[0]).toBe("COMMIT");
     expect(pg.end).toHaveBeenCalledOnce();
   });
-  it("skips existing relations without querying, updating or reseeding their rows", async () => {
+  it("skips existing data relations without querying, updating or reseeding their rows, and refreshes the catalog", async () => {
     pg.query.mockImplementation(async (sql: string, params?: string[]) => ({
       rows: sql.includes("pg_try_advisory") ? [{ locked: true }] : sql.includes("to_regclass") ? [{ relation: params![0] }] : [],
+      rowCount: sql.startsWith("INSERT INTO public.insightful_table_catalog") ? JSON.parse(params![0]).length : 0,
     }));
     const result = await initializeSavedDatabase();
-    expect(result.tables).toHaveLength(4);
-    expect(result.tables.every((table) => table.status === "skipped" && table.insertedRows === 0)).toBe(true);
-    expect(pg.query.mock.calls.some(([sql]) => /CREATE TABLE|INSERT|UPDATE|DELETE/.test(sql))).toBe(false);
+    expect(result.tables).toHaveLength(5);
+    expect(result.tables.filter((table) => table.name !== "public.insightful_table_catalog")
+      .every((table) => table.status === "skipped" && table.insertedRows === 0)).toBe(true);
+    expect(result.tables[3]).toEqual({ name: "public.insightful_table_catalog", status: "seeded", insertedRows: DATASETS.length + 2 });
+    expect(pg.query.mock.calls.some(([sql]) => !sql.includes("insightful_table_catalog") && /CREATE TABLE|INSERT|UPDATE|DELETE/.test(sql))).toBe(false);
+    const catalog = pg.query.mock.calls.find(([sql]) => sql.startsWith("INSERT INTO public.insightful_table_catalog"));
+    const entries = JSON.parse(catalog![1][0]) as { id: string; relation: string; search_text: string }[];
+    expect(entries.map((entry) => entry.id)).toEqual(expect.arrayContaining(["hkex_short_selling", "insightful_datasets", ...DATASETS.map((ds) => `dataset:${ds.id}`)]));
+    expect(entries.some((entry) => entry.relation.includes("configuration") || entry.search_text.includes("insightful_configuration"))).toBe(false);
+    expect(pg.query.mock.calls.some(([sql]) => sql.includes("DELETE FROM public.insightful_table_catalog WHERE id LIKE 'dataset:%'"))).toBe(true);
     expect(pg.query.mock.calls.at(-1)?.[0]).toBe("COMMIT");
   });
   it("migrates legacy API settings and removes them from the file only after commit", async () => {
@@ -154,7 +173,7 @@ describe("transactional database initialization", () => {
     const migration = pg.query.mock.calls.find(([sql]) => sql.includes("ON CONFLICT (kind) DO NOTHING"));
     expect(migration).toBeDefined();
     expect(JSON.parse(migration![1][0])).toEqual([{ kind: "api", settings: api }]);
-    expect(pg.query.mock.calls.some(([sql]) => /CREATE TABLE|UPDATE|DELETE/.test(sql))).toBe(false);
+    expect(pg.query.mock.calls.some(([sql]) => !sql.includes("insightful_table_catalog") && /CREATE TABLE|UPDATE|DELETE/.test(sql))).toBe(false);
     expect(JSON.parse(await readFile(process.env.CONNECTION_CONFIG_PATH!, "utf8"))).toEqual({ database });
   });
   it("preserves legacy API settings when migration fails and rolls back seed changes", async () => {

@@ -188,6 +188,8 @@ export type InsightReport = {
 export type UseCase = {
   id: string;
   execution?: "database-agent";
+  /** Database-agent data access: "all" catalogued sample datasets, or only this use case's datasetIds (default). */
+  agentDatasets?: "all";
   name: string;
   persona: string;
   tagline: string;

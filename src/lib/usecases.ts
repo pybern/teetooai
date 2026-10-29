@@ -1,4 +1,7 @@
 import type { UseCase } from "./types";
+import { formatCoverageDate, HKEX_COVERAGE, HKEX_COVERAGE_LABEL } from "./hkex-coverage";
+
+const HKEX_LATEST = formatCoverageDate(HKEX_COVERAGE.to);
 
 export const ALL_DATASET_IDS = ["hk-indices", "hk-valuations", "hk-prices", "hk-financials", "us-macro", "world-economy", "climate-signals", "co2-emitters", "electricity-mix", "renewables-growth", "ev-global", "ev-regions", "big-tech"];
 
@@ -6,27 +9,29 @@ export const USE_CASES: UseCase[] = [
   {
     id: "hkex-db",
     execution: "database-agent",
+    agentDatasets: "all",
     name: "HKEX Short-Selling Research",
     persona: "Short-selling insights",
     tagline: "Explore HKEX short-selling activity",
-    scenario: "Discover the most shorted stocks, compare companies and follow market trends with clear charts, key findings and sources.",
+    scenario: `Discover the most shorted stocks, compare companies and follow market trends with clear charts, key findings and sources. Data covers ${HKEX_COVERAGE.tradingDays} HKEX trading days from ${HKEX_COVERAGE_LABEL}; it is a historical extract, not a live feed.`,
     icon: "candlestick",
     accent: "#2d72d2",
     datasetIds: [],
     questions: [
-      { q: "Rank the top 10 HKD stocks by short-selling value on the latest stored trading day.", tag: "Ranking" },
-      { q: "Show Tencent's HKD short-selling turnover ratio over the latest 30 available calendar days.", tag: "Trend" },
-      { q: "Compare HSBC and AIA short-selling values over the latest 30 calendar days in HKD.", tag: "Compare" },
-      { q: "How has total HKD short-selling turnover changed over the latest 30 calendar days?", tag: "Market" },
+      { q: `Rank the top 10 HKD stocks by short-selling value on ${HKEX_LATEST}, the latest stored trading day.`, tag: "Ranking" },
+      { q: `Show Tencent's HKD short-selling turnover ratio from ${HKEX_COVERAGE_LABEL}.`, tag: "Trend" },
+      { q: `Compare HSBC and AIA short-selling values in HKD from ${HKEX_COVERAGE_LABEL}.`, tag: "Compare" },
+      { q: `How did total HKD short-selling turnover change from ${HKEX_COVERAGE_LABEL}?`, tag: "Market" },
     ],
   },
   {
     id: "hk",
+    execution: "database-agent",
     name: "HK Equities Analyst",
     persona: "Portfolio manager at a Hong Kong fund house",
     tagline: "Hang Seng, blue-chip valuations, dividends and earnings",
     scenario:
-      "You run an Asia equity income fund and the Monday investment meeting starts in an hour. You need a read on how the Hang Seng has moved, which blue chips look cheap, where the dividend yield is, and whose earnings are actually growing.",
+      "You run an Asia equity income fund and the Monday investment meeting starts in an hour. You need a read on how the Hang Seng has moved, which blue chips look cheap, where the dividend yield is, whose earnings are actually growing and where short sellers are active.",
     icon: "candlestick",
     accent: "#2d72d2",
     datasetIds: ["hk-indices", "hk-valuations", "hk-prices", "hk-financials"],
@@ -41,8 +46,8 @@ export const USE_CASES: UseCase[] = [
       { q: "Relationship between P/E and dividend yield", tag: "Correlation" },
       { q: "Tencent revenue and profit trend", tag: "Trend" },
       { q: "Which company grew net income fastest?", tag: "Growth" },
-      { q: "Detect anomalies in the Hang Seng Index", tag: "Anomaly" },
-      { q: "Forecast the Hang Seng Index to 2027", tag: "Forecast" },
+      { q: "Which blue chips had the highest HKD short-selling value on the latest stored trading day?", tag: "Short selling" },
+      { q: "Compare Tencent's P/E and dividend yield with its recent short-selling turnover ratio", tag: "Cross-dataset" },
     ],
   },
   {

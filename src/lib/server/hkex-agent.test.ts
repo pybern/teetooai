@@ -28,6 +28,11 @@ let providerStatus = 200;
 let explanation = false;
 let supportedEfforts: ReasoningEffort[];
 let finishReason = "stop";
+let script: string[] | undefined;
+function toolCall(name: string, input: unknown, id = `call_${name}`) {
+  return chunk({ tool_calls: [{ index: 0, id, type: "function", function: { name, arguments: JSON.stringify(input) } }] }) +
+    chunk({}, "tool_calls") + "data: [DONE]\n\n";
+}
 function request(body: unknown = { messages: [{ role: "user", content: "Rank HKD short-selling stocks." }] }) {
   return new Request("http://localhost/api/hkex/chat", {
     method: "POST", headers: { Origin: "http://localhost", "Content-Type": "application/json" }, body: JSON.stringify(body),
@@ -49,6 +54,7 @@ beforeAll(async () => {
     calls.push(JSON.parse(raw));
     if (providerStatus !== 200) { response.writeHead(providerStatus); response.end("private upstream details"); return; }
     response.writeHead(200, { "Content-Type": "text/event-stream" });
+    if (script) { response.end(script[calls.length - 1] ?? chunk({ content: JSON.stringify(plan) }, "stop") + "data: [DONE]\n\n"); return; }
     response.end(chunk({ reasoning_content: "Select the supported query." }) +
       chunk({ content: explanation ? "## Explanation\n\nTENCENT: HKD 12345.67, based on retrieved evidence." : JSON.stringify(plan) }, finishReason) + "data: [DONE]\n\n");
   });
@@ -58,10 +64,10 @@ beforeAll(async () => {
   baseUrl = `http://127.0.0.1:${address.port}/v1`;
 });
 beforeEach(() => {
-  calls = []; providerStatus = 200; explanation = false;
+  calls = []; providerStatus = 200; explanation = false; script = undefined;
   supportedEfforts = ["none", "minimal", "low", "medium", "high"];
   finishReason = "stop";
-  plan = { clarification: null, queries: [{ ...queryInput }] };
+  plan = { clarification: null, queries: [{ ...queryInput }], sqlQueries: [] };
   vi.stubEnv("CONFIG_ADMIN_TOKEN", "");
   vi.stubEnv("AI_GATEWAY_API_KEY", "");
   vi.stubEnv("CONNECTION_CONFIG_PATH", path.join(directory, `${crypto.randomUUID()}.json`));
@@ -184,7 +190,7 @@ describe("single-call HKEX research", () => {
   });
   it.each(["auto", "HKEXHorizontalBarChart"])("renders a %s catalog chart without a chart or narrative model call", async (chart) => {
     await saveSettings(); interceptChat();
-    plan = { clarification: null, queries: [{ ...queryInput, chart }] };
+    plan = { clarification: null, queries: [{ ...queryInput, chart }], sqlQueries: [] };
     const onTools = vi.fn<(tools: ModelChatToolActivity[]) => void>();
     const result = await research(onTools);
     expect(calls).toHaveLength(1);
@@ -193,7 +199,7 @@ describe("single-call HKEX research", () => {
   });
   it("reports an incompatible chart while retaining valid query results", async () => {
     await saveSettings(); interceptChat();
-    plan = { clarification: null, queries: [{ ...queryInput, chart: "HKEXAreaChart" }] };
+    plan = { clarification: null, queries: [{ ...queryInput, chart: "HKEXAreaChart" }], sqlQueries: [] };
     const result = await research();
     expect(calls).toHaveLength(1);
     expect(result.message.content).toContain("This chart isn't available");
@@ -202,7 +208,7 @@ describe("single-call HKEX research", () => {
   });
   it("resolves stock names server-side before querying, without additional model calls", async () => {
     await saveSettings(); interceptChat();
-    plan = { clarification: null, queries: [{ ...queryInput, stockSearches: ["Tencent"] }] };
+    plan = { clarification: null, queries: [{ ...queryInput, stockSearches: ["Tencent"] }], sqlQueries: [] };
     const result = await research();
     expect(calls).toHaveLength(1);
     expect(result.tools?.find((item) => item.tool === "findStocks")?.status).toBe("complete");
@@ -215,7 +221,7 @@ describe("single-call HKEX research", () => {
       { ...queryInput, stockSearches: ["Tencent"] },
       { ...queryInput, stockSearches: ["HSBC"] },
       { ...queryInput, stockSearches: ["Tencent", "HSBC"] },
-    ] };
+    ], sqlQueries: [] };
     const original = pg.query.getMockImplementation()!;
     const lookups: (() => void)[] = [];
     const queries: (() => void)[] = [];
@@ -245,21 +251,42 @@ describe("single-call HKEX research", () => {
     expect(result.message.content.indexOf("Second query")).toBeLessThan(result.message.content.indexOf("Third query"));
     // Six research connections plus the saved-model configuration read.
     expect(pg.connect).toHaveBeenCalledTimes(7);
-    expect(pg.query).toHaveBeenCalledTimes(20);
+    // Includes the preflight check for the table catalog.
+    expect(pg.query).toHaveBeenCalledTimes(21);
     expect(pg.end).toHaveBeenCalledTimes(7);
   });
+  it("streams the answer section by section, starting before the data queries finish", async () => {
+    await saveSettings(); interceptChat();
+    plan = { clarification: null, queries: [{ ...queryInput }, { ...queryInput, currency: "CNY" }], sqlQueries: [] };
+    const original = pg.query.getMockImplementation()!;
+    const pending: (() => void)[] = [];
+    pg.query.mockImplementation(async (sql: string, parameters: unknown[]) => sql.startsWith("WITH latest")
+      ? new Promise((resolve) => pending.push(() => resolve({ rows: [{ ...evidence, trading_currency: parameters[2] }] })))
+      : original(sql, parameters));
+    const texts: string[] = [];
+    const done = sendModelChat(undefined, [{ role: "user", content: "Rank" }], new AbortController().signal, (text) => texts.push(text), vi.fn(), { api: "/api/hkex/chat" });
+    await vi.waitFor(() => expect(pending).toHaveLength(2));
+    await vi.waitFor(() => expect(texts.at(-1)).toBe("## Results\n\n"));
+    pending[0]();
+    await vi.waitFor(() => expect(texts.at(-1)).toContain("Currency: **HKD**"));
+    expect(texts.at(-1)).not.toContain("Currency: **CNY**");
+    pending[1]();
+    const result = await done;
+    expect(result.message.content.indexOf("Currency: **HKD**")).toBeLessThan(result.message.content.indexOf("Currency: **CNY**"));
+  });
+
   it("validates every resolved query before starting any parallel data reads", async () => {
     await saveSettings(); interceptChat();
     plan = { clarification: null, queries: [
       { ...queryInput },
       { ...queryInput, from: "2026-02-30", to: "2026-03-02" },
-    ] };
+    ], sqlQueries: [] };
     await expect(research()).rejects.toThrow("Invalid HKEX filters");
     expect(pg.query.mock.calls.some(([sql]) => sql.startsWith("WITH latest"))).toBe(false);
   });
   it("asks for clarification on ambiguous stock names rather than looping or guessing", async () => {
     await saveSettings(); interceptChat();
-    plan = { clarification: null, queries: [{ ...queryInput, stockSearches: ["bank"] }] };
+    plan = { clarification: null, queries: [{ ...queryInput, stockSearches: ["bank"] }], sqlQueries: [] };
     const original = pg.query.getMockImplementation()!;
     pg.query.mockImplementation(async (sql: string) => sql.includes("stock_name ILIKE")
       ? { rows: [evidence, { ...evidence, stock_code: "00005" }] } : original(sql));
@@ -273,7 +300,7 @@ describe("single-call HKEX research", () => {
   });
   it("handles unsupported requests with one planner clarification and no data query", async () => {
     await saveSettings(); interceptChat();
-    plan = { clarification: "Prices require an additional dataset.", queries: [] };
+    plan = { clarification: "Prices require an additional dataset.", queries: [], sqlQueries: [] };
     const result = await research();
     expect(calls).toHaveLength(1);
     expect(result.message.content).toContain("Prices require");
@@ -291,7 +318,7 @@ describe("single-call HKEX research", () => {
   });
   it("rejects malformed plans and invalid date ranges without executing data queries", async () => {
     await saveSettings();
-    for (const badPlan of [{ sql: "DELETE FROM private" }, { clarification: null, queries: [{ ...queryInput, from: "2026-02-30", to: "2026-03-02" }] }]) {
+    for (const badPlan of [{ sql: "DELETE FROM private" }, { clarification: null, queries: [{ ...queryInput, from: "2026-02-30", to: "2026-03-02" }], sqlQueries: [] }]) {
       plan = badPlan;
       const body = await (await POST(request())).text();
       expect(body).not.toContain('"completed":true');
@@ -299,9 +326,9 @@ describe("single-call HKEX research", () => {
     }
   });
   it("validates plan-level query/lookup limits", () => {
-    expect(hkexPlanSchema.safeParse({ clarification: null, queries: Array(4).fill(queryInput) }).success).toBe(false);
-    expect(hkexPlanSchema.safeParse({ clarification: null, queries: Array(3).fill({ ...queryInput, stockSearches: ["a", "b"] }) }).success).toBe(false);
-    expect(hkexPlanSchema.safeParse({ clarification: "Ambiguous", queries: [queryInput] }).success).toBe(false);
+    expect(hkexPlanSchema.safeParse({ clarification: null, queries: Array(4).fill(queryInput), sqlQueries: [] }).success).toBe(false);
+    expect(hkexPlanSchema.safeParse({ clarification: null, queries: Array(3).fill({ ...queryInput, stockSearches: ["a", "b"] }), sqlQueries: [] }).success).toBe(false);
+    expect(hkexPlanSchema.safeParse({ clarification: "Ambiguous", queries: [queryInput], sqlQueries: [] }).success).toBe(false);
   });
   it("makes one additional model request only for explicit explanations using server-held evidence", async () => {
     await saveSettings(); interceptChat();
@@ -429,3 +456,136 @@ describe("single-call HKEX research", () => {
     expect(response.status).toBe(400);
   });
 });
+
+describe("catalog-guided research", () => {
+  const catalogRow = { id: "dataset:world-economy", kind: "dataset", relation: "public.insightful_dataset_rows", title: "World Economy", description: "GDP by country", rank: "0.6" };
+  const described = {
+    ...catalogRow, columns: [{ name: "gdp", type: "numeric", description: "GDP" }], sample_rows: [{ entity: "China", gdp: 18.5 }],
+    query_notes: ["Read JSON keys"], example_queries: [], row_count: "100", coverage: { as_of: "2025-06" }, source: { name: "World Bank" },
+  };
+  const finalSql = "SELECT data->>'entity' AS entity, (data->>'gdp')::numeric AS gdp FROM public.insightful_dataset_rows WHERE dataset_id = 'world-economy' ORDER BY gdp DESC LIMIT 5";
+  beforeEach(() => {
+    const original = pg.query.getMockImplementation()!;
+    pg.query.mockImplementation(async (input: string | { text: string }, parameters?: unknown[]) => {
+      const sql = typeof input === "string" ? input : input.text;
+      if (sql.includes("to_regclass") && parameters?.[0] === "public.insightful_table_catalog") return { rows: [{ relation: "public.insightful_table_catalog" }] };
+      if (sql.includes("SELECT id, kind, left(title")) return { rows: [{ id: catalogRow.id, kind: "dataset", title: catalogRow.title }] };
+      if (sql.includes("plainto_tsquery")) return { rows: [catalogRow] };
+      if (sql.includes("sample_rows, query_notes")) return { rows: [described] };
+      if (sql.includes("AS agent_query")) return { rows: [{ entity: "United States", gdp: "27.4" }, { entity: "China", gdp: "18.5" }] };
+      return original(sql, parameters);
+    });
+  });
+
+  it("searches and reads the catalog, rejects forbidden SQL as tool feedback, then renders validated catalogue SQL", async () => {
+    await saveSettings(); interceptChat();
+    plan = { clarification: null, queries: [], sqlQueries: [{ title: "Largest economies", sql: finalSql }] };
+    script = [
+      toolCall("searchTables", { keywords: "gdp economy country" }),
+      toolCall("describeTable", { id: "dataset:world-economy" }),
+      toolCall("runSql", { sql: "SELECT settings FROM public.insightful_configuration" }),
+    ];
+    const result = await research();
+    expect(calls).toHaveLength(4);
+    expect((calls[0].tools as { function: { name: string } }[]).map((item) => item.function.name)).toEqual(["searchTables", "describeTable", "runSql"]);
+    expect(JSON.stringify(calls[0].messages)).toContain("dataset:world-economy");
+    expect(JSON.stringify(calls[1].messages)).toContain("GDP by country");
+    expect(JSON.stringify(calls[2].messages)).toContain("Read JSON keys");
+    expect(JSON.stringify(calls[3].messages)).toContain("SQL rejected: table public.insightful_configuration is not in the catalog");
+    expect(pg.query.mock.calls.some(([input]) => JSON.stringify(input).includes("insightful_configuration"))).toBe(false);
+    expect(result.message.content).toContain("## Largest economies");
+    expect(result.message.content).toContain("| United States | 27.4 |");
+    expect(result.message.content).toContain("`public.insightful_dataset_rows`");
+    const executed = result.tools?.find((item) => item.tool === "querySql");
+    expect(executed).toMatchObject({ status: "complete", sql: finalSql });
+    expect(result.tools?.map((item) => item.tool)).toEqual(expect.arrayContaining(["searchTables", "describeTable", "querySql"]));
+    expect(result.tools?.find((item) => item.tool === "runSql")?.status).toBe("error");
+    expect(pg.query.mock.calls.filter(([input]) => typeof input === "string" && /^(INSERT|UPDATE|DELETE|CREATE)/.test(input))).toHaveLength(0);
+  });
+
+  it("preloads the HK Equities tables so it plans without searching, and scopes catalog reads and SQL", async () => {
+    await saveSettings();
+    const sql = "SELECT data->>'year' AS year FROM public.insightful_dataset_rows WHERE dataset_id = 'hk-indices'";
+    plan = { clarification: null, queries: [], sqlQueries: [{ title: "Hang Seng", sql }] };
+    script = [toolCall("runSql", { sql })];
+    const response = await POST(request({ messages: [{ role: "user", content: "How has the Hang Seng moved?" }], useCaseId: "hk" }));
+    expect(response.status).toBe(200);
+    const text = await response.text();
+    expect(text).toContain("## Hang Seng");
+    const scopeIds = ["hkex_short_selling", "insightful_datasets", "dataset:hk-indices", "dataset:hk-valuations", "dataset:hk-prices", "dataset:hk-financials"];
+    const queries = pg.query.mock.calls.map(([input, parameters]) => ({ sql: typeof input === "string" ? input : input.text, parameters: parameters ?? input.values }));
+    expect(queries.find((item) => item.sql.includes("SELECT id, kind, left(title"))?.parameters).toEqual([scopeIds]);
+    expect(queries.find((item) => item.sql.includes("WHERE id = ANY($1::text[]) ORDER BY kind DESC"))?.parameters).toEqual([scopeIds]);
+    expect(queries.some((item) => item.sql.includes("plainto_tsquery"))).toBe(false);
+    expect(calls).toHaveLength(agent.MAX_SCOPED_AGENT_STEPS);
+    expect((calls[0].tools as { function: { name: string } }[]).map((item) => item.function.name)).toEqual(["runSql"]);
+    expect(calls.at(-1)!.tools).toBeUndefined();
+    expect(JSON.stringify(calls[0].messages)).toContain("Workspace tables");
+    expect(JSON.stringify(calls[0].messages)).toContain("Read JSON keys");
+    expect(queries.find((item) => item.sql.includes("AS agent_query"))?.sql)
+      .toContain("dataset_id = ANY(ARRAY['hk-indices', 'hk-valuations', 'hk-prices', 'hk-financials']::text[])");
+    expect(JSON.stringify(calls[0].messages)).toContain("HK Equities Analyst");
+  });
+
+  it("keeps the HKEX workspace unscoped and rejects non-agent use cases before any provider or database call", async () => {
+    await saveSettings();
+    plan = { clarification: null, queries: [], sqlQueries: [{ title: "All", sql: "SELECT id FROM insightful_datasets" }] };
+    script = [];
+    await (await POST(request({ messages: [{ role: "user", content: "List datasets" }], useCaseId: "hkex-db" }))).text();
+    expect(pg.query.mock.calls.find(([input]) => typeof input === "string" && input.includes("SELECT id, kind, left(title"))?.[1]).toEqual([null]);
+    expect(pg.query.mock.calls.find(([input]) => JSON.stringify(input).includes("agent_query"))?.[0].text).not.toContain("ARRAY[");
+    calls = []; pg.connect.mockClear();
+    for (const useCaseId of ["macro", "missing", "__proto__"]) {
+      const response = await POST(request({ messages: [{ role: "user", content: "GDP" }], useCaseId }));
+      expect(response.status).toBe(400);
+    }
+    expect(calls).toHaveLength(0);
+    expect(pg.connect).not.toHaveBeenCalled();
+  });
+
+  it("offers an explanation for HK Equities SQL answers, using the stored rows, workspace and table docs without re-querying", async () => {
+    await saveSettings();
+    const sql = "SELECT data->>'entity' AS entity FROM public.insightful_dataset_rows WHERE dataset_id = 'hk-valuations'";
+    plan = { clarification: null, queries: [], sqlQueries: [{ title: "Largest HK stocks", sql }] };
+    script = [];
+    const text = await (await POST(request({ messages: [{ role: "user", content: "Top HK stocks by market cap" }], useCaseId: "hk" }))).text();
+    const id = /"explanationId":"([0-9a-f-]{36})"/.exec(text)?.[1];
+    expect(id).toBeDefined();
+    pg.query.mockClear();
+    const before = calls.length;
+    explanation = true; script = undefined;
+    interceptChat();
+    const explained = await sendModelChat(undefined, [], new AbortController().signal, vi.fn(), undefined, { api: "/api/hkex/chat", explanationId: id });
+    expect(calls).toHaveLength(before + 1);
+    const prompt = JSON.stringify(calls.at(-1)!.messages);
+    expect(prompt).toContain("United States");
+    expect(prompt).toContain("Largest HK stocks");
+    expect(prompt).toContain("HK Equities Analyst");
+    expect(prompt).toContain("Read JSON keys");
+    expect(prompt).toContain("2025-06");
+    expect(prompt).not.toContain("Short turnover ratio is not short interest");
+    expect(explained.message.content).toContain("## Explanation");
+    expect(pg.query.mock.calls.some(([input]) => /insightful_(dataset|hkex|table_catalog)/.test(JSON.stringify(input)))).toBe(false);
+  });
+
+  it("withdraws tools on the final step so the loop always ends with a plan", async () => {
+    await saveSettings(); interceptChat();
+    plan = { clarification: null, queries: [], sqlQueries: [{ title: "Largest economies", sql: finalSql }] };
+    script = Array.from({ length: agent.MAX_AGENT_STEPS - 1 }, (_, index) => toolCall("searchTables", { keywords: `gdp ${index}` }, `call_${index}`));
+    const result = await research();
+    expect(calls).toHaveLength(agent.MAX_AGENT_STEPS);
+    expect(calls.at(-1)!.tools).toBeUndefined();
+    expect(result.message.content).toContain("## Largest economies");
+  });
+
+  it("reports an invalid final SQL plan without executing it", async () => {
+    await saveSettings(); interceptChat();
+    plan = { clarification: null, queries: [], sqlQueries: [{ title: "Secrets", sql: "SELECT * FROM insightful_configuration" }] };
+    script = [];
+    const result = await research();
+    expect(result.message.content).toContain("This query could not be completed");
+    expect(result.tools?.find((item) => item.tool === "querySql")?.status).toBe("error");
+    expect(pg.query.mock.calls.some(([input]) => JSON.stringify(input).includes("agent_query"))).toBe(false);
+  });
+});
+

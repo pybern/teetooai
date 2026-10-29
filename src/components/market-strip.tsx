@@ -18,7 +18,7 @@ const pct = (v: number | null) => (v == null ? "—" : `${v > 0 ? "+" : ""}${v.t
 export function MarketStrip({ summary }: { summary: MarketSummary }) {
   const asOf = new Date(summary.fetchedAt).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric", timeZone: "Asia/Hong_Kong" });
   return (
-    <section className="md:pl-[4.75rem]">
+    <section>
       <div className="meta mb-2 flex items-center justify-between text-slate-500">
         <span>HKEX snapshot · Yahoo Finance</span>
         <span className="tabular-nums">As of {asOf}</span>

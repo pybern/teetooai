@@ -75,7 +75,7 @@ describe("HKEX database agent workspace", () => {
     fetchMock.mockImplementationOnce(async (url: string, init: RequestInit) => {
       expect(url).toBe("/api/hkex/chat");
       expect(new Headers(init.headers).has("Authorization")).toBe(false);
-      expect(JSON.parse(init.body as string)).toEqual({ messages: [{ role: "user", content: "Rank HKD" }] });
+      expect(JSON.parse(init.body as string)).toEqual({ messages: [{ role: "user", content: "Rank HKD" }], useCaseId: "hkex-db" });
       return createUIMessageStreamResponse({ stream: createUIMessageStream({
         execute: ({ writer }) => {
           writer.write({ type: "start" });
@@ -99,6 +99,8 @@ describe("HKEX database agent workspace", () => {
     expect(container.textContent).toContain(item.sql);
     expect(container.textContent).toContain("Parameters:");
     expect(container.textContent).not.toContain("Last reply:");
+    expect(container.textContent).not.toContain("Internal model reasoning");
+    await act(async () => { container.querySelector<HTMLButtonElement>('button[aria-label="Expand thinking"]')!.click(); });
     expect(container.textContent).toContain("Internal model reasoning");
     expect(container.textContent).not.toMatch(/Skills:|thinking effort|output tokens|One model call plans|shared request limits/);
     expect(container.textContent).not.toContain(settings.api.model);
@@ -118,3 +120,34 @@ describe("HKEX database agent workspace", () => {
     expect(fetchMock.mock.calls[0][0]).toBe("/api/hkex/chat");
   });
 });
+
+describe("HK Equities agent workspace", () => {
+  beforeEach(async () => {
+    await act(async () => root.render(createElement(HkexAgentWorkspace, { uc: USE_CASE_BY_ID.hk }, createElement("p", null, "Market strip"))));
+  });
+  it("uses the HK brief, examples and market strip, and sends its use case to the agent", async () => {
+    expect(container.textContent).toContain("HK Equities Analyst");
+    expect(container.textContent).toContain("Market strip");
+    expect(container.textContent).not.toContain("HKEX short selling");
+    expect(container.textContent).not.toContain("Chart the top 10 HKD stocks");
+    const example = USE_CASE_BY_ID.hk.questions[0].q;
+    await act(async () => { [...container.querySelectorAll("button")].find((button) => button.textContent === example)!.click(); });
+    fetchMock.mockImplementationOnce(async (url: string, init: RequestInit) => {
+      expect(url).toBe("/api/hkex/chat");
+      expect(JSON.parse(init.body as string)).toEqual({ messages: [{ role: "user", content: example }], useCaseId: "hk" });
+      return createUIMessageStreamResponse({ stream: createUIMessageStream({
+        execute: ({ writer }) => {
+          writer.write({ type: "start" });
+          writer.write({ type: "text-start", id: "answer" });
+          writer.write({ type: "text-delta", id: "answer", delta: "Hang Seng answer" });
+          writer.write({ type: "text-end", id: "answer" });
+          writer.write({ type: "finish", messageMetadata: { model: settings.api.model, baseUrl: "", durationMs: 25, completed: true } });
+        },
+      }) });
+    });
+    await submit();
+    expect(fetchMock).toHaveBeenCalledOnce();
+    expect(container.textContent).toContain("Hang Seng answer");
+  });
+});
+

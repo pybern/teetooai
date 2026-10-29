@@ -109,7 +109,8 @@ body {
   font-feature-settings: "tnum" 1;
 }
 
-.app-main:has([data-research-workspace]) {
+/* Next.js keeps inactive routes mounted inside hidden React Activity trees. */
+.app-main:has([data-research-workspace]:not([style*="display: none"], [hidden], [style*="display: none"] *, [hidden] *)) {
   display: flex;
   height: 100dvh;
   flex-direction: column;

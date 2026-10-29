@@ -19,6 +19,10 @@ type Props = {
   unsavedChanges: boolean;
   disabled: boolean;
   agentMode?: boolean;
+  /** Agent-mode header label and PDF export title. */
+  agentLabel?: string;
+  exportTitle?: string;
+  emptyPrompt?: string;
   initialDraft?: string;
   suggestions?: string[];
   onExplain?: (id: string, signal: AbortSignal, onText: (text: string) => void, onReasoning: (text: string) => void) => Promise<ModelChatResult>;
@@ -82,7 +86,7 @@ const MarkdownReply = memo(function MarkdownReply({ text, muted = false }: { tex
 
 function ThinkingBlock({ text, streaming = false }: { text: string; streaming?: boolean }) {
   const id = useId();
-  const [expanded, setExpanded] = useState(true);
+  const [expanded, setExpanded] = useState(false);
   const content = useRef<HTMLDivElement>(null);
   const following = useRef(true);
   useEffect(() => {
@@ -175,7 +179,11 @@ const ChatMessage = memo(function ChatMessage({ message, agentMode, onExplain, d
   );
 });
 
-export function ModelChat({ model, baseUrl, unsavedChanges, disabled, onSend, onExplain, agentMode = false, initialDraft = "", suggestions = [] }: Props) {
+export function ModelChat({
+  model, baseUrl, unsavedChanges, disabled, onSend, onExplain, agentMode = false, initialDraft = "", suggestions = [],
+  agentLabel = "HKEX short selling", exportTitle = "HKEX Short-Selling Research",
+  emptyPrompt = "Compare stocks, explore short-selling trends or start with a question below.",
+}: Props) {
   const inputId = useId();
   const [messages, setMessages] = useState<ConversationMessage[]>([]);
   const [draft, setDraft] = useState(initialDraft);
@@ -278,13 +286,13 @@ export function ModelChat({ model, baseUrl, unsavedChanges, disabled, onSend, on
     <section aria-labelledby={`${inputId}-title`} className={`flex flex-col overflow-hidden border border-slate-700 bg-slate-950 ${agentMode ? "min-h-0 flex-1 p-3 md:p-5" : "h-[52rem] p-5 md:p-6"}`}>
       <div className="flex shrink-0 flex-wrap items-start justify-between gap-3">
         <div className="min-w-0 flex-1">
-          <div className="meta text-slate-500">{agentMode ? "HKEX short selling" : "Live model playground"}</div>
+          <div className="meta text-slate-500">{agentMode ? agentLabel : "Live model playground"}</div>
           <h2 id={`${inputId}-title`} className="mt-2 text-xl font-semibold text-white">{agentMode ? "Ask a question" : "Chat with your saved model"}</h2>
           {!agentMode && <p className="mt-2 break-words font-mono text-xs text-slate-300">{lastResult?.model ?? model}</p>}
           {!agentMode && (lastResult?.baseUrl ?? baseUrl) && <p className="mt-1 break-all text-xs text-slate-500">{lastResult?.baseUrl ?? baseUrl}</p>}
         </div>
         <div className="flex flex-wrap justify-end gap-2">
-          {agentMode && <PdfExportButton target={log} title="HKEX Short-Selling Research" disabled={!!pending || (!messages.length && !incomplete)} />}
+          {agentMode && <PdfExportButton target={log} title={exportTitle} disabled={!!pending || (!messages.length && !incomplete)} />}
           <button type="button" className={buttonClass} onClick={clear}>New chat</button>
         </div>
       </div>
@@ -299,7 +307,7 @@ export function ModelChat({ model, baseUrl, unsavedChanges, disabled, onSend, on
       <div ref={log} role="log" tabIndex={0} aria-label={agentMode ? "Research conversation" : "Model test conversation"} aria-live="polite" aria-relevant="additions" className={`${agentMode ? "mt-3" : "mt-5"} min-h-0 flex-1 overflow-y-auto overscroll-contain border-y border-slate-700`}>
         {!messages.length && !pending && !incomplete && (
           <div className="px-1 py-8 text-sm text-slate-500">
-            <p>{agentMode ? "Compare stocks, explore short-selling trends or start with a question below." : "Send a message to see a real reply from your saved model."}</p>
+            <p>{agentMode ? emptyPrompt : "Send a message to see a real reply from your saved model."}</p>
             {suggestions.length > 0 && <div className="mt-4 flex flex-wrap gap-2">
               {suggestions.map((question) => <button key={question} type="button" className="border border-slate-700 px-3 py-2 text-left text-xs text-slate-300 hover:border-sky-400" disabled={disabled} onClick={() => { setDraft(question); input.current?.focus(); }}>{question}</button>)}
             </div>}

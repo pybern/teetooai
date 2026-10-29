@@ -14,11 +14,17 @@ import { PdfExportButton } from "./pdf-export-button";
 export function Workspace({ marketStrip }: { marketStrip?: ReactNode }) {
   const params = useSearchParams();
   const uc = USE_CASE_BY_ID[params.get("uc") ?? "hk"] ?? USE_CASE_BY_ID.hk;
-  if (uc.execution === "database-agent") return <HkexAgentWorkspace key={uc.id} uc={uc} initialDraft={params.get("q") ?? ""} />;
-  return <ChatSession key={uc.id} uc={uc} q={params.get("q")} marketStrip={marketStrip} />;
+  if (uc.execution === "database-agent") {
+    return (
+      <HkexAgentWorkspace key={uc.id} uc={uc} initialDraft={params.get("q") ?? ""}>
+        {uc.id === "hk" ? marketStrip : null}
+      </HkexAgentWorkspace>
+    );
+  }
+  return <ChatSession key={uc.id} uc={uc} q={params.get("q")} />;
 }
 
-function ChatSession({ uc, q, marketStrip }: { uc: UseCase; q: string | null; marketStrip?: ReactNode }) {
+function ChatSession({ uc, q }: { uc: UseCase; q: string | null }) {
   const router = useRouter();
   const { hydrated, entries, pinned, ask, remove, settle, togglePin, isPinned } = useInsights();
   const autoRan = useRef<string | null>(null);
@@ -110,9 +116,7 @@ function ChatSession({ uc, q, marketStrip }: { uc: UseCase; q: string | null; ma
 
       <div ref={threadRef} role="region" aria-label="Research conversation" tabIndex={0} className="mx-auto min-h-0 w-full max-w-5xl flex-1 space-y-12 overflow-y-auto overscroll-contain px-4 py-10 md:px-10">
         {hydrated && (
-          <Greeting uc={uc} onAsk={onAsk} showPrompts={feed.length === 0}>
-            {marketStrip && uc.id === "hk" ? marketStrip : null}
-          </Greeting>
+          <Greeting uc={uc} onAsk={onAsk} showPrompts={feed.length === 0} />
         )}
         {conversation.map((e, i) => (
           <ChatTurn
@@ -150,12 +154,10 @@ function Greeting({
   uc,
   onAsk,
   showPrompts,
-  children,
 }: {
   uc: UseCase;
   onAsk: (q: string) => void;
   showPrompts: boolean;
-  children?: ReactNode;
 }) {
   return (
     <section className="space-y-6">
@@ -167,7 +169,6 @@ function Greeting({
           <p className="mt-3 max-w-2xl text-[15px] leading-relaxed text-slate-300">{uc.scenario}</p>
         </div>
       </div>
-      {children}
       {showPrompts && (
         <div className="grid gap-x-3 md:grid-cols-[4rem_1fr]">
           <span className="meta pt-3 text-slate-500">Generate</span>

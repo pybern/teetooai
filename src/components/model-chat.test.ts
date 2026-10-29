@@ -34,6 +34,13 @@ async function click(label: string) {
   });
 }
 
+/** Thinking always starts collapsed; tests that inspect its content open every block first. */
+async function expandThinking() {
+  await act(async () => {
+    for (const button of container.querySelectorAll<HTMLButtonElement>('button[aria-label="Expand thinking"]')) button.click();
+  });
+}
+
 beforeEach(async () => {
   vi.stubGlobal("IS_REACT_ACT_ENVIRONMENT", true);
   onSend.mockReset().mockResolvedValue(result);
@@ -125,6 +132,8 @@ describe("saved-model chat interface", () => {
     expect(onExplain).toHaveBeenCalledOnce();
     expect(onExplain.mock.calls[0][0]).toBe("server-reference");
     expect(container.textContent).toContain("Optional AI analysis");
+    expect(container.textContent).not.toContain("Internal explanation reasoning");
+    await expandThinking();
     expect(container.textContent).toContain("Internal explanation reasoning");
     expect(container.querySelector('[aria-label="Thinking process"] strong')?.textContent).toBe("Internal explanation reasoning");
     expect(onSend).toHaveBeenCalledOnce();
@@ -164,6 +173,7 @@ describe("saved-model chat interface", () => {
       ]);
     });
     await act(async () => { reject(new Error("API returned HTTP 503")); });
+    await expandThinking();
     expect(container.textContent).toContain("Incomplete research");
     expect(container.textContent).toContain("Unfinished finding");
     expect(container.textContent).toContain("Earlier provider reasoning");
@@ -190,11 +200,14 @@ describe("saved-model chat interface", () => {
       onSend.mock.calls[0][4]([{ id: "plan", tool: "planResearch", status: "running", summary: "Planning model calls." }]);
     });
     expect(container.textContent).toContain("Researching your question...");
+    expect(container.querySelector('button[aria-label="Expand thinking"]')?.getAttribute("aria-expanded")).toBe("false");
+    await expandThinking();
     expect(container.textContent).toContain("Internal planning details");
     expect(container.textContent).toContain("planResearch");
     expect(container.textContent).not.toMatch(/thinking effort|output tokens|Each request has|alibaba|https:/);
     await act(async () => reject(new Error("Research planning reached its 4,096-token output limit.")));
     expect(container.querySelector('[role="alert"]')?.textContent).toContain("Try a shorter question");
+    await expandThinking();
     expect(container.textContent).toContain("Incomplete research");
     expect(container.textContent).toContain("Internal planning details");
     expect(container.textContent).toContain("Interrupted before completion");
@@ -366,6 +379,7 @@ describe("saved-model chat interface", () => {
     })));
     await edit("Explain your approach"); await submit();
     await act(async () => onSend.mock.calls[0][3]("## Approach\n\n**Check coverage**\n\n```sql\nSELECT"));
+    await expandThinking();
     let panel = container.querySelector('[aria-label="Thinking process"]')!;
     expect(panel.querySelector("h2")?.textContent).toBe("Approach");
     expect(panel.querySelector("strong")?.textContent).toBe("Check coverage");
@@ -397,6 +411,7 @@ describe("saved-model chat interface", () => {
     await click("Expand thinking");
     assertMarkdown();
     await act(async () => finish({ ...result, reasoning }));
+    await expandThinking();
     assertMarkdown();
   });
   it("retains formatted thinking when a research stream fails", async () => {
@@ -408,57 +423,53 @@ describe("saved-model chat interface", () => {
     await edit("Research"); await submit();
     await act(async () => onSend.mock.calls[0][3]("**Checking stored dates**"));
     await act(async () => fail(new Error("Stream disconnected")));
+    await expandThinking();
     expect(container.textContent).toContain("Incomplete research");
     expect(container.querySelector('[aria-label="Thinking process"] strong')?.textContent).toBe("Checking stored dates");
   });
-  it("keeps long thinking open in a fixed-height block and supports manual collapse", async () => {
+  it("starts thinking collapsed while streaming and after completion, and expands into a fixed-height block on request", async () => {
     let resolve!: (value: unknown) => void;
     onSend.mockImplementationOnce(() => new Promise((done) => { resolve = done; }));
     await edit("Think about this");
     await submit();
     await act(async () => { onSend.mock.calls[0][3]("Short thinking"); });
-    expect(container.textContent).toContain("Short thinking");
+    const toggle = () => container.querySelector<HTMLButtonElement>("button[aria-expanded]")!;
+    expect(toggle().getAttribute("aria-expanded")).toBe("false");
+    expect(toggle().textContent).toBe("Thinking...");
+    expect(container.textContent).not.toContain("Short thinking");
     expect(container.textContent).toContain("Receiving model thinking");
-    expect(container.textContent).not.toContain("Expand thinking");
-    await act(async () => { onSend.mock.calls[0][3]("r".repeat(1200)); });
-    expect(container.textContent).toContain("r".repeat(1200));
-    expect(container.querySelector('button[aria-label="Expand thinking"]')).toBeNull();
+    const contentId = toggle().getAttribute("aria-controls")!;
+    expect(document.getElementById(contentId)?.hidden).toBe(true);
+    expect(document.getElementById(contentId)?.parentElement?.classList.contains("h-56")).toBe(false);
     const reasoning = `${"r".repeat(1200)}<script>thinking tail</script>`;
     await act(async () => { onSend.mock.calls[0][3](reasoning); });
-    const toggle = () => container.querySelector<HTMLButtonElement>("button[aria-expanded]")!;
+    expect(toggle().getAttribute("aria-expanded")).toBe("false");
+    expect(container.querySelector("[data-pdf-thinking]")?.getAttribute("data-pdf-thinking")).toBe(reasoning);
+    await click("Expand thinking");
     expect(toggle().getAttribute("aria-expanded")).toBe("true");
-    const contentId = toggle().getAttribute("aria-controls")!;
-    expect(toggle().textContent).toBe("Thinking...");
     expect(document.getElementById(contentId)?.parentElement?.classList.contains("h-56")).toBe(true);
     expect(document.getElementById(contentId)?.classList.contains("overflow-y-auto")).toBe(true);
     expect(document.getElementById(contentId)?.textContent).toBe(reasoning);
-    expect(document.getElementById(contentId)?.hidden).toBe(false);
-    await click("Collapse thinking");
-    expect(document.getElementById(contentId)?.hidden).toBe(true);
-    await click("Expand thinking");
-    expect(toggle().getAttribute("aria-expanded")).toBe("true");
-    expect(document.getElementById(contentId)?.hidden).toBe(false);
-    expect(container.textContent).toContain("<script>thinking tail</script>");
     expect(container.querySelector("script")).toBeNull();
     await act(async () => { onSend.mock.calls[0][3](`${reasoning} live update`); });
     expect(toggle().getAttribute("aria-expanded")).toBe("true");
     expect(container.textContent).toContain("live update");
     await click("Collapse thinking");
-    expect(toggle().textContent).toBe("Thinking...");
     expect(document.getElementById(contentId)?.textContent).toBe("");
-    expect(container.textContent).not.toContain("thinking tail");
     await act(async () => {
       onSend.mock.calls[0][2](result.message.content);
       resolve({ ...result, reasoning });
     });
     expect(container.textContent).not.toContain("Receiving model thinking");
+    expect(toggle().getAttribute("aria-expanded")).toBe("false");
+    expect(container.textContent).not.toContain("thinking tail");
+    await expandThinking();
     expect(container.querySelectorAll("article")[1].textContent).toContain("thinking tail");
     await edit("Follow up");
     await submit();
     expect(onSend.mock.calls[1][0]).toEqual([
       { role: "user", content: "Think about this" }, result.message, { role: "user", content: "Follow up" },
     ]);
-    expect(container.textContent).toContain("thinking tail");
     await click("New chat");
     expect(container.textContent).not.toContain("thinking tail");
   });
@@ -467,21 +478,23 @@ describe("saved-model chat interface", () => {
     { reasoning: "x".repeat(1201) },
     { reasoning: Array(18).fill("line").join("\n") },
     { reasoning: Array(80).fill("line").join("\n") },
-  ].flatMap((test) => [false, true].map((agentMode) => ({ ...test, agentMode }))))("keeps thinking visible regardless of length (agent=$agentMode)", async ({ reasoning, agentMode }) => {
+  ].flatMap((test) => [false, true].map((agentMode) => ({ ...test, agentMode }))))("collapses completed thinking regardless of length (agent=$agentMode)", async ({ reasoning, agentMode }) => {
     await act(async () => root.render(createElement(ModelChat, {
       model: result.model, baseUrl: result.baseUrl, unsavedChanges: false, disabled: false, onSend, agentMode,
     })));
     onSend.mockResolvedValueOnce({ ...result, reasoning });
     await edit("Threshold test");
     await submit();
-    expect(container.querySelector('button[aria-label="Expand thinking"]')).toBeNull();
-    expect(container.querySelector("button[aria-expanded]")?.getAttribute("aria-expanded")).toBe("true");
+    expect(container.querySelector("button[aria-expanded]")?.getAttribute("aria-expanded")).toBe("false");
+    expect(container.textContent).not.toContain(reasoning);
+    await expandThinking();
     expect(container.textContent).toContain(reasoning);
   });
   it("follows new thinking until the reader scrolls up, then resumes when they return to the bottom", async () => {
     onSend.mockImplementationOnce(() => new Promise(() => {}));
     await edit("Follow thinking"); await submit();
     await act(async () => onSend.mock.calls[0][3]("First thinking"));
+    await expandThinking();
     const panel = container.querySelector<HTMLDivElement>('[aria-label="Thinking process"]')!;
     let height = 1000;
     Object.defineProperties(panel, {

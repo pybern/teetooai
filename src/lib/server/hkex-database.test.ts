@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { DEFAULT_CONNECTIONS } from "@/lib/connections";
-import { buildHkexQuery, HkexDatabase, validateHkexQuery, type HkexQuery } from "./hkex-database";
+import { buildHkexQuery, HkexDatabase, HKEX_READ_LIMIT, validateHkexQuery, type HkexQuery } from "./hkex-database";
 
 const pg = vi.hoisted(() => ({ connect: vi.fn(), query: vi.fn(), end: vi.fn(), on: vi.fn() }));
 vi.mock("pg", () => ({
@@ -29,9 +29,15 @@ describe("bounded HKEX queries", () => {
     expect(result.sql).toContain("sum(short_selling_value) / nullif(sum(total_turnover), 0)");
     expect(result.sql).toContain("AND trading_currency = $3");
     expect(result.sql).toContain("stock_code = ANY($5::text[])");
-    expect(result.sql).toContain("WHERE $2::date IS NULL AND trading_currency = $3");
+    expect(result.sql).toContain("WHERE ($1::date IS NULL OR $2::date IS NULL) AND trading_currency = $3");
     expect(result.sql).not.toContain("00700");
     expect(result.sql).not.toContain("avg(");
+  });
+  it("defaults trends to all stored days (up to 366) and rankings to the latest stored day", () => {
+    const trend = buildHkexQuery({ ...filters, mode: "market-trend" }).sql;
+    expect(trend).toContain("GREATEST(first_stored, COALESCE($2::date, day) - 365)");
+    expect(trend).not.toMatch(/- 29\b/);
+    expect(buildHkexQuery(filters).sql).toContain("COALESCE($1::date, COALESCE($2::date, day)) AS first_day");
   });
   it.each([
     { ...filters, stockCodes: ["700"] }, { ...filters, stockCodes: ["00700'); DROP TABLE x;--"] },
@@ -50,7 +56,7 @@ describe("bounded HKEX queries", () => {
     const result = await new HkexDatabase(settings, new AbortController().signal).query(filters);
     expect(result.rows).toHaveLength(10);
     expect(result.truncated).toBe(true);
-    expect(pg.query.mock.calls[0][0]).toBe("BEGIN READ ONLY; SET LOCAL statement_timeout = '5s'; SET LOCAL lock_timeout = '2s'");
+    expect(pg.query.mock.calls[0][0]).toBe("BEGIN READ ONLY; SET LOCAL statement_timeout = '5s'; SET LOCAL lock_timeout = '2s'; SET LOCAL search_path = public");
     expect(pg.query).toHaveBeenCalledTimes(3);
     expect(pg.query.mock.calls.at(-1)![0]).toBe("ROLLBACK");
     expect(pg.end).toHaveBeenCalledOnce();
@@ -76,9 +82,9 @@ describe("bounded HKEX queries", () => {
     await expect(database.query(filters)).rejects.toThrow("SELECT access");
     expect(pg.end).toHaveBeenCalledOnce();
     pg.query.mockResolvedValue({ rows: [] });
-    for (let i = 0; i < 9; i++) await database.query(filters);
-    await expect(database.query(filters)).rejects.toThrow("ten-read limit");
-    expect(pg.connect).toHaveBeenCalledTimes(10);
+    for (let i = 0; i < HKEX_READ_LIMIT - 1; i++) await database.query(filters);
+    await expect(database.query(filters)).rejects.toThrow(`${HKEX_READ_LIMIT}-read limit`);
+    expect(pg.connect).toHaveBeenCalledTimes(HKEX_READ_LIMIT);
   });
   it("propagates cancellation and closes the active client on stream abort", async () => {
     const controller = new AbortController();

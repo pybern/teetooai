@@ -2,14 +2,15 @@
 
 Ask a question in plain English and get back a visual answer: a headline, KPI cards with sparklines, charts, key findings, the underlying data and sources.
 
-The six curated analysis use cases use a deterministic engine and real statistics, without LLM calls. A separate **HKEX Short-Selling Research** use case uses the AI SDK with your saved model and PostgreSQL connections.
+Five curated analysis use cases use a deterministic engine and real statistics, without LLM calls. **HKEX Short-Selling Research** and **HK Equities Analyst** use the database research agent (AI SDK) with your saved model and PostgreSQL connections.
 
 ### Export and query preview
 
 Research workspaces fill the available viewport height. The conversation scrolls
 independently while the header and message composer remain visible, including
-below the mobile navigation. Thinking panels render Markdown (including lists,
-tables, links and code blocks) and retain their own fixed-height scroll.
+below the mobile navigation. Thinking panels always start collapsed (while
+streaming and after completion); expanding one renders Markdown (including
+lists, tables, links and code blocks) in its own fixed-height scroll.
 
 Choose **Export PDF** in any research conversation, then **Save as PDF** in the
 browser print dialog. The print-ready snapshot includes the current session's
@@ -39,7 +40,7 @@ available. Configuration keeps its administrator diagnostics.
 
 - **Seven use cases** with a persona, a scenario and curated questions:
   - HKEX Database Research (public, read-only AI agent)
-  - HK Equities Analyst (the default)
+  - HK Equities Analyst (the default; database agent scoped to the HK datasets and HKEX short selling)
   - Macro Economist
   - Climate Analyst
   - EV Market Strategist
@@ -215,9 +216,14 @@ The initializer creates only these missing tables in the `public` schema:
 | `insightful_datasets` | The 13 curated dataset IDs and JSONB metadata, including metrics, entities, provenance, as-of date and source row count |
 | `insightful_dataset_rows` | Every curated observation as JSONB, keyed by `(dataset_id, row_index)` with a foreign key to the dataset catalog; decimal-year periods are preserved |
 | `insightful_hkex_short_selling` | All 34,077 bundled HKEX records, keyed by `(trading_date, stock_code)`; stock codes remain text, share counts use bigint, and monetary values use exact numeric with a separate trading currency |
+| `insightful_table_catalog` | Searchable descriptions of every agent-queryable table and sample dataset: purpose, column meanings and units, query notes, sample rows, coverage, source and example SQL, with a full-text `tsvector` index. Refreshed on every initialization (see [Table catalog](#table-catalog-and-agent-sql)) |
 | `insightful_configuration` | API endpoint, model, thinking effort and configured API key as JSONB, keyed by `kind = 'api'`, with an update timestamp; imports existing file-based API settings without overwriting a saved database value |
 
 Existing dataset relations are **skipped entirely**, even if empty or incomplete.
+The table catalog is the exception among data tables: it only documents the
+other tables, so each run upserts its managed entries from the current code and
+the stored HKEX coverage/sample rows (reported as `seeded`), and removes stale
+`dataset:*` entries. Other catalog rows are left untouched.
 Initialization does not migrate schemas, update existing rows or backfill
 existing dataset tables. The configuration table is the exception: initialization
 imports a legacy API settings row if missing, using `ON CONFLICT DO NOTHING`.
@@ -290,8 +296,9 @@ and provider spending limits appropriate to your audience.
 Implementation:
 
 - [hkex-agent.ts](./src/lib/server/hkex-agent.ts) uses AI SDK 7
-  `streamText` with `Output.object` for one validated research plan.
-  It replaces the multi-step `ToolLoopAgent`; there is no model tool loop.
+  `streamText` with `Output.object` for one validated research plan. When the
+  table catalog exists, the model may first call catalog tools in a bounded
+  loop (see [Table catalog and agent SQL](#table-catalog-and-agent-sql)).
 - [hkex-skills.ts](./src/lib/server/hkex-skills.ts) holds the system instructions
   and the runtime `hkex-short-selling` research skill. These are application
   skills loaded by the agent, not editor/Copilot customization files.
@@ -346,11 +353,74 @@ Up to five stock-name lookups are allowed per plan; ambiguous matches ask
 the user to specify a five-digit code rather than guessing or looping.
 Unsupported requests receive a planner clarification, not fabricated data.
 Internal activity records status, SQL templates, parameters and row counts.
-The public conversation shows live provider reasoning in a Thinking block and
-an expandable tool log alongside the answer, findings and charts. Raw plan JSON
+The public conversation shows live provider reasoning in a collapsed Thinking
+block and an expandable tool log alongside the answer, findings and charts.
+The answer streams as soon as the plan is validated: the results heading first,
+then each query's section in plan order as it completes (queries still run in
+parallel). Raw plan JSON
 is not shown. The surrounding interface does not include instructional copy
 about token limits, architecture or generation counts. Public errors explain
 what the user can do next without provider/configuration setup instructions.
+
+### Table catalog and agent SQL
+
+Use cases with `execution: "database-agent"` open the agent chat and send their
+`useCaseId` to `/api/hkex/chat` (other use cases are rejected there, and
+`/api/insight` rejects agent use cases). **HKEX Short-Selling Research**
+(`agentDatasets: "all"`) can use every catalogued dataset. **HK Equities
+Analyst** is scoped to its `datasetIds` (`hk-indices`, `hk-valuations`,
+`hk-prices`, `hk-financials`) plus the HKEX table: catalog listing, search and
+describe only return those entries, and every reference to
+`insightful_dataset_rows`/`insightful_datasets` in its SQL is rewritten on the
+server into a subquery filtered to those dataset ids. Because a scoped workspace has
+only a few tables, the preflight also loads their full catalog descriptions
+(columns, JSON keys, units, notes, sample rows and example SQL) into the
+planner prompt. The model writes SQL directly without `searchTables` or
+`describeTable`. It may check one draft with `runSql` (at most 2 model steps),
+so a typical question needs one model request. The HK workspace keeps its
+brief, example questions and market strip; it no longer produces the engine's
+forecast/anomaly reports, and sample-data answers are tables rather than charts.
+
+[table-catalog.ts](./src/lib/server/table-catalog.ts) defines one catalog entry
+for the HKEX table, one for the sample dataset registry and one per curated
+sample dataset (`dataset:<id>`, e.g. `dataset:us-macro`). Each entry stores the
+physical relation, description, column meanings/units (dataset metrics map to
+JSON keys in `insightful_dataset_rows.data`), query notes, up to five sample
+rows, coverage, source and runnable example SQL. Metric labels, aliases,
+entities and keywords are folded into the search text, so plain-language terms
+such as "jobless", "carbon emissions" or "short turnover" find the right entry.
+
+When the catalog is present, the planner receives the list of catalog ids and
+three model-callable tools (at most 10 calls and 6 model steps per turn; the
+final step has no tools so it always returns a plan):
+
+| Tool | Purpose |
+| --- | --- |
+| `searchTables` | Full-text search of the catalog with model-chosen keywords; any matching term ranks an entry, with an `ILIKE` fallback |
+| `describeTable` | Return one entry's columns, notes, sample rows, coverage and example SQL |
+| `runSql` | Run a draft query (20 rows) so the model can check and fix it; errors return to the model as tool results |
+
+The final plan may contain up to three `sqlQueries` alongside the templated HKEX
+queries. The server re-validates and runs them (100-row cap), renders a Markdown
+table with the tables used, and exposes the SQL through **View SQL**. Templated
+HKEX queries are still preferred for HKEX rankings/trends because they include
+charts and computed findings. Without a catalog (not yet re-initialized) the
+agent keeps its original single-request behaviour and cannot write SQL.
+
+Model-written SQL is parsed with the real PostgreSQL parser
+([libpg-query](https://www.npmjs.com/package/libpg-query)) in
+[agent-sql.ts](./src/lib/server/agent-sql.ts) and must be exactly one `SELECT`
+(CTEs allowed) that references only `insightful_hkex_short_selling`,
+`insightful_dataset_rows` and `insightful_datasets` in `public`. CTE scoping is
+resolved so a CTE cannot shadow another table. Node types, functions
+(common aggregate, window, math, date, text and JSON functions) and cast types
+are allow-listed; system catalogs, `insightful_configuration`, SQL-executing or
+file functions, `SELECT INTO` and row locks are rejected. Accepted SQL runs
+wrapped in a row limit, in a `READ ONLY` transaction with `search_path = public`
+and the existing 5-second statement timeout. Database syntax/data errors are
+returned to the model for correction; other failures stay sanitized. A turn is
+limited to 24 database reads. For defence in depth, also point the saved
+connection at a role that can only `SELECT` from these tables.
 
 ### Factual insight cards
 
@@ -383,6 +453,14 @@ already-calculated findings under **Incomplete research** for inspection;
 they are not treated as a completed answer.
 
 **Explain these results** is an optional explicit action, not automatic.
+It is available in every database-agent workspace (HKEX Short-Selling Research
+and HK Equities Analyst) whenever an answer returned rows: HKEX template results
+and catalogue SQL results are both kept. The explainer also receives the
+workspace name and persona, plus the catalog documentation of the tables used
+(column meanings, units, notes, coverage/as-of date and source). It applies
+general rules (direct answer first, patterns/outliers, units, limitations, no
+recommendations or predictions), and adds HKEX-specific rules only when HKEX
+evidence is present.
 It makes one separate streaming model call using the server-held evidence,
 without planning or querying again. Additional provider charges apply.
 Explanations are shown separately and do not enter future research context.
@@ -483,7 +561,14 @@ automatically. Configuration chat retains its 60-second server deadline.
 
 Latest means the latest **stored** date matching the currency/board/stock
 filters, never an assumed live trading date. Rankings default to that day;
-trends default to the 30 calendar days ending there. Currency values are never
+trends default to every stored day (up to 366) ending there, i.e. the full
+bundled period of 24 Aug – 20 Oct 2026 (40 trading days). Relative periods such
+as "last 30 days" or "this month" are anchored to the latest stored date, never
+today's date; requests beyond stored coverage use the overlapping stored dates,
+and a period with no overlap gets a clarification stating the stored range. The
+use-case brief and example questions show this range from
+[hkex-coverage.ts](./src/lib/hkex-coverage.ts), which a test keeps in sync with
+the bundled CSV. Currency values are never
 summed together, numeric values retain exact strings, missing rows are not
 treated as zero, and row-limit truncation is explicit. Short turnover percentage
 is `100 * SUM(short_selling_value) / SUM(total_turnover)`, not an average of

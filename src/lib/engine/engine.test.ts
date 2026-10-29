@@ -51,7 +51,7 @@ describe("parser routing", () => {
 
 describe("numbers are computed from the data", () => {
   it("ranks HK market cap leader correctly", () => {
-    const r = runInsight("Top 5 Hong Kong stocks by market cap", "hk");
+    const r = runInsight("Top 5 Hong Kong stocks by market cap", "explore");
     expect(r.table.rows[0].entity).toBe("Tencent");
   });
   it("forecast EV sales grows", () => {

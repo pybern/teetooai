@@ -7,6 +7,8 @@ import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } 
 import { DATASETS } from "@/lib/data";
 import { initializeSavedDatabase, loadHkexSeed } from "./database-seed";
 import { loadConnections, loadSavedApi, saveConnection } from "./connections";
+import { HkexDatabase } from "./hkex-database";
+import { HKEX_COVERAGE } from "@/lib/hkex-coverage";
 
 const connectionString = process.env.TEST_POSTGRES_URL;
 const api = { baseUrl: "https://api.example.test/v1", model: "seeded-model", apiKey: "test-private-api-key", reasoningEffort: "high" };
@@ -55,7 +57,7 @@ describe.skipIf(!connectionString)("database initialization against PostgreSQL",
     const result = await initializeSavedDatabase();
     const source = await loadHkexSeed();
     const observations = DATASETS.reduce((count, dataset) => count + dataset.rows.length, 0);
-    expect(result.tables.map((table) => table.insertedRows)).toEqual([DATASETS.length, observations, source.rows.length, 1]);
+    expect(result.tables.map((table) => table.insertedRows)).toEqual([DATASETS.length, observations, source.rows.length, DATASETS.length + 2, 1]);
     expect((await client.query("SELECT settings FROM public.insightful_configuration WHERE kind = 'api'")).rows[0].settings).toEqual(api);
     expect(JSON.parse(await readFile(process.env.CONNECTION_CONFIG_PATH!, "utf8")).api).toBeUndefined();
     expect(await loadSavedApi()).toEqual(api);
@@ -82,7 +84,9 @@ describe.skipIf(!connectionString)("database initialization against PostgreSQL",
     await client.query("UPDATE public.insightful_datasets SET metadata = metadata || '{\"custom_marker\": true}'::jsonb");
     await client.query("DELETE FROM public.insightful_hkex_short_selling WHERE trading_date = $1 AND stock_code = $2", [first.trading_date, first.stock_code]);
     const second = await initializeSavedDatabase();
-    expect(second.tables.every((table) => table.status === "skipped")).toBe(true);
+    expect(second.tables.map((table) => table.status)).toEqual(["skipped", "skipped", "skipped", "seeded", "skipped"]);
+    expect((await client.query("SELECT row_count::int FROM public.insightful_table_catalog WHERE id = 'hkex_short_selling'")).rows[0].row_count)
+      .toBe(source.rows.length - 1);
     expect((await client.query("SELECT count(*)::int AS count FROM public.insightful_datasets WHERE metadata->>'custom_marker' = 'true'")).rows[0].count).toBe(DATASETS.length);
     expect((await client.query("SELECT count(*)::int AS count FROM public.insightful_hkex_short_selling")).rows[0].count).toBe(source.rows.length - 1);
   }, 30000);
@@ -91,9 +95,57 @@ describe.skipIf(!connectionString)("database initialization against PostgreSQL",
     await initializeSavedDatabase();
     await client.query("DROP TABLE public.insightful_hkex_short_selling");
     const result = await initializeSavedDatabase();
-    expect(result.tables.map((table) => table.status)).toEqual(["skipped", "skipped", "created", "skipped"]);
+    expect(result.tables.map((table) => table.status)).toEqual(["skipped", "skipped", "created", "seeded", "skipped"]);
     expect(result.tables[2].insertedRows).toBe(34077);
   }, 30000);
+
+  it("seeds a searchable table catalog that the agent can describe and query through the SQL guard", async () => {
+    await initializeSavedDatabase();
+    const entries = (await client.query("SELECT id, relation, jsonb_array_length(sample_rows) AS samples, row_count::int FROM public.insightful_table_catalog ORDER BY id")).rows;
+    expect(entries).toHaveLength(DATASETS.length + 2);
+    expect(entries.every((entry) => entry.samples > 0 && entry.row_count > 0)).toBe(true);
+    expect(entries.some((entry) => /configuration/.test(entry.relation))).toBe(false);
+    const url = new URL(connectionString!);
+    const research = new HkexDatabase({
+      host: url.hostname, port: Number(url.port || 5432), database: name,
+      username: decodeURIComponent(url.username), password: decodeURIComponent(url.password), ssl: false, caCertificate: "",
+    }, new AbortController().signal);
+    expect((await research.inspect()).catalog).toHaveLength(DATASETS.length + 2);
+    const emissions = await research.searchCatalog("carbon emissions by country");
+    expect(emissions.rows.map((row) => row.id)).toContain("dataset:co2-emitters");
+    expect((await research.searchCatalog("short selling turnover")).rows[0].id).toBe("hkex_short_selling");
+    const described = (await research.describeCatalog("dataset:us-macro")).rows[0] as unknown as { example_queries: { sql: string }[]; columns: { name: string }[] };
+    expect(described.columns.map((column) => column.name)).toContain("inflation");
+    for (const entry of entries) {
+      const detail = (await new HkexDatabase(research["settings"], new AbortController().signal).describeCatalog(entry.id)).rows[0] as unknown as { example_queries: { sql: string }[] };
+      for (const example of detail.example_queries) {
+        const result = await new HkexDatabase(research["settings"], new AbortController().signal).runAgentSql(example.sql);
+        expect(result.rows.length, `${entry.id}: ${example.sql}`).toBeGreaterThan(0);
+      }
+    }
+    await expect(research.runAgentSql("SELECT settings FROM public.insightful_configuration")).rejects.toThrow("not in the catalog");
+    await expect(research.runAgentSql("SELECT nope FROM public.insightful_datasets")).rejects.toThrow('column "nope" does not exist');
+    const settings = research["settings"];
+    const hk = () => new HkexDatabase(settings, new AbortController().signal, { datasetIds: ["hk-indices", "hk-valuations", "hk-prices", "hk-financials"] });
+    const scopedDatasets = await hk().runAgentSql(`SELECT DISTINCT r.dataset_id FROM public.insightful_dataset_rows r
+      JOIN insightful_datasets d ON d.id = r.dataset_id ORDER BY 1`);
+    expect(scopedDatasets.rows.map((row) => row.dataset_id)).toEqual(["hk-financials", "hk-indices", "hk-prices", "hk-valuations"]);
+    expect((await hk().runAgentSql("SELECT count(*) AS n FROM insightful_dataset_rows WHERE dataset_id = 'us-macro'")).rows[0].n).toBe("0");
+    expect((await hk().searchCatalog("inflation unemployment")).rows).toEqual([]);
+    await expect(hk().describeCatalog("dataset:us-macro")).rejects.toThrow("No catalog entry");
+    expect((await hk().inspect()).catalog?.map((entry) => entry.id).sort()).toEqual(
+      ["dataset:hk-financials", "dataset:hk-indices", "dataset:hk-prices", "dataset:hk-valuations", "hkex_short_selling", "insightful_datasets"]);
+    const marketTrend = await new HkexDatabase(settings, new AbortController().signal).query({
+      mode: "market-trend", from: null, to: null, stockCodes: [], currency: "HKD", board: null, metric: "short_selling_value", limit: 100,
+    });
+    expect(marketTrend.rows).toHaveLength(HKEX_COVERAGE.tradingDays);
+    expect(marketTrend.rows[0].trading_date).toBe(HKEX_COVERAGE.from);
+    expect(marketTrend.rows.at(-1)!.trading_date).toBe(HKEX_COVERAGE.to);
+    const limited = await research.runAgentSql("SELECT * FROM public.insightful_hkex_short_selling", 5);
+    expect(limited.rows).toHaveLength(5);
+    expect(limited.truncated).toBe(true);
+    expect(typeof limited.rows[0].trading_date).toBe("string");
+  }, 60000);
 
   it("persists API updates in PostgreSQL, retains omitted secrets and keeps migrated values on repeat initialization", async () => {
     await initializeSavedDatabase();

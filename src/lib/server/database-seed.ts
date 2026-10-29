@@ -9,6 +9,7 @@ import {
   loadSavedDatabase, removeLegacyApi, updateConnectionStorage,
 } from "./connections";
 import type { ApiSettings } from "@/lib/connections";
+import { buildCatalogEntries, CATALOG_TABLE_DEFINITION, loadHkexCatalogStats, upsertCatalog } from "./table-catalog";
 
 export const HKEX_COLUMNS = [
   "board", "trading_date", "stock_code", "stock_name", "short_selling_shares",
@@ -50,6 +51,7 @@ const TABLES = [
       PRIMARY KEY (trading_date, stock_code)
     )`,
   },
+  CATALOG_TABLE_DEFINITION,
   CONFIGURATION_TABLE,
 ] as const;
 
@@ -200,6 +202,16 @@ async function initializeDatabase(signal?: AbortSignal, legacyApi?: ApiSettings)
           status: existing.rows[0]?.relation ? (insertedRows ? "seeded" : "skipped") : "created",
           insertedRows,
         });
+        continue;
+      }
+      if (table.name === CATALOG_TABLE_DEFINITION.name) {
+        // The catalog only documents seeded tables, so it is refreshed on every run to match the current code and data.
+        if (!existing.rows[0]?.relation) {
+          await client.query(table.create);
+          for (const index of CATALOG_TABLE_DEFINITION.indexes) await client.query(index);
+        }
+        const insertedRows = await upsertCatalog(client, buildCatalogEntries(await loadHkexCatalogStats(client)));
+        tables.push({ name: table.name, status: existing.rows[0]?.relation ? "seeded" : "created", insertedRows });
         continue;
       }
       if (existing.rows[0]?.relation) {

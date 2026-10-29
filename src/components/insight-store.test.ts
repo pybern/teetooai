@@ -14,7 +14,7 @@ vi.mock("next/navigation", () => ({
 }));
 vi.mock("./theme", () => ({ ThemeToggle: () => null }));
 
-const report = runInsight("Top 10 Hong Kong stocks by market cap", "hk");
+const report = runInsight("Top 10 Hong Kong stocks by market cap", "explore");
 const saved = {
   entries: [{
     id: "saved-query", question: "Saved market research", useCaseId: "hk",

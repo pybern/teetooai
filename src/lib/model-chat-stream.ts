@@ -17,12 +17,14 @@ export function researchErrorMessage(error: unknown): string {
 export async function sendModelChat(
   token: string | undefined, messages: ModelChatMessage[], signal: AbortSignal, onText: (text: string) => void,
   onReasoning?: (reasoning: string) => void,
-  options?: { api: "/api/hkex/chat"; onTools?: (tools: ModelChatToolActivity[]) => void; explanationId?: string },
+  options?: { api: "/api/hkex/chat"; onTools?: (tools: ModelChatToolActivity[]) => void; explanationId?: string; useCaseId?: string },
 ): Promise<ModelChatResult> {
   const transport = new DefaultChatTransport<ChatUIMessage>({
     api: options?.api ?? "/api/config/chat",
     headers: !options && token ? { Authorization: `Bearer ${token}` } : {},
-    prepareSendMessagesRequest: () => ({ body: options?.explanationId ? { explanationId: options.explanationId } : { messages } }),
+    prepareSendMessagesRequest: () => ({
+      body: options?.explanationId ? { explanationId: options.explanationId } : { messages, ...(options?.useCaseId ? { useCaseId: options.useCaseId } : {}) },
+    }),
     fetch: async (url, init) => {
       const response = await fetch(url, { ...init, cache: "no-store" });
       if (!response.ok) {
