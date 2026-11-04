@@ -11,6 +11,10 @@ independently while the header and message composer remain visible, including
 below the mobile navigation. Thinking panels always start collapsed (while
 streaming and after completion); expanding one renders Markdown (including
 lists, tables, links and code blocks) in its own fixed-height scroll.
+Active thinking labels, running tool labels and loading status text shimmer
+in both research workspaces and optional explanations. Completed, failed and
+cancelled activity stops shimmering. Reduced-motion preferences, forced-color
+mode and print use static readable text instead.
 
 Choose **Export PDF** in any research conversation, then **Save as PDF** in the
 browser print dialog. The print-ready snapshot includes the current session's
@@ -32,7 +36,12 @@ Public research screens focus on questions and answers, while retaining live
 thinking blocks, expandable tool activity with SQL/parameters, and per-answer
 execution traces and SQL/method controls for curated reports. They omit the
 static explanations of system architecture, token budgets, model-call counts
-and connection setup. Failure messages use plain language. Charts, KPI cards,
+and connection setup. Failure messages use plain language, with a collapsed
+**Error details** section showing the underlying client/server-returned message
+for failed research and optional explanations. Details render as plain text,
+without stack traces or raw provider response bodies; existing server-side
+credential protection remains in place. Retrying or starting a new chat clears
+the previous error details. Charts, KPI cards,
 findings, underlying data, sources and material data limitations remain
 available. Configuration keeps its administrator diagnostics.
 
@@ -265,7 +274,8 @@ HKEX in the in-memory data catalog.
 
 ## HKEX database research agent
 
-Choose **HKEX Database Research** from the desktop/mobile use-case navigation
+It is the default workspace: `/` (or an unknown `uc`) opens **HKEX Short-Selling Research**, which can also be
+chosen from the desktop/mobile use-case navigation
 (`/?uc=hkex-db`). Save a model that supports JSON-schema structured output and a PostgreSQL
 connection in Configuration. Explicitly initialize missing tables if needed;
 the agent never seeds, migrates or modifies your database.
@@ -297,8 +307,9 @@ Implementation:
 
 - [hkex-agent.ts](./src/lib/server/hkex-agent.ts) uses AI SDK 7
   `streamText` with `Output.object` for one validated research plan. When the
-  table catalog exists, the model may first call catalog tools in a bounded
-  loop (see [Table catalog and agent SQL](#table-catalog-and-agent-sql)).
+  table catalog exists, its workspace descriptions are preloaded and the model
+  may check one SQL draft before returning its plan
+  (see [Table catalog and agent SQL](#table-catalog-and-agent-sql)).
 - [hkex-skills.ts](./src/lib/server/hkex-skills.ts) holds the system instructions
   and the runtime `hkex-short-selling` research skill. These are application
   skills loaded by the agent, not editor/Copilot customization files.
@@ -324,11 +335,28 @@ Server-executed research steps (no additional model calls):
 | `findStocks` | Resolve names or short codes to five-digit stock codes; at most 20 matches |
 | `queryHkex` | Rank stocks or query stock/market trends; one currency, up to five stock codes and 100 result rows |
 | `renderChart` | Validate the plan's preferred shadcn chart, or select an eligible automatic default, against actual results; at most three charts |
+| `computeInsights` | Calculate a headline, KPIs and findings from the returned rows of each HKEX or chartable SQL result |
+| `chooseChart` | After the answer has streamed, ask the chart agent whether SQL results need a chart (the only step here that calls the model; see [Charts for SQL results](#charts-for-sql-results)) |
 
 The server loads the skill and inspects metadata before the model request.
 The model produces only a structured plan: a clarification, or up to three
 queries with filters, stock lookups and preferred chart components. The saved
 model/endpoint must support JSON-schema structured output.
+The provider receives a strict JSON schema for the plan's shape; the server
+separately validates business rules (clarification or queries, never both, and
+at most five stock-name lookups across the plan). Missing output, malformed JSON
+or schema/business-rule failures after a normally completed generation trigger
+at most **one automatic plan repair** using the same model, question and
+workspace metadata. The correction request receives safe validation reasons,
+not the raw invalid output, and has no tools. Only a fully validated plan may
+execute final queries; a previously checked read-only SQL draft may already
+have run. Failed repair reports the specific category and bounded field
+paths/reasons in **Error details**, without model values, unknown field names,
+credentials or raw provider responses. Cancellation, timeouts, filtered/refused
+finishes, truncated output, transport and authentication failures do not trigger
+plan repair. Repair remains within the turn's existing deadline and can incur
+one additional generation charge (up to three model steps including a draft
+check). The separate single pre-stream HTTP 503 retry remains unchanged.
 HKEX planning and optional explanations use **low thinking effort** when the
 model catalog advertises it, without overwriting the saved model settings.
 Explicit saved `none`/`minimal` efforts are preserved rather than increased.
@@ -338,8 +366,10 @@ failures are reported explicitly, and this metadata request is not a generation
 round trip. Configuration tests and the playground retain their saved effort.
 The server validates it, resolves names, queries the saved database and builds
 factual Markdown tables/charts from returned values. No second narrative call
-or chart-selection round trip is made. Normal query and chart requests both
-use **one generation call**, excluding the existing single 503 retry.
+or chart-selection round trip is made. Query and chart requests normally
+use **one generation call**, or two when checking a SQL draft, excluding the
+existing single 503 retry.
+Invalid plans may also incur the single correction call described above.
 Independent stock lookups run concurrently and identical search strings are
 resolved once per turn. After all stock filters are resolved and validated,
 up to three independent queries run concurrently; answer sections retain plan
@@ -372,14 +402,16 @@ Analyst** is scoped to its `datasetIds` (`hk-indices`, `hk-valuations`,
 `hk-prices`, `hk-financials`) plus the HKEX table: catalog listing, search and
 describe only return those entries, and every reference to
 `insightful_dataset_rows`/`insightful_datasets` in its SQL is rewritten on the
-server into a subquery filtered to those dataset ids. Because a scoped workspace has
-only a few tables, the preflight also loads their full catalog descriptions
+server into a subquery filtered to those dataset ids. Both workspaces use the
+same agent flow: the preflight loads their permitted full catalog descriptions
 (columns, JSON keys, units, notes, sample rows and example SQL) into the
 planner prompt. The model writes SQL directly without `searchTables` or
 `describeTable`. It may check one draft with `runSql` (at most 2 model steps),
-so a typical question needs one model request. The HK workspace keeps its
-brief, example questions and market strip; it no longer produces the engine's
-forecast/anomaly reports, and sample-data answers are tables rather than charts.
+so a typical question needs one planning request (plus one chart request when
+a SQL result can be charted; see [Charts for SQL results](#charts-for-sql-results)).
+Data access remains scoped independently of this shared planning flow. The HK
+workspace keeps its brief, example questions and market strip; it no longer
+produces the engine's forecast/anomaly reports.
 
 [table-catalog.ts](./src/lib/server/table-catalog.ts) defines one catalog entry
 for the HKEX table, one for the sample dataset registry and one per curated
@@ -390,21 +422,24 @@ rows, coverage, source and runnable example SQL. Metric labels, aliases,
 entities and keywords are folded into the search text, so plain-language terms
 such as "jobless", "carbon emissions" or "short turnover" find the right entry.
 
-When the catalog is present, the planner receives the list of catalog ids and
-three model-callable tools (at most 10 calls and 6 model steps per turn; the
-final step has no tools so it always returns a plan):
+When the catalog is present, both planners receive the list of permitted catalog
+ids and their full descriptions, including sample rows and example SQL.
+Preflight metadata has a separate 128,000-character limit to accommodate the
+full catalog; query evidence retains its 32,000-character limit. Oversized or
+incomplete metadata fails explicitly rather than silently dropping descriptions.
+The only model-callable tool is `runSql` (at most one call and two model steps
+per turn; the final step has no tools so it always returns a plan):
 
 | Tool | Purpose |
 | --- | --- |
-| `searchTables` | Full-text search of the catalog with model-chosen keywords; any matching term ranks an entry, with an `ILIKE` fallback |
-| `describeTable` | Return one entry's columns, notes, sample rows, coverage and example SQL |
-| `runSql` | Run a draft query (20 rows) so the model can check and fix it; errors return to the model as tool results |
+| `runSql` | Optionally check one draft query (20 rows); errors return to the model so it can correct the final plan |
 
 The final plan may contain up to three `sqlQueries` alongside the templated HKEX
 queries. The server re-validates and runs them (100-row cap), renders a Markdown
 table with the tables used, and exposes the SQL through **View SQL**. Templated
-HKEX queries are still preferred for HKEX rankings/trends because they include
-charts and computed findings. Without a catalog (not yet re-initialized) the
+HKEX queries are still preferred for HKEX rankings/trends because their charts
+are chosen in the plan and validated against HKEX evidence. SQL results get
+their own insight cards and charts (below). Without a catalog (not yet re-initialized) the
 agent keeps its original single-request behaviour and cannot write SQL.
 
 Model-written SQL is parsed with the real PostgreSQL parser
@@ -452,6 +487,41 @@ findings without loading the curated chart engine. A failed turn may retain
 already-calculated findings under **Incomplete research** for inspection;
 they are not treated as a completed answer.
 
+Catalogue SQL results get the same card, from
+[sql-insights.ts](./src/lib/server/sql-insights.ts), when the rows have a clear
+axis (a date, a `year`-like column or a text category with unique values) and a
+numeric measure (the first numeric column that is not the axis, a year, an id or
+a code). Ordered axes show the latest value, change over the period, peak, low
+and the largest single move; categories show the leader, lowest value, spread,
+a returned-row total (or average when values can be negative) and concentration
+within the returned rows. Missing values and truncated results are flagged.
+Results with repeated axis values (several series mixed together), a single row
+or no numeric measure get no card. No model call is made.
+
+### Charts for SQL results
+
+SQL answers are streamed first. After every section has been sent, a separate
+chart agent ([sql-chart.ts](./src/lib/server/sql-chart.ts)) decides whether a
+chart would help. This is one additional structured-output model request, made
+only when at least one SQL result has two or more rows and a numeric column;
+HKEX template answers never trigger it. The agent sees the question, each
+result's title, column profiles (number/date/text, distinct and null counts)
+and up to 12 sample rows, and returns either no chart or, per result, a chart
+type (`bar`, `horizontal-bar`, `line`, `area`), an axis column, one to four
+value columns and an optional series column.
+
+The server then builds the chart from the **returned rows**, never from
+model-written values. A choice is rejected if a column does not exist, a value
+column is not numeric, a line/area axis is not a date or number, an area chart
+has more than one series, the axis repeats within a series, or the chart would
+exceed 100 points or 8 series. Time axes are sorted; bar charts keep the SQL
+order; missing values stay missing. Charts appear below the answer text. While
+the chart step runs, a chart-sized placeholder with a shimmering "Preparing
+chart..." caption holds that spot and is replaced by the chart (or removed if
+no chart is added). A
+declined, invalid or failed chart request never affects the completed answer;
+the tool log records the outcome.
+
 **Explain these results** is an optional explicit action, not automatic.
 It is available in every database-agent workspace (HKEX Short-Selling Research
 and HK Equities Analyst) whenever an answer returned rows: HKEX template results
@@ -485,7 +555,7 @@ If it persists, check provider status and model availability; an administrator
 can choose another structured-output-capable model. The live HKEX planner allows **one** delayed
 retry per turn, only for an HTTP 503 received before that model call starts
 streaming. It waits one second, reuses the failed call's request,
-and stays within the same 120-second deadline and cancellation
+and stays within the same 290-second deadline and cancellation
 signal. It does not restart the whole research turn, retry a broken stream,
 retry other HTTP statuses, or silently switch models. The retry can incur
 additional provider charges. Configuration tests/playground keep retries disabled.
@@ -493,7 +563,8 @@ HTTP 429 indicates a provider rate/quota
 limit; check usage and account credits if waiting does not help.
 
 The previous agent made several model calls per turn. Research now makes one
-planning call; explanations are separate, explicit requests. On a failed live turn,
+planning call, plus one chart call after the answer when a SQL result can be
+charted; explanations are separate, explicit requests. On a failed live turn,
 partial thinking, tool activity, text, findings and charts stay visible under
 **Incomplete research**.
 They are not a completed answer and are excluded from future model context.
@@ -532,7 +603,8 @@ Area charts cannot silently stack multiple stock series. Unsupported views
 such as scatter plots require an appropriate paired-metric dataset and are
 not exposed in this catalog.
 
-Charts appear as research tools complete, before the final Markdown reply, and
+Charts appear as research tools complete, always below the answer text (HKEX
+charts first, then any SQL charts), and
 stay with that completed turn. Each chart labels its metric, currency, actual
 stored dates, representative HKEX sources and any row-limit truncation.
 Rankings use bars or eligible composition charts; trends use lines or a
@@ -548,11 +620,31 @@ write tool, URL-fetch tool, or access to other tables. Grant the database user
 only the SELECT privileges it needs in production. Research is bounded to one
 planning generation, three queries, five stock lookups, ten database reads
 including preflight, a 366-day date span, 32,000 characters per evidence result,
-and 4,096 output tokens per generation (which may include provider thinking
-tokens). Summaries show up to ten rows per query;
-chart tables retain all returned rows. Each research or explanation request has a
-120-second server deadline after database preflight (including catalog
-validation), with a 150-second browser deadline for the entire request, including
+and a configurable output-token limit per model call (see below). Summaries show
+up to ten rows per query; chart tables retain all returned rows.
+
+**Output-token limits** are the main control on how much each model call can
+generate, including provider thinking tokens. An administrator sets them under
+**Configuration → Research output-token limits**, saved with the model settings:
+
+| Step | Model call | Default |
+| --- | --- | --- |
+| Planning | Writes the research plan and SQL | 4,096 |
+| Chart choice | Decides whether SQL results get a chart, after the answer | 4,096 |
+| Explanation | **Explain these results**, on request | 4,096 |
+
+Each limit accepts a whole number from 256 to 32,768; a blank field uses the
+default. Reaching a limit stops that call with a message naming the limit. A
+truncated plan runs no queries; a truncated chart choice adds no chart but
+keeps the answer. The provider-stream size cap grows with the largest limit
+(at least 1,024 KB). Research thinking longer than 16,000 characters is
+shortened for display instead of failing the turn.
+
+Time is a safety net rather than the main limit. Each research or explanation
+request has a 290-second server deadline after database preflight (including
+catalog validation), covering planning, queries and the optional chart request,
+with a 320-second browser deadline for the entire request. The chat route sets
+`maxDuration = 300` so hosts such as Vercel allow the full turn, including
 the single pre-stream 503 retry described above; SDK-level retries remain disabled.
 Cancellation closes active database reads as well as model generation.
 Timeout, user cancellation and planner output-token exhaustion are reported

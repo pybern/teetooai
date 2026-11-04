@@ -1,0 +1,47 @@
+{
+  "skill_name": "research-agent-workflow",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Users of the HK Equities Analyst workspace say that for some questions the answer table has numbers but no chart ever shows up. Figure out where in the code this can happen and the likely causes, and tell me how I'd confirm which one it is for a given question. Don't change any code.",
+      "expected_output": "A triage answer naming isChartable/profileColumns, the chooseChart decline or failure, buildSqlChart validation rejections, and the tool log (chooseChart / renderChart activity) as the way to confirm.",
+      "files": [],
+      "assertions": [
+        "Names isChartable/profileColumns as the first gate (no chart call when not chartable)",
+        "Names the chart agent declining or failing (chooseSqlCharts / chooseChart)",
+        "Names buildSqlChart validation rejecting the choice",
+        "Points to src/lib/server/sql-chart.ts",
+        "Explains confirming via the tool log activities (chooseChart/renderChart summaries)"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "I want SQL results in the research agent to support a scatter chart (two numeric columns against each other). Write an implementation plan that lists the exact files and functions to change, the validation rules, and the tests to add. Don't change any code yet.",
+      "expected_output": "A plan touching src/lib/sql-chart.ts (SQL_CHART_TYPES/spec), src/lib/server/sql-chart.ts (choice schema, SQL_CHART_INSTRUCTIONS, buildSqlChart), src/components/sql-chart.tsx, tests in sql-chart.test.ts and model-chat.test.ts, README, working for both use cases.",
+      "files": [],
+      "assertions": [
+        "Extends SQL_CHART_TYPES in src/lib/sql-chart.ts",
+        "Updates the chart-agent prompt SQL_CHART_INSTRUCTIONS",
+        "Adds scatter validation in buildSqlChart",
+        "Renders scatter in src/components/sql-chart.tsx",
+        "Adds unit tests in src/lib/server/sql-chart.test.ts",
+        "Keeps it working for both use cases (hkex-db and hk)",
+        "Updates the README"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Complex research questions are failing with 'API request timed out after 290 seconds'. Should we just raise the timeout to 600 seconds? Explain the trade-offs and exactly what you'd change. Don't change any code.",
+      "expected_output": "Explains that tokens are the primary control, the server < maxDuration (300) < client ordering, hosting limits, recommends output-token limits in Configuration / narrowing, and names HKEX_SERVER_TIMEOUT_MS, HKEX_CLIENT_TIMEOUT_MS and maxDuration with test/README updates if changed.",
+      "files": [],
+      "assertions": [
+        "Names HKEX_SERVER_TIMEOUT_MS",
+        "Names HKEX_CLIENT_TIMEOUT_MS",
+        "Names the route maxDuration",
+        "States the server < maxDuration < client ordering",
+        "Recommends output-token limits (Configuration) as the primary lever",
+        "Flags the hosting platform duration cap (e.g. Vercel)"
+      ]
+    }
+  ]
+}

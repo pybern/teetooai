@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { DEFAULT_CONNECTIONS } from "@/lib/connections";
 import { buildHkexQuery, HkexDatabase, HKEX_READ_LIMIT, validateHkexQuery, type HkexQuery } from "./hkex-database";
+import { buildCatalogEntries, catalogIdsForScope } from "./table-catalog";
 
 const pg = vi.hoisted(() => ({ connect: vi.fn(), query: vi.fn(), end: vi.fn(), on: vi.fn() }));
 vi.mock("pg", () => ({
@@ -75,6 +76,45 @@ describe("bounded HKEX queries", () => {
     await expect(database.inspect()).rejects.toThrow("existing HKEX table is empty");
     pg.query.mockImplementation(async (sql: string) => ({ rows: sql.startsWith("WITH latest") ? [{ stock_name: "x".repeat(32001) }] : [] }));
     await expect(database.query(filters)).rejects.toThrow("32,000");
+  });
+  it.each([null, ["hk-indices", "hk-valuations", "hk-prices", "hk-financials"]])("preloads all permitted real catalog descriptions for scope %j", async (datasetIds) => {
+    const scope = { datasetIds };
+    const ids = catalogIdsForScope(scope);
+    const entries = buildCatalogEntries({ sample_rows: [], row_count: 2, coverage: {} })
+      .filter((entry) => !ids || ids.includes(entry.id))
+      .map((entry) => ({
+        id: entry.id, relation: entry.relation, title: entry.title, description: entry.description,
+        columns: entry.columns, sample_rows: entry.sample_rows, query_notes: entry.query_notes,
+        example_queries: entry.example_queries, row_count: String(entry.row_count),
+        coverage: entry.coverage, source: entry.source,
+      }));
+    pg.query.mockImplementation(async (sql: string) => {
+      if (sql.includes("information_schema.columns")) return { rows: [{ column_name: "stock_code" }] };
+      if (sql.includes("count(DISTINCT stock_code)")) return { rows: [{ first_date: "2026-01-02", last_date: "2026-01-05" }] };
+      if (sql.includes("to_regclass")) return { rows: [{ relation: "public.insightful_table_catalog" }] };
+      if (sql.includes("SELECT id, kind, left(title")) return { rows: entries.map(({ id, title }) => ({ id, title, kind: "dataset" })) };
+      if (sql.includes("sample_rows, query_notes")) return { rows: entries };
+      return { rows: [] };
+    });
+    const metadata = await new HkexDatabase(settings, new AbortController().signal, scope).inspect();
+    expect(metadata.tables).toEqual(entries);
+    expect(metadata.tables?.some((entry) => entry.id === "dataset:world-economy")).toBe(datasetIds === null);
+    expect(pg.query.mock.calls.find(([sql]) => sql.includes("WHERE id = ANY($1::text[]) ORDER BY kind DESC"))?.[1])
+      .toEqual([entries.map((entry) => entry.id)]);
+    if (datasetIds === null) expect(JSON.stringify(metadata).length).toBeGreaterThan(32000);
+  });
+  it.each(["incomplete", "oversized"])("rejects %s preloaded catalog descriptions explicitly", async (failure) => {
+    pg.query.mockImplementation(async (sql: string) => {
+      if (sql.includes("information_schema.columns")) return { rows: [{ column_name: "stock_code" }] };
+      if (sql.includes("count(DISTINCT stock_code)")) return { rows: [{ first_date: "2026-01-02" }] };
+      if (sql.includes("to_regclass")) return { rows: [{ relation: "public.insightful_table_catalog" }] };
+      if (sql.includes("SELECT id, kind, left(title")) return { rows: [{ id: "hkex_short_selling", title: "HKEX", kind: "table" }] };
+      if (sql.includes("sample_rows, query_notes")) return { rows: failure === "incomplete" ? [] : [{ id: "hkex_short_selling", description: "x".repeat(128001) }] };
+      return { rows: [] };
+    });
+    await expect(new HkexDatabase(settings, new AbortController().signal).inspect())
+      .rejects.toThrow(failure === "incomplete" ? "descriptions are incomplete" : "128,000");
+    expect(pg.end).toHaveBeenCalledOnce();
   });
   it("sanitizes database failures, releases connections and bounds the number of reads", async () => {
     const database = new HkexDatabase(settings, new AbortController().signal);

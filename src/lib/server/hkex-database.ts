@@ -26,6 +26,7 @@ export type CatalogDetail = {
 };
 export const AGENT_SQL_ROW_LIMIT = 100;
 export const HKEX_READ_LIMIT = 24;
+const METADATA_MAX_CHARS = 128000;
 const rawText = { getTypeParser: () => (value: string) => value };
 
 function date(value: unknown): value is string | null {
@@ -101,7 +102,7 @@ export class HkexDatabase {
     this.signal = AbortSignal.any([this.signal, signal]);
   }
 
-  private async read<T>(operation: (client: Client) => Promise<T>, exposeQueryErrors = false): Promise<T> {
+  private async read<T>(operation: (client: Client) => Promise<T>, exposeQueryErrors = false, maxChars = 32000): Promise<T> {
     if (this.signal.aborted) throw new ConnectionError("Database research was cancelled.", 499);
     if (++this.calls > HKEX_READ_LIMIT) throw new ConnectionError(`Database research reached its ${HKEX_READ_LIMIT}-read limit. Ask a narrower question.`, 429);
     const client = createPostgresClient(this.settings, "insightful-hkex-agent", 10000);
@@ -118,7 +119,7 @@ export class HkexDatabase {
       if (this.signal.aborted) throw new ConnectionError("Database research was cancelled.", 499);
       // No writes are permitted, and rollback also releases the read snapshot.
       await client.query("ROLLBACK");
-      if (JSON.stringify(result).length > 32000) throw new ConnectionError("Database evidence exceeded 32,000 characters. Narrow the filters or reduce the result limit.", 413);
+      if (JSON.stringify(result).length > maxChars) throw new ConnectionError(`Database evidence exceeded ${maxChars.toLocaleString("en-US")} characters. Narrow the filters or reduce the result limit.`, 413);
       return result;
     } catch (error) {
       if (error instanceof ConnectionError) throw error;
@@ -160,17 +161,19 @@ export class HkexDatabase {
         ? (await client.query<{ id: string; kind: string; title: string }>(`SELECT id, kind, left(title, 120) AS title FROM ${CATALOG_TABLE}
             WHERE $1::text[] IS NULL OR id = ANY($1::text[]) ORDER BY kind DESC, id LIMIT 50`, [this.catalogIds])).rows
         : null;
-      // Scoped workspaces have few tables, so their full descriptions are preloaded and the model can write SQL without searching.
-      const tables: CatalogDetail[] | null = catalog?.length && this.catalogIds
+      const tables: CatalogDetail[] | null = catalog?.length
         ? (await client.query<CatalogDetail>(`SELECT id, relation, title, description, columns, sample_rows, query_notes, example_queries,
               row_count::text AS row_count, coverage, source
-            FROM ${CATALOG_TABLE} WHERE id = ANY($1::text[]) ORDER BY kind DESC, id`, [this.catalogIds])).rows
+            FROM ${CATALOG_TABLE} WHERE id = ANY($1::text[]) ORDER BY kind DESC, id`, [catalog.map((entry) => entry.id)])).rows
         : null;
+      if (catalog?.length && catalog.some((entry) => !tables?.some((table) => table.id === entry.id))) {
+        throw new ConnectionError("Workspace table descriptions are incomplete. Refresh the table catalog before running research.", 409);
+      }
       return {
         table: HKEX_TABLE, columns, coverage, catalog: catalog?.length ? catalog : null, tables,
         note: "Coverage is from the saved database, not a live HKEX feed. Numeric amounts retain exact decimal strings.",
       };
-    });
+    }, false, METADATA_MAX_CHARS);
   }
 
   async findStocks(search: string): Promise<DatabaseEvidence> {

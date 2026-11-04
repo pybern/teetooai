@@ -224,6 +224,26 @@ describe("automatic model dropdown loading", () => {
     expect(JSON.parse(save![1].body).settings.model).toBe("custom/my-model");
   });
 
+  it("loads, edits and saves per-step output-token limits, leaving blanks to the defaults", async () => {
+    fetchMock.mockImplementationOnce(async () => ({ ok: true, json: async () => ({
+      api: { ...DEFAULT_CONNECTIONS.api, outputTokens: { chart: 1500 }, apiKey: undefined, hasApiKey: false },
+      database: { ...DEFAULT_CONNECTIONS.database, password: undefined, hasPassword: false },
+    }) }));
+    await unlock();
+    const field = (label: string) => container.querySelector<HTMLInputElement>(`input[aria-label="${label} output-token limit"]`)!;
+    expect(field("Planning").value).toBe("");
+    expect(field("Planning").placeholder).toBe("4096");
+    expect(field("Chart choice").value).toBe("1500");
+    expect(field("Explanation").max).toBe("32768");
+    await edit('input[aria-label="Planning output-token limit"]', "8000");
+    await edit('input[aria-label="Chart choice output-token limit"]', "");
+    await act(async () => {
+      container.querySelector("form")!.dispatchEvent(new Event("submit", { bubbles: true, cancelable: true }));
+    });
+    const save = fetchMock.mock.calls.find(([, init]) => init.method === "PUT");
+    expect(JSON.parse(save![1].body).settings.outputTokens).toEqual({ planning: 8000 });
+  });
+
   it("keeps chat on saved settings while editing and resets it after an API save", async () => {
     await unlock();
     const savedModel = DEFAULT_CONNECTIONS.api.model;

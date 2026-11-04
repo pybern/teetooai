@@ -10,7 +10,7 @@ export function researchErrorMessage(error: unknown): string {
   if (/timed out|timeout/i.test(message) || (error instanceof Error && error.name === "TimeoutError")) return "This is taking longer than expected. Try again or ask a more focused question.";
   if (/cancel|abort/i.test(message)) return "Research was cancelled. You can send your question again.";
   if (/429|rate limit|quota|too many|already active|busy/i.test(message)) return "Research is busy right now. Please wait a moment and try again.";
-  if (/output limit|character|chat limit|conversation limit/i.test(message)) return "We couldn't finish this request. Try a shorter question or start a new chat.";
+  if (/output(?:-token)? limit|character|chat limit|conversation limit/i.test(message)) return "We couldn't finish this request. Try a shorter question or start a new chat.";
   return "We couldn't complete your request. Please try again. If the problem continues, contact support.";
 }
 

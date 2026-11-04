@@ -11,7 +11,7 @@ import type { ModelChatResult } from "@/lib/connections";
 let root: Root;
 let container: HTMLDivElement;
 const onSend = vi.fn();
-const result = {
+const result: ModelChatResult = {
   message: { role: "assistant", content: "Hello from the saved model." },
   model: "alibaba/qwen3-coder", baseUrl: "https://ai-gateway.vercel.sh/v1", durationMs: 150,
 };
@@ -60,6 +60,68 @@ afterEach(async () => {
 });
 
 describe("saved-model chat interface", () => {
+  it.each(["complete", "error", "cancel"])("shimmers only active thinking and running tools, stopping on %s", async (outcome) => {
+    let finish!: (value: ModelChatResult) => void;
+    let fail!: (error: Error) => void;
+    onSend.mockImplementationOnce(() => new Promise((resolve, reject) => { finish = resolve; fail = reject; }));
+    await act(async () => root.render(createElement(ModelChat, {
+      model: result.model, baseUrl: "", unsavedChanges: false, disabled: false, onSend, agentMode: true,
+    })));
+    await edit("Research"); await submit();
+    expect(container.querySelector('[role="status"] .research-shimmer')?.textContent).toBe("Researching your question...");
+    const tools = [
+      { id: "running", tool: "planResearch", status: "running" as const, summary: "Planning." },
+      { id: "done", tool: "inspectDatabase", status: "complete" as const, summary: "Read coverage." },
+    ];
+    await act(async () => {
+      onSend.mock.calls[0][3]("Live reasoning");
+      onSend.mock.calls[0][4](tools);
+    });
+    expect(container.querySelector('button[aria-label="Expand thinking"] .research-shimmer')?.textContent).toBe("Thinking...");
+    expect(container.querySelector("summary .research-shimmer")?.textContent).toContain("Research tools");
+    const items = container.querySelectorAll("details li");
+    expect(items[0].querySelector(".research-shimmer")?.textContent).toContain("planResearch");
+    expect(items[1].querySelector(".research-shimmer")).toBeNull();
+    await expandThinking();
+    expect(container.querySelector('[aria-label="Thinking process"] .research-shimmer')).toBeNull();
+    if (outcome === "cancel") await click("Cancel request");
+    else if (outcome === "error") await act(async () => fail(new Error("Stream failed")));
+    else await act(async () => finish({ ...result, reasoning: "Live reasoning", tools }));
+    expect(container.querySelector(".research-shimmer")).toBeNull();
+    expect(container.querySelector('[role="status"]')).toBeNull();
+  });
+  it("stops shimmering a completed tool while research is still pending", async () => {
+    onSend.mockImplementationOnce(() => new Promise(() => {}));
+    await edit("Research"); await submit();
+    await act(async () => onSend.mock.calls[0][4]([
+      { id: "query", tool: "queryHkex", status: "running", summary: "Querying." },
+    ]));
+    expect(container.querySelector("summary .research-shimmer")).not.toBeNull();
+    await act(async () => onSend.mock.calls[0][4]([
+      { id: "query", tool: "queryHkex", status: "complete", summary: "Finished." },
+    ]));
+    expect(container.querySelector("details .research-shimmer")).toBeNull();
+    expect(container.querySelector('[role="status"] .research-shimmer')).not.toBeNull();
+    await click("New chat");
+    expect(container.querySelector(".research-shimmer")).toBeNull();
+  });
+  it.each(["complete", "error", "cancel"])("shimmers while an explanation loads, stopping on %s", async (outcome) => {
+    let finish!: (value: ModelChatResult) => void;
+    let fail!: (error: Error) => void;
+    const onExplain = vi.fn(() => new Promise<ModelChatResult>((resolve, reject) => { finish = resolve; fail = reject; }));
+    onSend.mockResolvedValueOnce({ ...result, tools: [{ id: "results", tool: "researchResults", status: "complete", summary: "Ready", explanationId: "reference" }] });
+    await act(async () => root.render(createElement(ModelChat, {
+      model: result.model, baseUrl: "", unsavedChanges: false, disabled: false, onSend, onExplain, agentMode: true,
+    })));
+    await edit("Research"); await submit();
+    expect(container.querySelector(".research-shimmer")).toBeNull();
+    await click("Explain these results");
+    expect(container.querySelector('[role="status"] .research-shimmer')?.textContent).toBe("Preparing your explanation...");
+    if (outcome === "cancel") await click("Cancel explanation");
+    else if (outcome === "error") await act(async () => fail(new Error("Explanation failed")));
+    else await act(async () => finish(result));
+    expect(container.querySelector(".research-shimmer")).toBeNull();
+  });
   it("offers a read-only SQL preview with bound parameters without another request", async () => {
     const tools = [{ id: "query", tool: "queryHkex", status: "complete", summary: "Returned two rows", sql: "SELECT * FROM example WHERE stock_code = $1", parameters: ["00700"] }];
     onSend.mockResolvedValueOnce({ ...result, tools });
@@ -150,8 +212,14 @@ describe("saved-model chat interface", () => {
     })));
     await edit("Research"); await submit(); await click("Explain these results");
     expect(container.querySelector('[role="alert"]')?.textContent).toContain("no longer available");
+    const details = [...container.querySelectorAll("details")].find((item) => item.querySelector("summary")?.textContent === "Error details")!;
+    expect(details.open).toBe(false);
+    expect(details.querySelector("pre")?.textContent).toBe("Research results expired.");
+    await act(async () => details.querySelector("summary")!.click());
+    expect(details.open).toBe(true);
     onExplain.mockImplementationOnce(() => new Promise(() => {}));
     await click("Explain these results");
+    expect([...container.querySelectorAll("summary")].some((item) => item.textContent === "Error details")).toBe(false);
     const signal = onExplain.mock.calls[1][1] as AbortSignal;
     await click("New chat");
     expect(signal.aborted).toBe(true);
@@ -179,7 +247,8 @@ describe("saved-model chat interface", () => {
     expect(container.textContent).toContain("Earlier provider reasoning");
     expect(container.textContent).toContain("Read coverage");
     expect(container.textContent).toContain("Interrupted before completion");
-    expect(container.textContent).not.toContain("HTTP 503");
+    expect(container.querySelector('[role="alert"]')?.textContent).not.toContain("HTTP 503");
+    expect([...container.querySelectorAll("details")].find((item) => item.querySelector("summary")?.textContent === "Error details")?.open).toBe(false);
     expect(container.querySelector('[role="alert"]')?.textContent).toContain("Please try again");
     expect(container.textContent).not.toContain("Last reply:");
     expect(container.querySelector("textarea")!.value).toBe("Research HKEX");
@@ -211,7 +280,49 @@ describe("saved-model chat interface", () => {
     expect(container.textContent).toContain("Incomplete research");
     expect(container.textContent).toContain("Internal planning details");
     expect(container.textContent).toContain("Interrupted before completion");
-    expect(container.textContent).not.toContain("4,096");
+    expect(container.querySelector('[role="alert"]')?.textContent).not.toContain("4,096");
+  });
+  it("shows error details as escaped text without a stack, clears them on retry and resets the disclosure", async () => {
+    const message = 'Model stream failed.\n<script>alert("unsafe")</script>';
+    const failure = new Error(message);
+    failure.stack = "Private server stack must not be shown";
+    onSend.mockRejectedValueOnce(failure).mockRejectedValueOnce(new Error("Second failure"));
+    await act(async () => root.render(createElement(ModelChat, {
+      model: result.model, baseUrl: "", unsavedChanges: false, disabled: false, onSend, agentMode: true,
+    })));
+    await edit("Research"); await submit();
+    const details = container.querySelector<HTMLDetailsElement>("details")!;
+    expect(details.open).toBe(false);
+    expect(details.querySelector("summary")?.textContent).toBe("Error details");
+    expect(details.querySelector("pre")?.textContent).toBe(message);
+    expect(container.querySelector("script")).toBeNull();
+    expect(container.textContent).not.toContain(failure.stack);
+    await act(async () => details.querySelector("summary")!.click());
+    expect(details.open).toBe(true);
+    expect(onSend).toHaveBeenCalledOnce();
+    await act(async () => details.querySelector("summary")!.click());
+    expect(details.open).toBe(false);
+    await submit();
+    const nextDetails = container.querySelector<HTMLDetailsElement>("details")!;
+    expect(nextDetails.open).toBe(false);
+    expect(nextDetails.querySelector("pre")?.textContent).toBe("Second failure");
+    expect(container.textContent).not.toContain(message);
+    await click("New chat");
+    expect(container.querySelector('[role="alert"]')).toBeNull();
+    expect(container.querySelector("details")).toBeNull();
+  });
+  it.each([
+    { failure: "Request failed with a returned error", details: "Request failed with a returned error" },
+    { failure: { unexpected: "Do not serialize arbitrary errors" }, details: undefined },
+  ])("handles non-Error failures without serializing objects: $details", async ({ failure, details }) => {
+    onSend.mockRejectedValueOnce(failure);
+    await act(async () => root.render(createElement(ModelChat, {
+      model: result.model, baseUrl: "", unsavedChanges: false, disabled: false, onSend, agentMode: true,
+    })));
+    await edit("Research"); await submit();
+    expect(container.querySelector('[role="alert"]')?.textContent).toContain("Please try again");
+    expect(container.querySelector("details pre")?.textContent).toBe(details);
+    expect(container.textContent).not.toContain("Do not serialize arbitrary errors");
   });
   it("shows streamed chart tools only in the live agent and retains them after completion", async () => {
     vi.stubGlobal("ResizeObserver", class { observe() {} disconnect() {} });
@@ -236,6 +347,8 @@ describe("saved-model chat interface", () => {
     await act(async () => { finish({ ...result, tools }); });
     expect(container.querySelectorAll("figure")).toHaveLength(1);
     expect(container.querySelector("article:last-child figure")).not.toBeNull();
+    const answer = [...container.querySelectorAll("article:last-child p")].find((node) => node.textContent === result.message.content)!;
+    expect(answer.compareDocumentPosition(container.querySelector("article:last-child figure")!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     await click("New chat");
     expect(container.querySelector("figure")).toBeNull();
     await act(async () => root.render(createElement(ModelChat, {
@@ -245,6 +358,65 @@ describe("saved-model chat interface", () => {
     await edit("Config playground");
     await submit();
     expect(container.querySelector("figure")).toBeNull();
+  });
+  it("shows a chart placeholder below the answer while the chart step runs, then swaps in the chart", async () => {
+    vi.stubGlobal("ResizeObserver", class { observe() {} disconnect() {} });
+    const sqlChart = {
+      type: "bar", title: "GDP by economy", resultTitle: "Largest economies", labelColumn: "entity", valueLabel: "gdp",
+      tables: ["public.insightful_dataset_rows"], truncated: false,
+      points: [{ label: "United States", series: "gdp", value: 27.4 }, { label: "China", series: "gdp", value: 18.5 }],
+    } as const;
+    let finish!: (value: unknown) => void;
+    onSend.mockImplementationOnce(() => new Promise((resolve) => { finish = resolve; }));
+    await act(async () => root.render(createElement(ModelChat, {
+      model: result.model, baseUrl: "", unsavedChanges: false, disabled: false, onSend, agentMode: true,
+    })));
+    await edit("Largest economies"); await submit();
+    const placeholder = () => container.querySelector("figure[data-chart-placeholder]");
+    await act(async () => {
+      onSend.mock.calls[0][2]("## Largest economies\n\nAnswer table");
+      onSend.mock.calls[0][4]([{ id: "plan", tool: "planResearch", status: "running", summary: "Planning." }]);
+    });
+    expect(placeholder()).toBeNull();
+    const choosing = { id: "chart", tool: "chooseChart", status: "running", summary: "Deciding." };
+    await act(async () => { onSend.mock.calls[0][4]([choosing]); });
+    expect(placeholder()?.getAttribute("aria-busy")).toBe("true");
+    expect(placeholder()?.querySelector(".research-shimmer")?.textContent).toBe("Preparing chart...");
+    const heading = [...container.querySelectorAll("h2")].find((node) => node.textContent === "Largest economies")!;
+    expect(heading.compareDocumentPosition(placeholder()!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    const done = [{ ...choosing, status: "complete", summary: "Added 1 chart." }, { id: "render", tool: "renderChart", status: "complete", summary: "Charted.", sqlChart }];
+    await act(async () => { onSend.mock.calls[0][4](done); });
+    expect(placeholder()).toBeNull();
+    expect(container.querySelector("figure[data-sql-chart]")).not.toBeNull();
+    await act(async () => { onSend.mock.calls[0][4]([{ ...choosing, status: "error", summary: "No chart was added." }]); });
+    expect(placeholder()).toBeNull();
+    await act(async () => { finish({ ...result, tools: done }); });
+    expect(placeholder()).toBeNull();
+  });
+  it("places SQL charts after the answer text while streaming and after completion", async () => {
+    vi.stubGlobal("ResizeObserver", class { observe() {} disconnect() {} });
+    const sqlChart = {
+      type: "bar", title: "GDP by economy", resultTitle: "Largest economies", labelColumn: "entity", valueLabel: "gdp",
+      tables: ["public.insightful_dataset_rows"], truncated: false,
+      points: [{ label: "United States", series: "gdp", value: 27.4 }, { label: "China", series: "gdp", value: 18.5 }],
+    } as const;
+    const tools = [{ id: "sql-chart-1", tool: "renderChart", status: "complete", summary: "Charted", sqlChart }];
+    let finish!: (value: unknown) => void;
+    onSend.mockImplementationOnce(() => new Promise((resolve) => { finish = resolve; }));
+    await act(async () => root.render(createElement(ModelChat, {
+      model: result.model, baseUrl: "", unsavedChanges: false, disabled: false, onSend, agentMode: true,
+    })));
+    await edit("Largest economies"); await submit();
+    await act(async () => { onSend.mock.calls[0][2]("## Largest economies\n\nAnswer table"); });
+    expect(container.querySelector("figure[data-sql-chart]")).toBeNull();
+    await act(async () => { onSend.mock.calls[0][4](tools); });
+    const after = (node: Element) => [...container.querySelectorAll("h2")].find((heading) => heading.textContent === "Largest economies")!
+      .compareDocumentPosition(node) & Node.DOCUMENT_POSITION_FOLLOWING;
+    expect(after(container.querySelector("figure[data-sql-chart]")!)).toBeTruthy();
+    expect(container.textContent).toContain("GDP by economy");
+    await act(async () => { finish({ ...result, message: { role: "assistant", content: "## Largest economies\n\nAnswer table" }, tools }); });
+    expect(container.querySelectorAll("figure[data-sql-chart]")).toHaveLength(1);
+    expect(after(container.querySelector("article:last-child figure[data-sql-chart]")!)).toBeTruthy();
   });
   it("does not revalidate completed charts while typing or streaming a later answer", async () => {
     vi.stubGlobal("ResizeObserver", class { observe() {} disconnect() {} });

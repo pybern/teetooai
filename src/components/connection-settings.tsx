@@ -10,11 +10,17 @@ import {
   type PublicConnections, type ConnectionTestResult,
   type DatabaseInitializationResult,
   modelReasoningEfforts, isReasoningEffort, type ModelCatalog,
+  DEFAULT_OUTPUT_TOKENS, MAX_OUTPUT_TOKENS, MIN_OUTPUT_TOKENS, OUTPUT_TOKEN_STEPS, type OutputTokenStep,
 } from "@/lib/connections";
 
 type Kind = "api" | "database";
 type Notice = { error: string } | { saved: true } | ConnectionTestResult;
 const inputClass = "mt-2 w-full border border-slate-700 bg-slate-950 px-3 py-2.5 text-sm text-white placeholder:text-slate-500";
+const OUTPUT_TOKEN_LABELS: Record<OutputTokenStep, { label: string; hint: string }> = {
+  planning: { label: "Planning", hint: "Writes the research plan and SQL." },
+  chart: { label: "Chart choice", hint: "Decides whether SQL results get a chart, after the answer." },
+  explanation: { label: "Explanation", hint: "Explain these results, on request." },
+};
 const buttonClass = "min-h-10 border border-slate-600 px-4 text-sm text-slate-200 transition hover:border-sky-400 hover:text-white disabled:cursor-wait disabled:opacity-50";
 
 function Field({ label, hint, children }: { label: string; hint?: string; children: ReactNode }) {
@@ -142,7 +148,7 @@ export function ConnectionSettings() {
     setUnlockError("");
     try {
       const saved = await request<PublicConnections>(token, "/api/config", "GET");
-      setApi({ baseUrl: saved.api.baseUrl, model: saved.api.model, reasoningEffort: saved.api.reasoningEffort, apiKey: undefined });
+      setApi({ baseUrl: saved.api.baseUrl, model: saved.api.model, reasoningEffort: saved.api.reasoningEffort, outputTokens: saved.api.outputTokens, apiKey: undefined });
       setSavedApi({ baseUrl: saved.api.baseUrl, model: saved.api.model });
       const { hasPassword: storedPassword, ...db } = saved.database;
       setDatabase({ ...db, password: undefined });
@@ -171,7 +177,7 @@ export function ConnectionSettings() {
         setEnvironmentKeyAvailable(result.api.environmentApiKeyAvailable ?? false);
         if (kind === "api") {
           setHasKey(result.api.hasApiKey);
-          setApi({ baseUrl: result.api.baseUrl, model: result.api.model, reasoningEffort: result.api.reasoningEffort, apiKey: undefined });
+          setApi({ baseUrl: result.api.baseUrl, model: result.api.model, reasoningEffort: result.api.reasoningEffort, outputTokens: result.api.outputTokens, apiKey: undefined });
           setSavedApi({ baseUrl: result.api.baseUrl, model: result.api.model });
           setChatRevision((current) => current + 1);
         } else {
@@ -294,7 +300,7 @@ export function ConnectionSettings() {
                 {models.map((id) => <option key={id} value={id} label={id.startsWith("alibaba/") ? `${id} (Alibaba / Qwen)` : id} />)}
               </datalist>
               {(availableEfforts.length > 0 || api.reasoningEffort) ? (
-                <Field label="Thinking effort" hint="Provider default sends no effort override. Higher effort can increase latency and cost; the 60-second chat timeout and 1,024-token output budget still apply. Save to apply to chat.">
+                <Field label="Thinking effort" hint="Provider default sends no effort override. Higher effort can increase latency and cost; the configuration chat keeps its 60-second timeout and 1,024-token output budget, and research uses the output-token limits below. Save to apply.">
                   <select
                     aria-label="Thinking effort"
                     className={inputClass}
@@ -309,6 +315,36 @@ export function ConnectionSettings() {
                   </select>
                 </Field>
               ) : <p className="text-xs text-slate-500">Thinking effort uses the provider default. A selector appears when the selected model&apos;s catalog advertises effort controls.</p>}
+              <fieldset className="min-w-0">
+                <legend className="text-sm text-slate-300">Research output-token limits</legend>
+                <p className="mt-1.5 text-xs leading-relaxed text-slate-500">
+                  Maximum tokens each research model call may generate, including thinking. Leave blank for the default ({DEFAULT_OUTPUT_TOKENS.planning.toLocaleString("en-US")}).
+                  Higher limits allow more thinking but can increase cost and latency. Save to apply.
+                </p>
+                <div className="mt-2 grid gap-3 sm:grid-cols-3">
+                  {OUTPUT_TOKEN_STEPS.map((step) => (
+                    <Field key={step} label={OUTPUT_TOKEN_LABELS[step].label} hint={OUTPUT_TOKEN_LABELS[step].hint}>
+                      <input
+                        aria-label={`${OUTPUT_TOKEN_LABELS[step].label} output-token limit`}
+                        className={inputClass}
+                        type="number"
+                        inputMode="numeric"
+                        min={MIN_OUTPUT_TOKENS}
+                        max={MAX_OUTPUT_TOKENS}
+                        step={1}
+                        value={api.outputTokens?.[step] ?? ""}
+                        placeholder={String(DEFAULT_OUTPUT_TOKENS[step])}
+                        onChange={(event) => {
+                          const rest = { ...api.outputTokens };
+                          delete rest[step];
+                          const value = event.target.value === "" ? undefined : Number(event.target.value);
+                          updateApi({ outputTokens: value === undefined ? rest : { ...rest, [step]: value } });
+                        }}
+                      />
+                    </Field>
+                  ))}
+                </div>
+              </fieldset>
               <div aria-live="polite" className="text-xs leading-relaxed text-slate-500">
                 {modelError ? <p role="alert" className="text-rose-300">{modelError}</p> : modelsLoading ? "Fetching the provider's live catalog..." : models.length ? (
                   <p>{models.length} models available. All catalog models are included; image, audio or embedding models may not support the chat connection test.</p>

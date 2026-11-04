@@ -113,11 +113,40 @@ describe("HKEX database agent workspace", () => {
     await edit("textarea", "Rank HKD");
     await submit();
     expect(container.querySelector('[role="alert"]')?.textContent).toContain("Please try again");
-    expect(container.textContent).not.toContain("Save your database settings");
+    expect(container.querySelector('[role="alert"]')?.textContent).not.toContain("Save your database settings");
+    expect(container.querySelector<HTMLDetailsElement>("details")?.open).toBe(false);
+    expect(container.querySelector("details pre")?.textContent).toBe("Save your database settings before using database operations.");
     expect(container.querySelector("textarea")!.value).toBe("Rank HKD");
     expect(container.querySelector('input[type="password"]')).toBeNull();
     expect(fetchMock).toHaveBeenCalledOnce();
     expect(fetchMock.mock.calls[0][0]).toBe("/api/hkex/chat");
+  });
+});
+
+describe("shared research error details", () => {
+  it.each([
+    { useCaseId: "hk", streamed: false },
+    { useCaseId: "hk", streamed: true },
+    { useCaseId: "hkex-db", streamed: false },
+    { useCaseId: "hkex-db", streamed: true },
+  ])("offers collapsed actual errors for $useCaseId (streamed: $streamed)", async ({ useCaseId, streamed }) => {
+    await act(async () => root.render(createElement(HkexAgentWorkspace, { uc: USE_CASE_BY_ID[useCaseId] })));
+    const message = streamed ? "The model did not return a valid structured research plan." : "The saved database user needs SELECT access to the HKEX table.";
+    fetchMock.mockResolvedValueOnce(streamed
+      ? createUIMessageStreamResponse({ stream: createUIMessageStream({
+        execute: ({ writer }) => { writer.write({ type: "error", errorText: message }); },
+      }) })
+      : Response.json({ error: message }, { status: 502 }));
+    await edit("textarea", "Research question"); await submit();
+    expect(container.querySelector('[role="alert"]')?.textContent).toContain("Please try again");
+    const details = container.querySelector<HTMLDetailsElement>("details")!;
+    expect(details.open).toBe(false);
+    expect(details.querySelector("summary")?.textContent).toBe("Error details");
+    await act(async () => details.querySelector("summary")!.click());
+    expect(details.open).toBe(true);
+    expect(details.querySelector("pre")?.textContent).toBe(message);
+    expect(fetchMock).toHaveBeenCalledOnce();
+    expect(container.querySelector("textarea")!.value).toBe("Research question");
   });
 });
 
@@ -151,3 +180,42 @@ describe("HK Equities agent workspace", () => {
   });
 });
 
+describe.each(["hkex-db", "hk"])("shared research UI for %s", (useCaseId) => {
+  it("shimmers the status, thinking, running tool and chart placeholder while researching, and clears every shimmer when done", async () => {
+    await act(async () => root.render(createElement(HkexAgentWorkspace, { uc: USE_CASE_BY_ID[useCaseId] })));
+    let release!: () => void;
+    const gate = new Promise<void>((resolve) => { release = resolve; });
+    let releaseChart!: () => void;
+    const chartGate = new Promise<void>((resolve) => { releaseChart = resolve; });
+    fetchMock.mockImplementationOnce(async () => createUIMessageStreamResponse({ stream: createUIMessageStream({
+      execute: async ({ writer }) => {
+        writer.write({ type: "start" });
+        writer.write({ type: "reasoning-start", id: "thinking" });
+        writer.write({ type: "reasoning-delta", id: "thinking", delta: "Planning" });
+        writer.write({ type: "data-tool", id: "plan", data: { id: "plan", tool: "planResearch", status: "running", summary: "Planning." } });
+        await gate;
+        writer.write({ type: "data-tool", id: "plan", data: { id: "plan", tool: "planResearch", status: "complete", summary: "Planned." } });
+        writer.write({ type: "reasoning-end", id: "thinking" });
+        writer.write({ type: "text-start", id: "answer" });
+        writer.write({ type: "text-delta", id: "answer", delta: "Answer" });
+        writer.write({ type: "text-end", id: "answer" });
+        writer.write({ type: "data-tool", id: "chart", data: { id: "chart", tool: "chooseChart", status: "running", summary: "Deciding." } });
+        await chartGate;
+        writer.write({ type: "data-tool", id: "chart", data: { id: "chart", tool: "chooseChart", status: "complete", summary: "No chart." } });
+        writer.write({ type: "finish", messageMetadata: { model: settings.api.model, baseUrl: "", durationMs: 25, completed: true } });
+      },
+    }) }));
+    await edit("textarea", "Research question");
+    await submit();
+    await vi.waitFor(() => expect(container.querySelector("summary .research-shimmer")).not.toBeNull());
+    expect(container.querySelector('[role="status"] .research-shimmer')?.textContent).toBe("Researching your question...");
+    expect(container.querySelector('button[aria-label="Expand thinking"] .research-shimmer')?.textContent).toBe("Thinking...");
+    expect(container.querySelector("details li .research-shimmer")?.textContent).toContain("planResearch");
+    await act(async () => { release(); });
+    await vi.waitFor(() => expect(container.querySelector("figure[data-chart-placeholder] .research-shimmer")?.textContent).toBe("Preparing chart..."));
+    expect(container.textContent).toContain("Answer");
+    await act(async () => { releaseChart(); });
+    await vi.waitFor(() => expect(container.querySelector(".research-shimmer")).toBeNull());
+    expect(container.querySelector("figure[data-chart-placeholder]")).toBeNull();
+  });
+});

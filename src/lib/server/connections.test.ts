@@ -154,6 +154,18 @@ describe("configuration access and validation", () => {
     expect(parseApi({ ...api, reasoningEffort: "" })).toEqual(api);
     expect(parseApi(api)).toEqual(api);
   });
+  it("validates per-step output-token limits and omits blanks so defaults apply", () => {
+    expect(parseApi({ ...api, outputTokens: { planning: 8192, chart: 256, explanation: 32768 } }).outputTokens)
+      .toEqual({ planning: 8192, chart: 256, explanation: 32768 });
+    expect(parseApi({ ...api, outputTokens: { planning: 6000, chart: "", explanation: null } }).outputTokens).toEqual({ planning: 6000 });
+    expect(parseApi({ ...api, outputTokens: {} })).toEqual(api);
+    expect(parseApi({ ...api, outputTokens: null })).toEqual(api);
+    for (const planning of [255, 32769, 1.5, "4096", -1]) {
+      expect(() => parseApi({ ...api, outputTokens: { planning } })).toThrow("planning output-token limit must be a whole number from 256 to 32,768");
+    }
+    expect(() => parseApi({ ...api, outputTokens: { summary: 1000 } })).toThrow("only planning, chart and explanation");
+    expect(() => parseApi({ ...api, outputTokens: 4096 })).toThrow();
+  });
   it("accepts PostgreSQL hostnames, IPv4 and IPv6, and validates ports", () => {
     for (const host of ["db.example.test", "10.0.0.5", "::1"]) {
       expect(parseDatabase({ ...database, host }).host).toBe(host);

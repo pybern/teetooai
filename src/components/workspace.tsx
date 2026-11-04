@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import type { UseCase } from "@/lib/types";
-import { USE_CASE_BY_ID } from "@/lib/usecases";
+import { resolveUseCase } from "@/lib/usecases";
 import { AskBar } from "./ask-bar";
 import { ChatTurn } from "./insight-card";
 import { useInsights } from "./insight-store";
@@ -13,7 +13,7 @@ import { PdfExportButton } from "./pdf-export-button";
 
 export function Workspace({ marketStrip }: { marketStrip?: ReactNode }) {
   const params = useSearchParams();
-  const uc = USE_CASE_BY_ID[params.get("uc") ?? "hk"] ?? USE_CASE_BY_ID.hk;
+  const uc = resolveUseCase(params.get("uc"));
   if (uc.execution === "database-agent") {
     return (
       <HkexAgentWorkspace key={uc.id} uc={uc} initialDraft={params.get("q") ?? ""}>

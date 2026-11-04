@@ -11,7 +11,7 @@ import {
   isReasoningEffort, modelReasoningEfforts, type ModelCatalog, type ReasoningEffort,
   type DatabaseSettings, type PublicConnections,
   MAX_CHAT_MESSAGES, MAX_CHAT_MESSAGE_CHARS, MAX_CHAT_TOTAL_CHARS, type ModelChatMessage, type ModelChatMetadata, type ModelChatToolActivity,
-  HKEX_MAX_OUTPUT_TOKENS, HKEX_SERVER_TIMEOUT_MS,
+  HKEX_SERVER_TIMEOUT_MS, isOutputTokenLimit, MAX_OUTPUT_TOKENS, MIN_OUTPUT_TOKENS, OUTPUT_TOKEN_STEPS, outputTokenLimit, type OutputTokenLimits,
 } from "@/lib/connections";
 
 export class ConnectionError extends Error {
@@ -86,7 +86,29 @@ export function parseApi(value: unknown, previous = DEFAULT_CONNECTIONS.api): Ap
   if (input.reasoningEffort !== undefined && input.reasoningEffort !== "" && !isReasoningEffort(input.reasoningEffort)) {
     throw new ConnectionError("Choose a valid thinking effort or use the provider default.");
   }
-  return { ...endpoint, model, ...(isReasoningEffort(input.reasoningEffort) ? { reasoningEffort: input.reasoningEffort } : {}) };
+  const outputTokens = parseOutputTokens(input.outputTokens);
+  return {
+    ...endpoint, model,
+    ...(isReasoningEffort(input.reasoningEffort) ? { reasoningEffort: input.reasoningEffort } : {}),
+    ...(outputTokens ? { outputTokens } : {}),
+  };
+}
+
+function parseOutputTokens(value: unknown): OutputTokenLimits | undefined {
+  if (value === undefined || value === null) return undefined;
+  const input = object(value);
+  const unknown = Object.keys(input).filter((key) => !OUTPUT_TOKEN_STEPS.some((step) => step === key));
+  if (unknown.length) throw new ConnectionError("Output-token limits accept only planning, chart and explanation.");
+  const limits: OutputTokenLimits = {};
+  for (const step of OUTPUT_TOKEN_STEPS) {
+    const limit = input[step];
+    if (limit === undefined || limit === null || limit === "") continue;
+    if (!isOutputTokenLimit(limit)) {
+      throw new ConnectionError(`The ${step} output-token limit must be a whole number from ${MIN_OUTPUT_TOKENS.toLocaleString("en-US")} to ${MAX_OUTPUT_TOKENS.toLocaleString("en-US")}.`);
+    }
+    limits[step] = limit;
+  }
+  return Object.keys(limits).length ? limits : undefined;
 }
 
 export function parseDatabase(value: unknown, previous = DEFAULT_CONNECTIONS.database): DatabaseSettings {
@@ -490,6 +512,10 @@ export async function streamChatWithSavedModel(
   const settings = await checkReasoningEffort(savedSettings, abortSignal, Boolean(runner));
   let transportError: ConnectionError | undefined;
   let retryUsed = false;
+  // Larger token limits need room for SSE framing (roughly 100-400 bytes per streamed token).
+  const streamBytes = runner
+    ? Math.max(1024 * 1024, Math.max(...OUTPUT_TOKEN_STEPS.map((step) => outputTokenLimit(settings, step))) * 512)
+    : 1024 * 1024;
   const provider = createOpenAICompatible({
     name: "saved-model",
     baseURL: settings.baseUrl,
@@ -520,8 +546,8 @@ export async function streamChatWithSavedModel(
       return new Response(response.body.pipeThrough(new TransformStream<Uint8Array, Uint8Array>({
         transform(chunk, controller) {
           size += chunk.byteLength;
-          if (size > 1024 * 1024) {
-            transportError = new ConnectionError("API stream exceeded the 1024 KB limit.", 502);
+          if (size > streamBytes) {
+            transportError = new ConnectionError(`API stream exceeded the ${Math.round(streamBytes / 1024)} KB limit.`, 502);
             throw transportError;
           }
           controller.enqueue(chunk);
@@ -550,6 +576,7 @@ export async function streamChatWithSavedModel(
         let buffered = "";
         let text = "";
         let started = false;
+        let clipped = false;
         const flush = (final = false) => {
           buffered = redact(buffered, [settings.apiKey]);
           let keep = 0;
@@ -559,10 +586,16 @@ export async function streamChatWithSavedModel(
               if (buffered.endsWith(settings.apiKey.slice(0, length))) { keep = length; break; }
             }
           }
-          const delta = buffered.slice(0, buffered.length - keep);
+          let delta = buffered.slice(0, buffered.length - keep);
           buffered = buffered.slice(buffered.length - keep);
+          if (clipped) return;
+          // Research thinking is display-only, so long thinking is clipped rather than failing the turn.
+          if (runner && kind === "reasoning" && text.length + delta.length > MAX_CHAT_MESSAGE_CHARS) {
+            delta = delta.slice(0, MAX_CHAT_MESSAGE_CHARS - text.length) + "\n\n[Thinking shortened for display.]";
+            clipped = true;
+          }
           text += delta;
-          if (text.length > MAX_CHAT_MESSAGE_CHARS) throw new ConnectionError(`Model ${kind === "text" ? "reply" : "thinking"} exceeded the 16,000 character chat limit. Try a shorter response.`, 502);
+          if (!clipped && text.length > MAX_CHAT_MESSAGE_CHARS) throw new ConnectionError(`Model ${kind === "text" ? "reply" : "thinking"} exceeded the 16,000 character chat limit. Try a shorter response.`, 502);
           if (!delta) return;
           if (!started) { writer.write({ type: kind === "text" ? "text-start" : "reasoning-start", id }); started = true; }
           writer.write({ type: kind === "text" ? "text-delta" : "reasoning-delta", id, delta });
@@ -593,7 +626,7 @@ export async function streamChatWithSavedModel(
           if (part.type === "error") throw part.error;
           if (part.type === "abort") throw new ConnectionError(timeout.aborted ? `API request timed out after ${timeoutMs / 1000} seconds.` : "Model request was cancelled.", 499);
           if (runner && part.type === "finish" && part.finishReason === "length") {
-            throw new ConnectionError(`Research generation reached its ${HKEX_MAX_OUTPUT_TOKENS.toLocaleString("en-US")}-token output limit, which may include thinking tokens. Try a narrower question. No automatic retry was performed.`, 502);
+            throw new ConnectionError("Research generation reached its output-token limit, which may include thinking tokens. Try a narrower question, or raise the output-token limits in Configuration. No automatic retry was performed.", 502);
           }
           if (part.type === "text-delta") reply.push(part.text);
           if (part.type === "reasoning-delta") reasoning.push(part.text);

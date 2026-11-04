@@ -156,3 +156,10 @@ export const USE_CASES: UseCase[] = [
 ];
 
 export const USE_CASE_BY_ID: Record<string, UseCase> = Object.fromEntries(USE_CASES.map((u) => [u.id, u]));
+
+/** The workspace opened when no (or an unknown) use case is requested. */
+export const DEFAULT_USE_CASE_ID = "hkex-db";
+
+export function resolveUseCase(id: string | null | undefined): UseCase {
+  return id && Object.hasOwn(USE_CASE_BY_ID, id) ? USE_CASE_BY_ID[id] : USE_CASE_BY_ID[DEFAULT_USE_CASE_ID];
+}

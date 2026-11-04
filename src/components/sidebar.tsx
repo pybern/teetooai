@@ -3,7 +3,7 @@
 import clsx from "clsx";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
-import { USE_CASES } from "@/lib/usecases";
+import { resolveUseCase, USE_CASES } from "@/lib/usecases";
 import { useInsights } from "./insight-store";
 import { ThemeToggle } from "./theme";
 
@@ -16,7 +16,7 @@ const item = (active: boolean) =>
 export function Sidebar() {
   const pathname = usePathname();
   const params = useSearchParams();
-  const activeUc = params.get("uc") ?? "hk";
+  const activeUc = resolveUseCase(params.get("uc")).id;
   const { entries, pinned, clear } = useInsights();
   const recent = entries
     .filter((e) => e.status === "done")

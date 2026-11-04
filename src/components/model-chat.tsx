@@ -2,9 +2,11 @@
 
 import { memo, useEffect, useId, useRef, useState, type FormEvent } from "react";
 import { ChevronDown } from "lucide-react";
+import { cn } from "cn";
 import ReactMarkdown, { type Components } from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { HkexChart } from "./hkex-chart";
+import { SqlChart } from "./sql-chart";
 import { ResearchInsightSummary } from "./insight-summary";
 import { PdfExportButton } from "./pdf-export-button";
 import { researchErrorMessage } from "@/lib/model-chat-stream";
@@ -29,14 +31,34 @@ type Props = {
   onSend: (messages: ModelChatMessage[], signal: AbortSignal, onText: (text: string) => void, onReasoning: (reasoning: string) => void, onTools: (tools: ModelChatToolActivity[]) => void) => Promise<ModelChatResult>;
 };
 
-function ToolActivities({ tools }: { tools: ModelChatToolActivity[] }) {
+type ChatFailure = { message: string; details?: string };
+
+function researchFailure(error: unknown): ChatFailure {
+  return {
+    message: researchErrorMessage(error),
+    details: error instanceof Error ? error.message : typeof error === "string" ? error : undefined,
+  };
+}
+
+function ChatError({ error }: { error: ChatFailure }) {
+  return <div className="mt-3 min-w-0 shrink-0 text-sm text-rose-300">
+    <p role="alert">{error.message}</p>
+    {error.details && <details className="mt-2 border border-slate-700 px-3 py-2 text-xs text-slate-300">
+      <summary className="cursor-pointer py-1">Error details</summary>
+      <pre className="mt-2 max-h-32 overflow-y-auto whitespace-pre-wrap font-mono [overflow-wrap:anywhere]">{error.details}</pre>
+    </details>}
+  </div>;
+}
+
+function ToolActivities({ tools, active = false }: { tools: ModelChatToolActivity[]; active?: boolean }) {
+  const running = active && tools.some((item) => item.status === "running");
   return (
     <details className="my-3 border border-slate-700 px-3 py-2 text-xs text-slate-400">
-      <summary className="cursor-pointer py-1">Research tools ({tools.length}){tools.some((item) => item.status === "running") ? " - running" : ""}</summary>
+      <summary className="cursor-pointer py-1"><span className={cn(running && "research-shimmer")}>Research tools ({tools.length}){running ? " - running" : ""}</span></summary>
       <ol className="mt-2 space-y-3">
         {tools.map((item) => (
           <li key={item.id}>
-            <p className={item.status === "error" ? "text-rose-300" : ""}><strong>{item.tool}</strong> - {item.status}: {item.summary}</p>
+            <p className={cn(item.status === "error" && "text-rose-300")}><span className={cn(active && item.status === "running" && "research-shimmer")}><strong>{item.tool}</strong> - {item.status}: {item.summary}</span></p>
             {item.sql && <pre className="mt-2 overflow-x-auto whitespace-pre-wrap break-words font-mono">{item.sql}</pre>}
             {item.parameters && <p className="mt-1 break-words font-mono">Parameters: {JSON.stringify(item.parameters)}</p>}
           </li>
@@ -63,6 +85,26 @@ function SqlPreview({ tools }: { tools: ModelChatToolActivity[] }) {
 
 function ResearchCharts({ tools }: { tools: ModelChatToolActivity[] }) {
   return tools.filter((item) => item.status === "complete" && item.chart).map((item) => item.chart && <HkexChart key={item.id} spec={item.chart} />);
+}
+
+function SqlCharts({ tools }: { tools: ModelChatToolActivity[] }) {
+  return tools.filter((item) => item.status === "complete" && item.sqlChart).map((item) => item.sqlChart && <SqlChart key={item.id} spec={item.sqlChart} />);
+}
+
+const CHART_STEPS = new Set(["chooseChart", "renderChart"]);
+const PLACEHOLDER_BARS = [55, 80, 40, 95, 65, 30, 70];
+
+/** Holds the chart's place below the answer while a chart is still being chosen or built. */
+function ChartPlaceholder({ tools }: { tools: ModelChatToolActivity[] }) {
+  if (!tools.some((item) => item.status === "running" && CHART_STEPS.has(item.tool))) return null;
+  return (
+    <figure data-chart-placeholder aria-busy="true" aria-label="Chart loading" className="my-4 min-w-0 border border-slate-700 p-3 md:p-4">
+      <figcaption className="text-sm text-slate-400"><span className="research-shimmer">Preparing chart...</span></figcaption>
+      <div aria-hidden="true" className="mt-3 flex h-72 items-end gap-2">
+        {PLACEHOLDER_BARS.map((height, index) => <div key={index} className="shimmer flex-1 rounded-sm" style={{ height: `${height}%` }} />)}
+      </div>
+    </figure>
+  );
 }
 
 function ResearchInsights({ tools }: { tools: ModelChatToolActivity[] }) {
@@ -97,7 +139,7 @@ function ThinkingBlock({ text, streaming = false }: { text: string; streaming?: 
   return (
     <div data-pdf-thinking={text} className={`my-3 flex min-w-0 flex-col overflow-hidden border-l-2 border-slate-600 bg-slate-900/60 px-3 py-3 ${expanded ? "h-56" : ""}`}>
       <button type="button" aria-label={expanded ? "Collapse thinking" : "Expand thinking"} aria-expanded={expanded} aria-controls={id} onClick={() => { following.current = true; setExpanded((value) => !value); }} className="flex min-h-10 w-full shrink-0 items-center justify-between gap-3 text-slate-400 hover:text-white">
-        <span className="meta">{streaming ? "Thinking..." : "Thinking"}</span>
+        <span className={cn("meta", streaming && "research-shimmer")}>{streaming ? "Thinking..." : "Thinking"}</span>
         <ChevronDown aria-hidden="true" className={`size-4 transition-transform ${expanded ? "rotate-180" : ""}`} />
       </button>
       <div
@@ -117,7 +159,7 @@ function ThinkingBlock({ text, streaming = false }: { text: string; streaming?: 
 function ExplainResults({ id, onExplain, disabled }: { id: string; onExplain: NonNullable<Props["onExplain"]>; disabled: boolean }) {
   const [text, setText] = useState("");
   const [reasoning, setReasoning] = useState("");
-  const [error, setError] = useState("");
+  const [error, setError] = useState<ChatFailure | null>(null);
   const [busy, setBusy] = useState(false);
   const active = useRef<AbortController | null>(null);
   const panel = useRef<HTMLDivElement>(null);
@@ -130,7 +172,7 @@ function ExplainResults({ id, onExplain, disabled }: { id: string; onExplain: No
     if (active.current) return;
     const controller = new AbortController();
     active.current = controller;
-    setBusy(true); setText(""); setReasoning(""); setError("");
+    setBusy(true); setText(""); setReasoning(""); setError(null);
     try {
       const result = await onExplain(id, controller.signal,
         (value) => { if (!controller.signal.aborted) setText(value); },
@@ -140,17 +182,17 @@ function ExplainResults({ id, onExplain, disabled }: { id: string; onExplain: No
         if (result.reasoning) setReasoning(result.reasoning);
       }
     } catch (error) {
-      if (!controller.signal.aborted) setError(researchErrorMessage(error));
+      if (!controller.signal.aborted) setError(researchFailure(error));
     } finally {
       if (active.current === controller) { active.current = null; setBusy(false); }
     }
   }
   return <div ref={panel} data-pdf-busy={busy} className="mt-3 border-t border-slate-700 pt-3">
     {(!text || error) && !busy && <button type="button" disabled={disabled} onClick={explain} className="min-h-10 border border-slate-600 px-3 text-sm text-sky-300 disabled:opacity-50">Explain these results</button>}
-    {busy && <><p role="status" className="text-sm text-slate-400">Preparing your explanation...</p><button type="button" className="min-h-10 text-sm text-sky-300" onClick={() => { active.current?.abort(); active.current = null; setBusy(false); setText(""); setReasoning(""); setError("Explanation cancelled."); }}>Cancel explanation</button></>}
+    {busy && <><p role="status" className="text-sm text-slate-400"><span className="research-shimmer">Preparing your explanation...</span></p><button type="button" className="min-h-10 text-sm text-sky-300" onClick={() => { active.current?.abort(); active.current = null; setBusy(false); setText(""); setReasoning(""); setError({ message: "Explanation cancelled." }); }}>Cancel explanation</button></>}
     {reasoning && <ThinkingBlock text={reasoning} streaming={busy} />}
     {text && <><p className="meta mt-3 text-slate-400">{error ? "Incomplete explanation" : "Explanation"}</p><MarkdownReply text={text} /></>}
-    {error && <p role="alert" className="mt-2 text-sm text-rose-300">{error}</p>}
+    {error && <ChatError error={error} />}
   </div>;
 }
 
@@ -169,10 +211,11 @@ const ChatMessage = memo(function ChatMessage({ message, agentMode, onExplain, d
       {message.role === "assistant" && message.reasoning && <ThinkingBlock text={message.reasoning} />}
       {message.tools && <ToolActivities tools={message.tools} />}
       {agentMode && message.tools && <ResearchInsights tools={message.tools} />}
-      {agentMode && message.tools && <ResearchCharts tools={message.tools} />}
       {message.role === "assistant" ? <MarkdownReply text={message.content} /> : (
         <p className="mt-2 whitespace-pre-wrap break-words text-sm leading-relaxed text-slate-200">{message.content}</p>
       )}
+      {agentMode && message.tools && <ResearchCharts tools={message.tools} />}
+      {agentMode && message.tools && <SqlCharts tools={message.tools} />}
       {agentMode && message.tools && <SqlPreview tools={message.tools} />}
       {agentMode && onExplain && message.role === "assistant" && explanationId && <ExplainResults id={explanationId} onExplain={onExplain} disabled={disabled} />}
     </article>
@@ -191,7 +234,7 @@ export function ModelChat({
   const [streamingText, setStreamingText] = useState("");
   const [streamingReasoning, setStreamingReasoning] = useState("");
   const [streamingTools, setStreamingTools] = useState<ModelChatToolActivity[]>([]);
-  const [error, setError] = useState("");
+  const [error, setError] = useState<ChatFailure | null>(null);
   const [incomplete, setIncomplete] = useState<{ prompt: string; text: string; reasoning: string; tools: ModelChatToolActivity[] } | null>(null);
   const [lastResult, setLastResult] = useState<ModelChatResult | null>(null);
   const activeRequest = useRef<AbortController | null>(null);
@@ -213,7 +256,7 @@ export function ModelChat({
     setStreamingText("");
     setStreamingReasoning("");
     setStreamingTools([]);
-    setError("Request cancelled. Your message is still available to edit or resend.");
+    setError({ message: "Request cancelled. Your message is still available to edit or resend." });
   }
 
   function clear() {
@@ -226,7 +269,7 @@ export function ModelChat({
     setStreamingReasoning("");
     setStreamingTools([]);
     setDraft("");
-    setError("");
+    setError(null);
     setLastResult(null);
     input.current?.focus();
   }
@@ -241,7 +284,7 @@ export function ModelChat({
     setStreamingText("");
     setStreamingReasoning("");
     setStreamingTools([]);
-    setError("");
+    setError(null);
     setIncomplete(null);
     const partial = { prompt: user.content, text: "", reasoning: "", tools: [] as ModelChatToolActivity[] };
     try {
@@ -268,7 +311,7 @@ export function ModelChat({
             tools: partial.tools.map((item) => item.status === "running" ? { ...item, status: "error", summary: "Interrupted before completion; no result was confirmed." } : item),
           });
         }
-        setError(agentMode ? researchErrorMessage(error) : error instanceof Error ? error.message : "The model request failed. Your message has been kept for retry.");
+        setError(agentMode ? researchFailure(error) : { message: error instanceof Error ? error.message : "The model request failed. Your message has been kept for retry." });
       }
     } finally {
       if (activeRequest.current === controller) {
@@ -324,8 +367,9 @@ export function ModelChat({
             {incomplete.reasoning && <ThinkingBlock text={incomplete.reasoning} />}
             {incomplete.tools.length > 0 && <ToolActivities tools={incomplete.tools} />}
             {agentMode && <ResearchInsights tools={incomplete.tools} />}
-            {agentMode && <ResearchCharts tools={incomplete.tools} />}
             {incomplete.text && <MarkdownReply text={incomplete.text} />}
+            {agentMode && <ResearchCharts tools={incomplete.tools} />}
+            {agentMode && <SqlCharts tools={incomplete.tools} />}
             {agentMode && <SqlPreview tools={incomplete.tools} />}
           </article>
         )}
@@ -334,22 +378,24 @@ export function ModelChat({
             <div className="meta text-slate-500">You</div>
             <p className="mt-2 whitespace-pre-wrap break-words text-sm text-slate-200">{pending}</p>
             {streamingReasoning && <ThinkingBlock text={streamingReasoning} streaming={!streamingText} />}
-            {streamingTools.length > 0 && <ToolActivities tools={streamingTools} />}
+            {streamingTools.length > 0 && <ToolActivities tools={streamingTools} active />}
             {agentMode && <SqlPreview tools={streamingTools} />}
             {agentMode && <ResearchInsights tools={streamingTools} />}
-            {agentMode && <ResearchCharts tools={streamingTools} />}
             {streamingText && (
               <div className="mt-4">
                 <div className="meta text-slate-500">{agentMode ? "Answer" : "Model"}</div>
                 <MarkdownReply text={streamingText} />
               </div>
             )}
-            <p role="status" className="mt-4 text-xs text-sky-300">{agentMode ? "Researching your question..." : streamingText ? "Receiving model reply..." : streamingReasoning ? "Receiving model thinking..." : streamingTools.length ? "Running database research..." : "Waiting for model feedback..."}</p>
+            {agentMode && <ResearchCharts tools={streamingTools} />}
+            {agentMode && <SqlCharts tools={streamingTools} />}
+            {agentMode && <ChartPlaceholder tools={streamingTools} />}
+            <p role="status" className="mt-4 text-xs text-sky-300"><span className="research-shimmer">{agentMode ? "Researching your question..." : streamingText ? "Receiving model reply..." : streamingReasoning ? "Receiving model thinking..." : streamingTools.length ? "Running database research..." : "Waiting for model feedback..."}</span></p>
           </div>
         )}
       </div>
       {!agentMode && lastResult && <p className="mt-2 text-xs text-slate-500">Last reply: {lastResult.durationMs} ms</p>}
-      {error && <p role="alert" className="mt-3 text-sm text-rose-300">{error}</p>}
+      {error && <ChatError error={error} />}
       {full && <p role="status" className="mt-3 text-xs text-amber-400">{agentMode ? "Start a new chat to keep exploring." : "Conversation limit reached. Choose New chat or shorten your message."}</p>}
       <form onSubmit={send} className={`${agentMode ? "mt-3" : "mt-5"} shrink-0`}>
         <label htmlFor={inputId} className="text-sm text-slate-300">{agentMode ? "Your question" : "Message to saved model"}</label>

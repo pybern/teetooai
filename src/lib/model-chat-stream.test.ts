@@ -1,4 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { HKEX_CLIENT_TIMEOUT_MS } from "./connections";
 import { createUIMessageStream, createUIMessageStreamResponse } from "ai";
 import { researchErrorMessage, sendModelChat } from "./model-chat-stream";
 
@@ -30,16 +31,17 @@ afterEach(() => { vi.restoreAllMocks(); vi.unstubAllGlobals(); });
 describe("SDK chat stream client", () => {
   it.each([
     ["API returned HTTP 429. Provider quota reached.", "Please wait a moment"],
-    ["API request timed out after 120 seconds.", "taking longer than expected"],
+    ["API request timed out after 240 seconds.", "taking longer than expected"],
     ["The operation was aborted due to timeout", "taking longer than expected"],
     ["Research planning reached its 4,096-token output limit", "Try a shorter question"],
+    ["Research generation reached its output-token limit, which may include thinking tokens.", "Try a shorter question"],
     ["Research was cancelled.", "Research was cancelled"],
     ["These research results expired or are unavailable on this server.", "no longer available"],
     ["Saved PostgreSQL database needs SELECT permissions.", "Please try again"],
   ])("explains research failures in plain language: %s", (message, expected) => {
     const friendly = researchErrorMessage(new Error(message));
     expect(friendly).toContain(expected);
-    expect(friendly).not.toMatch(/HTTP|PostgreSQL|SELECT|tokens|provider|quota|120 seconds/i);
+    expect(friendly).not.toMatch(/HTTP|PostgreSQL|SELECT|tokens|provider|quota|240 seconds/i);
   });
   it("parses fragmented SSE and UTF-8 and sends only messages plus administrator authentication", async () => {
     const bytes = new Uint8Array(await response().arrayBuffer());
@@ -75,7 +77,7 @@ describe("SDK chat stream client", () => {
     const [url, init] = fetchMock.mock.calls[0];
     expect(url).toBe("/api/hkex/chat");
     expect(new Headers(init?.headers).has("Authorization")).toBe(false);
-    expect(timeout).toHaveBeenCalledWith(150000);
+    expect(timeout).toHaveBeenCalledWith(HKEX_CLIENT_TIMEOUT_MS);
   });
   it("streams reasoning separately from the answer and returns it for display", async () => {
     vi.stubGlobal("fetch", vi.fn(async () => response({ reasoning: "Provider reasoning 你好" })));

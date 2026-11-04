@@ -7,7 +7,7 @@ import {
 import { HKEX_CHART_METRICS, hkexChartCatalog, hkexChartSpecSchema, type HkexChartProps, type HkexChartSpec } from "@/lib/hkex-chart";
 import { ChartContainer, ChartLegend, ChartLegendContent, ChartTooltip, ChartTooltipContent, type ChartConfig } from "./ui/chart";
 
-const colors = [
+export const colors = [
   { light: "#2563eb", dark: "#60a5fa" },
   { light: "#7c3aed", dark: "#a78bfa" },
   { light: "#0d9488", dark: "#2dd4bf" },

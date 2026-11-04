@@ -8,6 +8,9 @@ import { USE_CASE_BY_ID } from "@/lib/usecases";
 import { acquireHkexRequest } from "@/lib/server/hkex-access";
 import { createHkexExplanationRunner } from "@/lib/server/hkex-explanation";
 
+// Hosting limit for one research turn; must exceed HKEX_SERVER_TIMEOUT_MS.
+export const maxDuration = 300;
+
 export async function POST(request: Request) {
   let release: (() => void) | undefined;
   try {

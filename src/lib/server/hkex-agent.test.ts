@@ -4,7 +4,7 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { sendModelChat } from "@/lib/model-chat-stream";
-import { DEFAULT_CONNECTIONS, type ModelChatToolActivity, type ReasoningEffort } from "@/lib/connections";
+import { DEFAULT_CONNECTIONS, HKEX_SERVER_TIMEOUT_MS, type ModelChatToolActivity, type OutputTokenLimits, type ReasoningEffort } from "@/lib/connections";
 import { loadConnections, saveConnection } from "./connections";
 import { hkexPlanSchema } from "./hkex-agent";
 import { POST } from "@/app/api/hkex/chat/route";
@@ -13,6 +13,7 @@ import { GET as CONFIG } from "@/app/api/config/route";
 import { POST as INITIALIZE } from "@/app/api/config/database/initialize/route";
 import * as access from "./hkex-access";
 import * as agent from "./hkex-agent";
+import { buildCatalogEntries } from "./table-catalog";
 
 const pg = vi.hoisted(() => ({ connect: vi.fn(), query: vi.fn(), end: vi.fn(), on: vi.fn() }));
 vi.mock("pg", () => ({ Client: class { connect = pg.connect; query = pg.query; end = pg.end; on = pg.on; } }));
@@ -28,7 +29,12 @@ let providerStatus = 200;
 let explanation = false;
 let supportedEfforts: ReasoningEffort[];
 let finishReason = "stop";
+let reasoning = "Select the supported query.";
 let script: string[] | undefined;
+let chartCalls: Record<string, unknown>[];
+let chartChoice: unknown;
+let chartStatus = 200;
+let chartGate: Promise<void> | undefined;
 function toolCall(name: string, input: unknown, id = `call_${name}`) {
   return chunk({ tool_calls: [{ index: 0, id, type: "function", function: { name, arguments: JSON.stringify(input) } }] }) +
     chunk({}, "tool_calls") + "data: [DONE]\n\n";
@@ -51,11 +57,20 @@ beforeAll(async () => {
     }
     let raw = "";
     for await (const bytes of req) raw += bytes;
-    calls.push(JSON.parse(raw));
+    const body = JSON.parse(raw);
+    if (body.response_format?.json_schema?.name === "sqlChartChoice") {
+      chartCalls.push(body);
+      await chartGate;
+      if (chartStatus !== 200) { response.writeHead(chartStatus); response.end("private upstream details"); return; }
+      response.writeHead(200, { "Content-Type": "text/event-stream" });
+      response.end(chunk({ content: JSON.stringify(chartChoice) }, "stop") + "data: [DONE]\n\n");
+      return;
+    }
+    calls.push(body);
     if (providerStatus !== 200) { response.writeHead(providerStatus); response.end("private upstream details"); return; }
     response.writeHead(200, { "Content-Type": "text/event-stream" });
     if (script) { response.end(script[calls.length - 1] ?? chunk({ content: JSON.stringify(plan) }, "stop") + "data: [DONE]\n\n"); return; }
-    response.end(chunk({ reasoning_content: "Select the supported query." }) +
+    response.end(chunk({ reasoning_content: reasoning }) +
       chunk({ content: explanation ? "## Explanation\n\nTENCENT: HKD 12345.67, based on retrieved evidence." : JSON.stringify(plan) }, finishReason) + "data: [DONE]\n\n");
   });
   await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
@@ -65,8 +80,9 @@ beforeAll(async () => {
 });
 beforeEach(() => {
   calls = []; providerStatus = 200; explanation = false; script = undefined;
+  chartCalls = []; chartChoice = { charts: [] }; chartStatus = 200; chartGate = undefined;
   supportedEfforts = ["none", "minimal", "low", "medium", "high"];
-  finishReason = "stop";
+  finishReason = "stop"; reasoning = "Select the supported query.";
   plan = { clarification: null, queries: [{ ...queryInput }], sqlQueries: [] };
   vi.stubEnv("CONFIG_ADMIN_TOKEN", "");
   vi.stubEnv("AI_GATEWAY_API_KEY", "");
@@ -87,26 +103,26 @@ afterAll(async () => {
   await new Promise<void>((resolve) => server.close(() => resolve()));
   await rm(directory, { recursive: true, force: true });
 });
-async function saveSettings(reasoningEffort?: ReasoningEffort) {
+async function saveSettings(reasoningEffort?: ReasoningEffort, outputTokens?: OutputTokenLimits) {
   await saveConnection("database", { ...DEFAULT_CONNECTIONS.database, host: "fixture-db", database: "fixture", username: "reader", password: "db-secret" });
-  await saveConnection("api", { baseUrl, model: "fixture-model", apiKey: "fixture-api-key", reasoningEffort });
+  await saveConnection("api", { baseUrl, model: "fixture-model", apiKey: "fixture-api-key", reasoningEffort, outputTokens });
 }
 function interceptChat() {
   const realFetch = globalThis.fetch;
   return vi.spyOn(globalThis, "fetch").mockImplementation(async (url, init) => url === "/api/hkex/chat"
     ? POST(new Request("http://localhost/api/hkex/chat", init)) : realFetch(url, init));
 }
-async function research(onTools = vi.fn()) {
-  return sendModelChat(undefined, [{ role: "user", content: "Chart HKD short selling." }], new AbortController().signal, vi.fn(), vi.fn(), { api: "/api/hkex/chat", onTools });
+async function research(onTools = vi.fn(), useCaseId = "hkex-db") {
+  return sendModelChat(undefined, [{ role: "user", content: "Chart HKD short selling." }], new AbortController().signal, vi.fn(), vi.fn(), { api: "/api/hkex/chat", onTools, useCaseId });
 }
 describe("single-call HKEX research", () => {
-  it("plans and renders exact factual results in exactly one provider request", async () => {
+  it.each(["hk", "hkex-db"])("plans and renders exact factual results without a catalog in one provider request for %s", async (useCaseId) => {
     await saveSettings(); interceptChat();
-    const result = await research();
+    const result = await research(vi.fn(), useCaseId);
     expect(calls).toHaveLength(1);
     expect(calls[0]).toMatchObject({ model: "fixture-model", stream: true, max_tokens: 4096, reasoning_effort: "low" });
     expect(calls[0].tools).toBeUndefined();
-    expect(calls[0].response_format).toMatchObject({ type: "json_schema" });
+    expect(calls[0].response_format).toMatchObject({ type: "json_schema", json_schema: { strict: true } });
     expect(JSON.stringify(calls[0].messages)).toContain("2026-01-05");
     expect(JSON.stringify(calls[0].messages)).toContain("NOT short interest");
     expect(JSON.stringify(calls[0].messages)).not.toContain("12345.67");
@@ -165,11 +181,26 @@ describe("single-call HKEX research", () => {
     expect(pg.query.mock.calls.some(([sql]) => sql.startsWith("WITH latest"))).toBe(false);
     expect(calls).toHaveLength(1);
   });
-  it("reports the 120-second server deadline as a timeout, not user cancellation", async () => {
+  it("applies the configured planning limit to the request and the token-limit message", async () => {
+    await saveSettings(undefined, { planning: 12000 }); interceptChat();
+    finishReason = "length";
+    plan = "truncated JSON";
+    await expect(research()).rejects.toThrow("Research planning reached its 12,000-token output limit");
+    expect(calls[0]).toMatchObject({ max_tokens: 12000 });
+  });
+  it("clips long research thinking for display instead of failing the turn", async () => {
+    await saveSettings(); interceptChat();
+    reasoning = "x".repeat(20000);
+    const result = await research();
+    expect(result.message.content).toContain("## Results");
+    expect(result.reasoning).toHaveLength(16000 + "\n\n[Thinking shortened for display.]".length);
+    expect(result.reasoning?.endsWith("[Thinking shortened for display.]")).toBe(true);
+  });
+  it("reports the server deadline as a timeout, not user cancellation", async () => {
     await saveSettings();
     const deadline = new AbortController();
     const realTimeout = AbortSignal.timeout.bind(AbortSignal);
-    const timeout = vi.spyOn(AbortSignal, "timeout").mockImplementation((ms) => ms === 120000 ? deadline.signal : realTimeout(ms));
+    const timeout = vi.spyOn(AbortSignal, "timeout").mockImplementation((ms) => ms === HKEX_SERVER_TIMEOUT_MS ? deadline.signal : realTimeout(ms));
     const realFetch = globalThis.fetch;
     vi.spyOn(globalThis, "fetch").mockImplementation(async (url, init) => {
       if (url === "/api/hkex/chat") return POST(new Request("http://localhost/api/hkex/chat", init));
@@ -184,8 +215,8 @@ describe("single-call HKEX research", () => {
       }
       return realFetch(url, init);
     });
-    await expect(research()).rejects.toThrow("timed out after 120 seconds");
-    expect(timeout).toHaveBeenCalledWith(120000);
+    await expect(research()).rejects.toThrow(`timed out after ${HKEX_SERVER_TIMEOUT_MS / 1000} seconds`);
+    expect(timeout).toHaveBeenCalledWith(HKEX_SERVER_TIMEOUT_MS);
     expect(pg.query.mock.calls.some(([sql]) => sql.startsWith("WITH latest"))).toBe(false);
   });
   it.each(["auto", "HKEXHorizontalBarChart"])("renders a %s catalog chart without a chart or narrative model call", async (chart) => {
@@ -360,7 +391,7 @@ describe("single-call HKEX research", () => {
     explanation = true;
     finishReason = "length";
     await expect(sendModelChat(undefined, [], new AbortController().signal, vi.fn(), undefined, { api: "/api/hkex/chat", explanationId: id }))
-      .rejects.toThrow("Research generation reached its 4,096-token output limit");
+      .rejects.toThrow("The explanation reached its 4,096-token output limit");
     expect(calls).toHaveLength(2);
     expect(pg.query.mock.calls.some(([sql]) => sql.startsWith("WITH latest"))).toBe(false);
   });
@@ -457,6 +488,99 @@ describe("single-call HKEX research", () => {
   });
 });
 
+describe("structured plan validation and repair", () => {
+  const cases = [
+    { name: "missing output", text: "", diagnostic: "Missing output" },
+    { name: "malformed JSON", text: '{"private-secret":', diagnostic: "Malformed JSON" },
+    { name: "schema mismatch", text: JSON.stringify({ clarification: null, queries: [{ ...queryInput, limit: "private-secret" }], sqlQueries: [] }), diagnostic: "queries.0.limit: missing field or incorrect type" },
+    { name: "empty plan", text: JSON.stringify({ clarification: null, queries: [], sqlQueries: [] }), diagnostic: "Provide either a clarification or at least one query" },
+    { name: "conflicting clarification", text: JSON.stringify({ clarification: "private-secret", queries: [queryInput], sqlQueries: [] }), diagnostic: "Provide either a clarification or at least one query" },
+    { name: "lookup budget", text: JSON.stringify({ clarification: null, queries: Array(3).fill({ ...queryInput, stockSearches: ["a", "b"] }), sqlQueries: [] }), diagnostic: "queries: At most five stock lookups per plan" },
+  ];
+  it.each(cases)("repairs $name once with strict structured output and no tools", async ({ text, diagnostic }) => {
+    await saveSettings(); interceptChat();
+    script = [chunk({ content: text }, "stop") + "data: [DONE]\n\n"];
+    const result = await research();
+    expect(calls).toHaveLength(2);
+    expect(calls[1].tools).toBeUndefined();
+    expect(calls[1].response_format).toMatchObject({ type: "json_schema", json_schema: { strict: true } });
+    const prompt = JSON.stringify(calls[1].messages);
+    expect(prompt).toContain(diagnostic);
+    expect(prompt).toContain("Regenerate a complete corrected plan");
+    expect(prompt).not.toContain("private-secret");
+    expect(result.message.content).toContain("00700 TENCENT");
+    expect(result.tools?.find((item) => item.tool === "planResearch")?.summary).toContain("after one automatic plan repair");
+    expect(pg.query.mock.calls.filter(([sql]) => typeof sql === "string" && sql.startsWith("WITH latest"))).toHaveLength(1);
+  });
+  it.each(["hk", "hkex-db"])("repairs once in the %s workspace", async (useCaseId) => {
+    await saveSettings(); interceptChat();
+    script = [chunk({ content: "{}" }, "stop") + "data: [DONE]\n\n"];
+    const result = await research(vi.fn(), useCaseId);
+    expect(calls).toHaveLength(2);
+    expect(result.message.content).toContain("## Results");
+  });
+  it.each(cases)("reports safe specific details if $name fails again and never runs final queries", async ({ text, diagnostic }) => {
+    await saveSettings(); interceptChat();
+    script = Array(2).fill(chunk({ content: text }, "stop") + "data: [DONE]\n\n");
+    await expect(research()).rejects.toThrow(diagnostic);
+    expect(calls).toHaveLength(2);
+    expect(pg.query.mock.calls.some(([sql]) => typeof sql === "string" && sql.startsWith("WITH latest"))).toBe(false);
+  });
+  it("does not echo unknown field names, values, or raw provider output into errors", async () => {
+    await saveSettings(); interceptChat();
+    plan = { clarification: null, queries: [], sqlQueries: [], "fixture-api-key": "db-secret" };
+    await expect(research()).rejects.toThrow("unexpected fields are not allowed");
+    const response = await (await POST(request())).text();
+    expect(response).toContain("single automatic plan repair also failed");
+    expect(response).not.toMatch(/fixture-api-key|db-secret/);
+  });
+  it.each(["content_filter", "length"])("does not repair a %s finish", async (reason) => {
+    await saveSettings(); interceptChat();
+    finishReason = reason;
+    await expect(research()).rejects.toThrow(reason === "length" ? "output limit" : "declined or filtered");
+    expect(calls).toHaveLength(1);
+  });
+  it("does not repair an authentication failure", async () => {
+    await saveSettings(); interceptChat();
+    providerStatus = 401;
+    await expect(research()).rejects.toThrow("HTTP 401");
+    expect(calls).toHaveLength(1);
+  });
+  it("does not repair a broken stream without a normal finish", async () => {
+    await saveSettings(); interceptChat();
+    script = [chunk({ content: "{" }) + "data: [DONE]\n\n"];
+    await expect(research()).rejects.toThrow();
+    expect(calls).toHaveLength(1);
+  });
+  it.each(["cancellation", "timeout"])("keeps the existing %s signal during repair and never makes a third attempt", async (failure) => {
+    await saveSettings();
+    const controller = new AbortController();
+    if (failure === "timeout") {
+      const realTimeout = AbortSignal.timeout.bind(AbortSignal);
+      vi.spyOn(AbortSignal, "timeout").mockImplementation((ms) => ms === HKEX_SERVER_TIMEOUT_MS ? controller.signal : realTimeout(ms));
+    }
+    const realFetch = globalThis.fetch;
+    let attempts = 0;
+    vi.spyOn(globalThis, "fetch").mockImplementation(async (url, init) => {
+      if (!String(url).endsWith("/chat/completions")) return realFetch(url, init);
+      attempts++;
+      if (attempts === 1) return new Response(chunk({ content: "{}" }, "stop") + "data: [DONE]\n\n", { headers: { "Content-Type": "text/event-stream" } });
+      return new Response(new ReadableStream({
+        start(stream) {
+          stream.enqueue(new TextEncoder().encode(chunk({ reasoning_content: "Correcting the plan." })));
+          init!.signal!.addEventListener("abort", () => stream.error(init!.signal!.reason), { once: true });
+          setTimeout(() => controller.abort(new DOMException(failure, failure === "timeout" ? "TimeoutError" : "AbortError")), 20);
+        },
+      }), { headers: { "Content-Type": "text/event-stream" } });
+    });
+    const body = await (await POST(new Request(request(), failure === "cancellation" ? { signal: controller.signal } : {}))).text();
+    expect(body).toContain(failure === "timeout" ? `timed out after ${HKEX_SERVER_TIMEOUT_MS / 1000} seconds` : "cancelled");
+    expect(body).not.toContain('"completed":true');
+    expect(attempts).toBe(2);
+    expect(pg.query.mock.calls.some(([sql]) => typeof sql === "string" && sql.startsWith("WITH latest"))).toBe(false);
+  });
+});
+
 describe("catalog-guided research", () => {
   const catalogRow = { id: "dataset:world-economy", kind: "dataset", relation: "public.insightful_dataset_rows", title: "World Economy", description: "GDP by country", rank: "0.6" };
   const described = {
@@ -464,41 +588,57 @@ describe("catalog-guided research", () => {
     query_notes: ["Read JSON keys"], example_queries: [], row_count: "100", coverage: { as_of: "2025-06" }, source: { name: "World Bank" },
   };
   const finalSql = "SELECT data->>'entity' AS entity, (data->>'gdp')::numeric AS gdp FROM public.insightful_dataset_rows WHERE dataset_id = 'world-economy' ORDER BY gdp DESC LIMIT 5";
+  const entries = buildCatalogEntries({ sample_rows: [evidence], row_count: 2, coverage: { first_date: "2026-01-02", last_date: "2026-01-05" } })
+    .map((entry) => entry.id === described.id ? described : entry);
   beforeEach(() => {
     const original = pg.query.getMockImplementation()!;
     pg.query.mockImplementation(async (input: string | { text: string }, parameters?: unknown[]) => {
       const sql = typeof input === "string" ? input : input.text;
       if (sql.includes("to_regclass") && parameters?.[0] === "public.insightful_table_catalog") return { rows: [{ relation: "public.insightful_table_catalog" }] };
-      if (sql.includes("SELECT id, kind, left(title")) return { rows: [{ id: catalogRow.id, kind: "dataset", title: catalogRow.title }] };
+      if (sql.includes("SELECT id, kind, left(title")) return { rows: entries.filter((entry) => !parameters?.[0] || (parameters[0] as string[]).includes(entry.id))
+        .map(({ id, kind, title }) => ({ id, kind, title })) };
       if (sql.includes("plainto_tsquery")) return { rows: [catalogRow] };
-      if (sql.includes("sample_rows, query_notes")) return { rows: [described] };
+      if (sql.includes("sample_rows, query_notes")) return { rows: entries.filter((entry) => (parameters?.[0] as string[]).includes(entry.id)) };
       if (sql.includes("AS agent_query")) return { rows: [{ entity: "United States", gdp: "27.4" }, { entity: "China", gdp: "18.5" }] };
       return original(sql, parameters);
     });
   });
 
-  it("searches and reads the catalog, rejects forbidden SQL as tool feedback, then renders validated catalogue SQL", async () => {
+  it.each(["hk", "hkex-db"])("preloads descriptions and returns a direct plan in one request for %s", async (useCaseId) => {
+    await saveSettings();
+    const sql = useCaseId === "hk" ? "SELECT id FROM public.insightful_datasets ORDER BY id LIMIT 5" : finalSql;
+    plan = { clarification: null, queries: [], sqlQueries: [{ title: "Stored data", sql }] };
+    const text = await (await POST(request({ messages: [{ role: "user", content: "Show stored data" }], useCaseId }))).text();
+    expect(text).toContain("## Stored data");
+    expect(calls).toHaveLength(1);
+    expect((calls[0].tools as { function: { name: string } }[]).map((item) => item.function.name)).toEqual(["runSql"]);
+    const prompt = JSON.stringify(calls[0].messages);
+    expect(prompt).toContain("Workspace tables");
+    expect(prompt).toContain("Return the final plan straight away");
+    expect(prompt).toContain("dataset:hk-indices");
+    expect(prompt.includes("dataset:world-economy")).toBe(useCaseId === "hkex-db");
+    expect(pg.query.mock.calls.some(([input]) => JSON.stringify(input).includes("plainto_tsquery"))).toBe(false);
+  });
+
+  it.each(["hk", "hkex-db"])("returns forbidden draft SQL as tool feedback then renders a validated plan for %s", async (useCaseId) => {
     await saveSettings(); interceptChat();
-    plan = { clarification: null, queries: [], sqlQueries: [{ title: "Largest economies", sql: finalSql }] };
+    const sql = useCaseId === "hk" ? "SELECT id FROM public.insightful_datasets ORDER BY id LIMIT 5" : finalSql;
+    plan = { clarification: null, queries: [], sqlQueries: [{ title: "Stored data", sql }] };
     script = [
-      toolCall("searchTables", { keywords: "gdp economy country" }),
-      toolCall("describeTable", { id: "dataset:world-economy" }),
       toolCall("runSql", { sql: "SELECT settings FROM public.insightful_configuration" }),
     ];
-    const result = await research();
-    expect(calls).toHaveLength(4);
-    expect((calls[0].tools as { function: { name: string } }[]).map((item) => item.function.name)).toEqual(["searchTables", "describeTable", "runSql"]);
-    expect(JSON.stringify(calls[0].messages)).toContain("dataset:world-economy");
-    expect(JSON.stringify(calls[1].messages)).toContain("GDP by country");
-    expect(JSON.stringify(calls[2].messages)).toContain("Read JSON keys");
-    expect(JSON.stringify(calls[3].messages)).toContain("SQL rejected: table public.insightful_configuration is not in the catalog");
+    const result = await sendModelChat(undefined, [{ role: "user", content: "Show stored data" }], new AbortController().signal, vi.fn(), vi.fn(), { api: "/api/hkex/chat", useCaseId });
+    expect(calls).toHaveLength(2);
+    expect((calls[0].tools as { function: { name: string } }[]).map((item) => item.function.name)).toEqual(["runSql"]);
+    expect(calls[1].tools).toBeUndefined();
+    expect(JSON.stringify(calls[1].messages)).toContain("SQL rejected: table public.insightful_configuration is not in the catalog");
     expect(pg.query.mock.calls.some(([input]) => JSON.stringify(input).includes("insightful_configuration"))).toBe(false);
-    expect(result.message.content).toContain("## Largest economies");
+    expect(result.message.content).toContain("## Stored data");
     expect(result.message.content).toContain("| United States | 27.4 |");
-    expect(result.message.content).toContain("`public.insightful_dataset_rows`");
+    expect(result.message.content).toContain(useCaseId === "hk" ? "`public.insightful_datasets`" : "`public.insightful_dataset_rows`");
     const executed = result.tools?.find((item) => item.tool === "querySql");
-    expect(executed).toMatchObject({ status: "complete", sql: finalSql });
-    expect(result.tools?.map((item) => item.tool)).toEqual(expect.arrayContaining(["searchTables", "describeTable", "querySql"]));
+    expect(executed?.status).toBe("complete");
+    expect(result.tools?.some((item) => ["searchTables", "describeTable"].includes(item.tool))).toBe(false);
     expect(result.tools?.find((item) => item.tool === "runSql")?.status).toBe("error");
     expect(pg.query.mock.calls.filter(([input]) => typeof input === "string" && /^(INSERT|UPDATE|DELETE|CREATE)/.test(input))).toHaveLength(0);
   });
@@ -515,13 +655,13 @@ describe("catalog-guided research", () => {
     const scopeIds = ["hkex_short_selling", "insightful_datasets", "dataset:hk-indices", "dataset:hk-valuations", "dataset:hk-prices", "dataset:hk-financials"];
     const queries = pg.query.mock.calls.map(([input, parameters]) => ({ sql: typeof input === "string" ? input : input.text, parameters: parameters ?? input.values }));
     expect(queries.find((item) => item.sql.includes("SELECT id, kind, left(title"))?.parameters).toEqual([scopeIds]);
-    expect(queries.find((item) => item.sql.includes("WHERE id = ANY($1::text[]) ORDER BY kind DESC"))?.parameters).toEqual([scopeIds]);
+    expect(queries.find((item) => item.sql.includes("WHERE id = ANY($1::text[]) ORDER BY kind DESC"))?.parameters?.[0]).toEqual(expect.arrayContaining(scopeIds));
     expect(queries.some((item) => item.sql.includes("plainto_tsquery"))).toBe(false);
-    expect(calls).toHaveLength(agent.MAX_SCOPED_AGENT_STEPS);
+    expect(calls).toHaveLength(agent.MAX_AGENT_STEPS);
     expect((calls[0].tools as { function: { name: string } }[]).map((item) => item.function.name)).toEqual(["runSql"]);
     expect(calls.at(-1)!.tools).toBeUndefined();
     expect(JSON.stringify(calls[0].messages)).toContain("Workspace tables");
-    expect(JSON.stringify(calls[0].messages)).toContain("Read JSON keys");
+    expect(JSON.stringify(calls[0].messages)).toContain("Every field below is a key in the data jsonb column");
     expect(queries.find((item) => item.sql.includes("AS agent_query"))?.sql)
       .toContain("dataset_id = ANY(ARRAY['hk-indices', 'hk-valuations', 'hk-prices', 'hk-financials']::text[])");
     expect(JSON.stringify(calls[0].messages)).toContain("HK Equities Analyst");
@@ -561,8 +701,8 @@ describe("catalog-guided research", () => {
     expect(prompt).toContain("United States");
     expect(prompt).toContain("Largest HK stocks");
     expect(prompt).toContain("HK Equities Analyst");
-    expect(prompt).toContain("Read JSON keys");
-    expect(prompt).toContain("2025-06");
+    expect(prompt).toContain("Every field below is a key in the data jsonb column");
+    expect(prompt).toContain("Sample dataset registry");
     expect(prompt).not.toContain("Short turnover ratio is not short interest");
     expect(explained.message.content).toContain("## Explanation");
     expect(pg.query.mock.calls.some(([input]) => /insightful_(dataset|hkex|table_catalog)/.test(JSON.stringify(input)))).toBe(false);
@@ -571,10 +711,41 @@ describe("catalog-guided research", () => {
   it("withdraws tools on the final step so the loop always ends with a plan", async () => {
     await saveSettings(); interceptChat();
     plan = { clarification: null, queries: [], sqlQueries: [{ title: "Largest economies", sql: finalSql }] };
-    script = Array.from({ length: agent.MAX_AGENT_STEPS - 1 }, (_, index) => toolCall("searchTables", { keywords: `gdp ${index}` }, `call_${index}`));
+    script = [toolCall("runSql", { sql: finalSql })];
     const result = await research();
     expect(calls).toHaveLength(agent.MAX_AGENT_STEPS);
     expect(calls.at(-1)!.tools).toBeUndefined();
+    expect(result.message.content).toContain("## Largest economies");
+  });
+
+  it("repairs an invalid final plan after a draft check without re-executing tools", async () => {
+    await saveSettings(); interceptChat();
+    plan = { clarification: null, queries: [], sqlQueries: [{ title: "Largest economies", sql: finalSql }] };
+    script = [
+      toolCall("runSql", { sql: finalSql }),
+      chunk({ content: '{"clarification":null,"queries":[],"sqlQueries":[]}' }, "stop") + "data: [DONE]\n\n",
+    ];
+    const result = await research();
+    expect(calls).toHaveLength(3);
+    expect(calls[2].tools).toBeUndefined();
+    expect(result.tools?.filter((item) => item.tool === "runSql")).toHaveLength(1);
+    expect(result.message.content).toContain("## Largest economies");
+    expect(result.tools?.find((item) => item.tool === "planResearch")?.summary).toContain("3 model steps");
+  });
+
+  it("executes at most one draft even when the model requests multiple SQL checks together", async () => {
+    await saveSettings(); interceptChat();
+    plan = { clarification: null, queries: [], sqlQueries: [{ title: "Largest economies", sql: finalSql }] };
+    script = [
+      chunk({ tool_calls: [0, 1].map((index) => ({
+        index, id: `call_${index}`, type: "function", function: { name: "runSql", arguments: JSON.stringify({ sql: finalSql }) },
+      })) }) + chunk({}, "tool_calls") + "data: [DONE]\n\n",
+    ];
+    const result = await research();
+    expect(calls).toHaveLength(2);
+    expect(JSON.stringify(calls[1].messages)).toContain("Tool budget of 1 calls reached");
+    expect(pg.query.mock.calls.filter(([input]) => JSON.stringify(input).includes("AS agent_query"))).toHaveLength(2);
+    expect(result.tools?.filter((item) => item.tool === "runSql")).toHaveLength(1);
     expect(result.message.content).toContain("## Largest economies");
   });
 
@@ -587,5 +758,119 @@ describe("catalog-guided research", () => {
     expect(result.tools?.find((item) => item.tool === "querySql")?.status).toBe("error");
     expect(pg.query.mock.calls.some(([input]) => JSON.stringify(input).includes("agent_query"))).toBe(false);
   });
-});
 
+  const gdpChart = { result: 0, type: "bar", title: "GDP by economy", labelColumn: "entity", valueColumns: ["gdp"], seriesColumn: null };
+
+  it("streams every SQL section before the chart agent answers, then adds a chart built from the returned rows", async () => {
+    await saveSettings();
+    plan = { clarification: null, queries: [], sqlQueries: [{ title: "Largest economies", sql: finalSql }] };
+    script = [];
+    chartChoice = { charts: [gdpChart] };
+    let release!: () => void;
+    chartGate = new Promise((resolve) => { release = resolve; });
+    const response = await POST(request({ messages: [{ role: "user", content: "Largest economies" }] }));
+    const reader = response.body!.getReader();
+    const decoder = new TextDecoder();
+    let streamed = "";
+    while (!streamed.includes("| United States | 27.4 |")) {
+      const { value, done } = await reader.read();
+      if (done) break;
+      streamed += decoder.decode(value, { stream: true });
+    }
+    await vi.waitFor(() => expect(chartCalls).toHaveLength(1));
+    expect(streamed).toContain("## Largest economies");
+    expect(streamed).not.toContain("sqlChart");
+    release();
+    let rest = "";
+    for (;;) {
+      const { value, done } = await reader.read();
+      if (done) break;
+      rest += decoder.decode(value, { stream: true });
+    }
+    expect(rest).toContain('"sqlChart"');
+    expect(rest).toContain('"type":"finish"');
+    expect(calls).toHaveLength(1);
+    expect(chartCalls[0].tools).toBeUndefined();
+    const prompt = JSON.stringify(chartCalls[0].messages);
+    expect(prompt).toContain("27.4");
+    expect(prompt).toContain("untrusted data");
+  });
+
+  it("returns the validated chart and deterministic SQL insights through the client", async () => {
+    await saveSettings(); interceptChat();
+    plan = { clarification: null, queries: [], sqlQueries: [{ title: "Largest economies", sql: finalSql }] };
+    script = [];
+    chartChoice = { charts: [gdpChart] };
+    const result = await research();
+    const chart = result.tools?.find((item) => item.sqlChart)?.sqlChart;
+    expect(chart).toMatchObject({ type: "bar", title: "GDP by economy", resultTitle: "Largest economies", labelColumn: "entity", valueLabel: "gdp", truncated: false });
+    expect(chart?.points).toEqual([{ label: "United States", series: "gdp", value: 27.4 }, { label: "China", series: "gdp", value: 18.5 }]);
+    expect(result.tools?.find((item) => item.tool === "chooseChart")).toMatchObject({ status: "complete", summary: "Added 1 chart after the answer." });
+    const insights = result.tools?.find((item) => item.tool === "computeInsights")?.insights;
+    expect(insights?.headline).toContain("United States has the highest gdp");
+    expect(insights?.kpis).toEqual(expect.arrayContaining([{ label: "Returned rows", value: "2" }, { label: "Highest gdp", value: "27.4", hint: "United States" }]));
+    const tools = result.tools!.map((item) => item.tool);
+    expect(tools.indexOf("computeInsights")).toBeLessThan(tools.indexOf("chooseChart"));
+  });
+
+  it("adds no chart when the chart agent declines", async () => {
+    await saveSettings(); interceptChat();
+    plan = { clarification: null, queries: [], sqlQueries: [{ title: "Largest economies", sql: finalSql }] };
+    script = [];
+    const result = await research();
+    expect(chartCalls).toHaveLength(1);
+    expect(chartCalls[0]).toMatchObject({ max_tokens: 4096 });
+    expect(result.tools?.some((item) => item.sqlChart)).toBe(false);
+    expect(result.tools?.find((item) => item.tool === "chooseChart")?.summary).toBe("A chart would not add to these results.");
+  });
+
+  it("uses separate configured limits for planning, chart choice and explanation", async () => {
+    await saveSettings(undefined, { planning: 6000, chart: 1500, explanation: 3000 }); interceptChat();
+    plan = { clarification: null, queries: [], sqlQueries: [{ title: "Largest economies", sql: finalSql }] };
+    script = [];
+    const result = await research();
+    expect(calls[0]).toMatchObject({ max_tokens: 6000 });
+    expect(chartCalls[0]).toMatchObject({ max_tokens: 1500 });
+    explanation = true;
+    const id = result.tools!.find((item) => item.explanationId)!.explanationId!;
+    await sendModelChat(undefined, [], new AbortController().signal, vi.fn(), undefined, { api: "/api/hkex/chat", explanationId: id });
+    expect(calls.at(-1)).toMatchObject({ max_tokens: 3000 });
+  });
+
+  it("rejects a chart choice that does not fit the rows and keeps the answer", async () => {
+    await saveSettings(); interceptChat();
+    plan = { clarification: null, queries: [], sqlQueries: [{ title: "Largest economies", sql: finalSql }] };
+    script = [];
+    chartChoice = { charts: [{ ...gdpChart, valueColumns: ["entity"] }, { ...gdpChart, result: 2 }] };
+    const result = await research();
+    expect(result.tools?.some((item) => item.sqlChart)).toBe(false);
+    expect(result.tools?.filter((item) => item.tool === "renderChart")).toEqual([expect.objectContaining({ status: "error" })]);
+    expect(result.tools?.find((item) => item.tool === "chooseChart")?.summary).toBe("No valid chart could be built from these results.");
+    expect(result.message.content).toContain("| United States | 27.4 |");
+  });
+
+  it("keeps the completed answer when chart selection fails", async () => {
+    await saveSettings(); interceptChat();
+    plan = { clarification: null, queries: [], sqlQueries: [{ title: "Largest economies", sql: finalSql }] };
+    script = [];
+    chartStatus = 500;
+    const result = await research();
+    expect(result.message.content).toContain("| United States | 27.4 |");
+    expect(result.tools?.find((item) => item.tool === "chooseChart")).toMatchObject({ status: "error", summary: "No chart was added; the results above are complete." });
+    expect(JSON.stringify(result)).not.toContain("private upstream details");
+  });
+
+  it("makes no chart request for HKEX template answers or results that cannot be charted", async () => {
+    await saveSettings(); interceptChat();
+    plan = { clarification: null, queries: [{ ...queryInput }], sqlQueries: [] };
+    await research();
+    plan = { clarification: null, queries: [], sqlQueries: [{ title: "Dataset ids", sql: "SELECT id FROM public.insightful_datasets ORDER BY id LIMIT 5" }] };
+    const original = pg.query.getMockImplementation()!;
+    pg.query.mockImplementation(async (input: string | { text: string }, parameters?: unknown[]) =>
+      JSON.stringify(input).includes("AS agent_query") ? { rows: [{ id: "hk-indices" }, { id: "us-macro" }] } : original(input, parameters));
+    const result = await research();
+    expect(chartCalls).toHaveLength(0);
+    expect(result.tools?.some((item) => item.tool === "chooseChart")).toBe(false);
+    expect(result.tools?.some((item) => item.tool === "computeInsights")).toBe(false);
+  });
+});

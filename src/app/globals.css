@@ -188,7 +188,8 @@ body {
 
 @media (prefers-reduced-motion: reduce) {
   .reveal,
-  .caret::after {
+  .caret::after,
+  .shimmer {
     animation: none;
   }
 }
@@ -197,4 +198,22 @@ body {
   background: linear-gradient(90deg, var(--wash) 25%, var(--hair) 50%, var(--wash) 75%);
   background-size: 200% 100%;
   animation: shimmer 1.6s linear infinite;
+}
+
+@supports (background-clip: text) {
+  .research-shimmer {
+    background: linear-gradient(90deg, var(--s400) 25%, var(--foreground) 50%, var(--s400) 75%);
+    background-size: 200% 100%;
+    background-clip: text;
+    color: transparent;
+    animation: shimmer 1.8s linear infinite;
+  }
+}
+
+@media (prefers-reduced-motion: reduce), (forced-colors: active), print {
+  .research-shimmer {
+    animation: none;
+    background: none;
+    color: inherit;
+  }
 }

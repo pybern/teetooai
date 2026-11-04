@@ -2,7 +2,7 @@ import { randomUUID } from "node:crypto";
 import { streamText } from "ai";
 import { ConnectionError, type SavedModelRunner } from "./connections";
 import type { DatabaseEvidence, HkexQuery } from "./hkex-database";
-import { HKEX_MAX_OUTPUT_TOKENS } from "@/lib/connections";
+import { outputTokenLimit } from "@/lib/connections";
 
 export type SqlExplanationResult = { title: string; tables: string[]; rows: DatabaseEvidence["rows"]; truncated: boolean };
 /** Catalog documentation that lets the explainer state units and meanings. */
@@ -48,14 +48,18 @@ export function createHkexExplanationRunner(id: unknown): SavedModelRunner {
     throw new ConnectionError("These research results expired or are unavailable on this server. Run the question again before requesting an explanation.", 410);
   }
   return async function* ({ model, settings, abortSignal, onError }) {
+    const limit = outputTokenLimit(settings, "explanation");
     const result = streamText({
-      model, abortSignal, maxRetries: 0, maxOutputTokens: HKEX_MAX_OUTPUT_TOKENS,
+      model, abortSignal, maxRetries: 0, maxOutputTokens: limit,
       instructions: explanationInstructions(entry.evidence),
       messages: [{ role: "user", content: JSON.stringify(entry.evidence) }],
       ...(settings.reasoningEffort ? { providerOptions: { savedModel: { reasoningEffort: settings.reasoningEffort } } } : {}),
     });
     for await (const part of result.stream) {
       if (part.type === "error") onError(part.error);
+      if (part.type === "finish" && part.finishReason === "length") {
+        throw new ConnectionError(`The explanation reached its ${limit.toLocaleString("en-US")}-token output limit, which may include thinking tokens. Raise the explanation output-token limit in Configuration, or try again. No automatic retry was performed.`, 502);
+      }
       yield part;
     }
   };
