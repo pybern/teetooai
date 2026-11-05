@@ -1039,6 +1039,24 @@ describe("catalog-guided research", () => {
   });
 });
 
+describe("HKEX evidence formatting", () => {
+  const evidence = {
+    sql: "SELECT", parameters: [], truncated: true,
+    rows: [{ trading_date: "2026-10-30", trading_currency: "HKD", short_selling_value: "1" }],
+    sources: ["https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261030e.htm", "javascript:alert(1)"],
+  };
+  const query = { mode: "market-trend", metric: "short_selling_value", currency: "HKD", stockCodes: [], limit: 100 } as unknown as Parameters<typeof agent.formatHkexEvidence>[0];
+  it("explains that a cut trend keeps the most recent dates and links only HKEX sources", () => {
+    const text = agent.formatHkexEvidence(query, evidence);
+    expect(text).toContain("only the most recent dates fit");
+    expect(text).toContain("(https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261030e.htm)");
+    expect(text).not.toContain("javascript:");
+  });
+  it("keeps the generic partial note for rankings", () => {
+    expect(agent.formatHkexEvidence({ ...query, mode: "ranking" }, evidence)).toContain("more matching data is available");
+  });
+});
+
 describe("stock search resolution", () => {
   const stock = (stock_code: string, stock_name: string, trading_currency = "HKD") => ({ stock_code, stock_name, trading_currency });
   it("prefers an exact name over longer names that contain it", () => {
