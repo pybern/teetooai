@@ -323,8 +323,17 @@ Gateway environment-key precedence; browser connection overrides are ignored.
 Each actual turn sends its question, conversation context and database metadata
 to your configured AI provider and can incur charges. New query results are
 rendered by the server; requesting an explanation explicitly sends their bounded
-evidence to the provider. Later questions include prior textual results in
-conversation context. Chat and tool activity remain in page memory,
+evidence to the provider. Later questions include each earlier research turn
+as a compact record of what ran, in place of its rendered answer: the
+validated template filters, the catalogue SQL that actually executed
+(including a corrected query), failed queries, stock clarifications, row
+counts, dates covered and up to five leading rows (8 columns, values cut to
+60 characters). The record is capped at 8,000 characters; leading rows are
+dropped first, and a turn whose record still does not fit falls back to its
+answer text. This lets follow-ups such as "same for 2025" or "the top stock"
+reuse the earlier query, and it keeps data-heavy turns from filling the
+64,000-character conversation limit. The planner treats these records as
+context for planning, never as evidence. Chat and tool activity remain in page memory,
 not localStorage, history or dashboard pins. **New chat** clears the conversation.
 Database hostnames, credentials and the configured API base URL are not exposed
 by this workspace. Connection editing, configuration chat and initialization
