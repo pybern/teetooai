@@ -395,7 +395,11 @@ Cancellation, timeouts, filtered/refused
 finishes, truncated output, transport and authentication failures do not trigger
 plan repair. Repair remains within the turn's existing deadline and can incur
 up to three additional generation charges (up to five model steps including a draft
-check). The separate single pre-stream HTTP 503 retry remains unchanged.
+check). A repair is not started when less than 20 seconds of the turn remain;
+the error then says planning timed out before the repair could start. When the
+planner checked a SQL draft, each repair is also told the draft SQL and its
+outcome (row count and column names, or the validation/database error), since
+repairs have no tools. The separate single pre-stream HTTP 503 retry remains unchanged.
 HKEX planning and optional explanations use **low thinking effort** when the
 model catalog advertises it, without overwriting the saved model settings.
 Explicit saved `none`/`minimal` efforts are preserved rather than increased.
@@ -411,7 +415,8 @@ factual Markdown tables/charts from returned values. No second narrative call
 or chart-selection round trip is made. Query and chart requests normally
 use **one generation call**, or two when checking a SQL draft, excluding the
 existing single 503 retry.
-Invalid plans may also incur up to three correction calls as described above.
+Invalid plans may also incur up to three correction calls as described above,
+and each failed catalogue SQL query at most one (see [Table catalog and agent SQL](#table-catalog-and-agent-sql)).
 Independent stock lookups run concurrently and identical search strings are
 resolved once per turn. Catalogue SQL queries do not depend on them, so they
 start before the lookups. After all stock filters are resolved and validated,
@@ -493,7 +498,15 @@ per turn; the final step has no tools so it always returns a plan):
 
 The final plan may contain up to three `sqlQueries` alongside the templated HKEX
 queries. The server re-validates and runs them (100-row cap), renders a Markdown
-table with the tables used, and exposes the SQL through **View SQL**. Templated
+table with the tables used, and exposes the SQL through **View SQL**. If a
+final query is rejected by the SQL validator or fails with a PostgreSQL syntax
+or data error (`42xxx` except permissions, or `22xxx`), the server makes **one
+correction request** for that query (`repairSql` in the tool log): no tools, the
+planning output-token limit, the safe error message, and at most 90 seconds
+within the turn deadline (skipped when less than 20 seconds remain). The
+corrected SQL is validated and scoped again before it runs; if that also fails,
+the section says the query could not be completed. Connection, permission,
+read-limit and evidence-size failures are never sent back for correction. Templated
 HKEX queries are still preferred for HKEX rankings/trends because their charts
 are chosen in the plan and validated against HKEX evidence. SQL results get
 their own insight cards and charts (below). Without a catalog (not yet re-initialized) the
