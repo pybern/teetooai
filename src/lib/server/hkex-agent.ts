@@ -55,6 +55,10 @@ function planValidationDetails(error: unknown): string | undefined {
     if (!error.text?.trim()) return "Missing output: the model returned no structured plan.";
     let value: unknown;
     try { value = JSON.parse(error.text); } catch { return "Malformed JSON: the model response was not a valid JSON object."; }
+    if (value === null || typeof value !== "object" || Array.isArray(value)) {
+      const type = value === null ? "null" : Array.isArray(value) ? "array" : typeof value;
+      return `Plan validation failed: plan: expected a JSON object, received ${type}.`;
+    }
     const parsed = hkexPlanSchema.safeParse(value);
     return parsed.success ? "Schema mismatch: the model response could not be validated." : planValidationDetails(parsed.error);
   }
@@ -109,6 +113,7 @@ export function formatHkexEvidence(query: HkexQuery, result: DatabaseEvidence): 
 /** Plan directly from preloaded descriptions, or check one draft with runSql first. */
 export const MAX_AGENT_TOOL_CALLS = 1;
 export const MAX_AGENT_STEPS = 2;
+export const MAX_PLAN_REPAIRS = 3;
 const SQL_PREVIEW_ROWS = 20;
 const SQL_PREVIEW_COLUMNS = 10;
 
@@ -203,8 +208,9 @@ export function createHkexRunner(
     try {
       let plan: z.infer<typeof hkexPlanSchema> | undefined;
       let repairDetails: string | undefined;
+      let repairs = 0;
       let steps = 0;
-      for (let attempt = 0; attempt < 2; attempt++) {
+      for (let attempt = 0; attempt <= MAX_PLAN_REPAIRS; attempt++) {
         finish = undefined;
         const result = streamText({
           model, messages, abortSignal, maxOutputTokens: planningTokens, maxRetries: 0,
@@ -217,10 +223,15 @@ export function createHkexRunner(
           instructions: instructions + (repairDetails
             ? `\n\nYour previous plan failed validation: ${repairDetails}\nRegenerate a complete corrected plan for the original question using the workspace metadata. No tools are available. Return only the structured plan; do not repeat the invalid response.`
             : ""),
-          output: Output.object({ schema: hkexPlanOutputSchema }),
+          output: Output.object({
+            schema: hkexPlanOutputSchema,
+            name: "hkexResearchPlan",
+            description: "One research plan object containing clarification, queries and sqlQueries.",
+          }),
           ...(settings.reasoningEffort ? { providerOptions: { savedModel: { reasoningEffort: settings.reasoningEffort } } } : {}),
         });
         try {
+          const repairStopped = attempt === 0 ? "No automatic repair was performed." : "No further automatic repair was performed.";
           for await (const part of result.stream) {
             if (part.type === "error") { onError(part.error); throw part.error; }
             if (part.type === "abort") {
@@ -231,27 +242,28 @@ export function createHkexRunner(
             if (part.type === "reasoning-start" || part.type === "reasoning-delta" || part.type === "reasoning-end") yield part;
           }
           if (finish?.finishReason === "length") {
-            throw new ConnectionError(`Research planning reached its ${planningTokens.toLocaleString("en-US")}-token output limit, which may include thinking tokens. No final data query was executed. Try a narrower question, or raise the planning output-token limit in Configuration. No automatic repair was performed.`, 502);
+            throw new ConnectionError(`Research planning reached its ${planningTokens.toLocaleString("en-US")}-token output limit, which may include thinking tokens. No final data query was executed. Try a narrower question, or raise the planning output-token limit in Configuration. ${repairStopped}`, 502);
           }
           if (abortSignal.aborted) throw abortSignal.reason;
-          if (finish?.finishReason === "content-filter") throw new ConnectionError("The model declined or filtered this research request. No automatic repair was performed.", 502);
-          if (!finish || finish.finishReason !== "stop") throw new ConnectionError("Research planning did not complete. No automatic repair was performed.", 502);
+          if (finish?.finishReason === "content-filter") throw new ConnectionError(`The model declined or filtered this research request. ${repairStopped}`, 502);
+          if (!finish || finish.finishReason !== "stop") throw new ConnectionError(`Research planning did not complete. ${repairStopped}`, 502);
           plan = hkexPlanSchema.parse(await result.output);
           steps += (await result.steps).length;
           break;
         } catch (error) {
           const details = planValidationDetails(error);
           if (!details || abortSignal.aborted || finish?.finishReason !== "stop") throw error;
-          if (attempt === 1) throw new ConnectionError(`${details} The single automatic plan repair also failed. No final data query was executed. Try again or choose a model that supports JSON-schema structured output.`, 502);
+          if (attempt === MAX_PLAN_REPAIRS) throw new ConnectionError(`${details} All ${MAX_PLAN_REPAIRS} automatic plan repairs failed. No final data query was executed. Use Test connection in Configuration to check strict JSON-schema compatibility, or choose another model.`, 502);
           steps += (await result.steps).length;
           repairDetails = details;
-          onToolActivity({ id: planId, tool: "planResearch", status: "running", summary: `${details} Attempting one automatic plan repair without tools; an additional model call may incur charges.` });
+          repairs++;
+          onToolActivity({ id: planId, tool: "planResearch", status: "running", summary: `${details} Attempting automatic plan repair ${repairs} of ${MAX_PLAN_REPAIRS} without tools; an additional model call may incur charges.` });
         }
       }
       if (!plan || !finish) throw new ConnectionError("Research planning did not produce a validated plan.", 502);
       onToolActivity({
         id: planId, tool: "planResearch", status: "complete",
-        summary: `Validated ${plan.queries.length + plan.sqlQueries.length} queries in ${steps === 1 ? "one model request" : `${steps} model steps`}${repairDetails ? " after one automatic plan repair" : ""}.`,
+        summary: `Validated ${plan.queries.length + plan.sqlQueries.length} queries in ${steps === 1 ? "one model request" : `${steps} model steps`}${repairs ? ` after ${repairs} automatic plan repair${repairs === 1 ? "" : "s"}` : ""}.`,
       });
       // The answer streams section by section in plan order as each query finishes.
       yield { type: "text-start", id: "research" };
@@ -370,7 +382,7 @@ export function createHkexRunner(
     } catch (error) {
       onToolActivity({ id: planId, tool: "planResearch", status: "error", summary: "Research did not complete. Previously streamed steps remain available for inspection." });
       if (NoObjectGeneratedError.isInstance(error) || NoOutputGeneratedError.isInstance(error)) {
-        throw new ConnectionError(`${planValidationDetails(error)} No final data query was executed. Research did not finish normally, so no automatic repair was performed.`, 502);
+        throw new ConnectionError(`${planValidationDetails(error)} No final data query was executed. Research did not finish normally, so no further automatic repair was performed.`, 502);
       }
       throw error;
     }

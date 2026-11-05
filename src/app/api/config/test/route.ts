@@ -1,6 +1,6 @@
 import {
   authorizeConfiguration, configurationError, ConnectionError, loadConnections,
-  loadBootstrapConnections, parseApi, parseDatabase, readConfigurationBody, testApi, testDatabase,
+  loadConfiguredBootstrapConnections, parseApi, parseDatabase, readConfigurationBody, testApi, testDatabase,
 } from "@/lib/server/connections";
 
 export async function POST(request: Request) {
@@ -10,7 +10,7 @@ export async function POST(request: Request) {
     if (body.kind !== "api" && body.kind !== "database") throw new ConnectionError("Choose api or database.");
     const result = body.kind === "api"
       ? await testApi(parseApi(body.settings, (await loadConnections()).api))
-      : await testDatabase(parseDatabase(body.settings, (await loadBootstrapConnections()).database));
+      : await testDatabase(parseDatabase(body.settings, (await loadConfiguredBootstrapConnections()).database));
     return Response.json(result, { headers: { "Cache-Control": "no-store" } });
   } catch (error) { return configurationError(error); }
 }

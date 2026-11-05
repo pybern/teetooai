@@ -54,8 +54,9 @@ Token limits (`src/lib/connections.ts`): `OUTPUT_TOKEN_STEPS = ["planning", "cha
 `src/lib/server/hkex-agent.ts` `createHkexRunner`:
 - Emits `loadResearchSkill` and `inspectDatabase` activities, then `planResearch` (running).
 - Instructions: `HKEX_AGENT_INSTRUCTIONS` + `PRELOADED_CATALOG_INSTRUCTIONS` (or `NO_CATALOG_INSTRUCTIONS`) + the workspace line (`useCase.name`, `persona`, `scenario`) + `HKEX_RESEARCH_SKILL` + metadata + workspace tables + `HKEX_CHART_OPTIONS`, all from `hkex-skills.ts`.
-- `streamText` with `Output.object({ schema: hkexPlanOutputSchema })`, `maxOutputTokens: outputTokenLimit(settings, "planning")` and `maxRetries: 0`. With a catalog: tools `{ runSql }`, `stopWhen: isStepCount(MAX_AGENT_STEPS)`, and `prepareStep` withdraws tools on the final step. `MAX_AGENT_TOOL_CALLS = 1`.
-- Validation is `hkexPlanSchema`: clarification XOR ≥1 query; ≤3 `queries`, ≤3 `sqlQueries`, ≤5 stock searches. `planValidationDetails` produces sanitized messages. One repair attempt (no tools) for schema failures after a normal finish. `finishReason === "length"` → step-specific error with the configured limit and no repair.
+- `streamText` with `Output.object({ schema: hkexPlanOutputSchema, name: "hkexResearchPlan", description: ... })`, `maxOutputTokens: outputTokenLimit(settings, "planning")` and `maxRetries: 0`. With a catalog: tools `{ runSql }`, `stopWhen: isStepCount(MAX_AGENT_STEPS)`, and `prepareStep` withdraws tools on the final step. `MAX_AGENT_TOOL_CALLS = 1`.
+- Validation is `hkexPlanSchema`: clarification XOR ≥1 query; ≤3 `queries`, ≤3 `sqlQueries`, ≤5 stock searches. `planValidationDetails` produces sanitized messages, including the received type for non-object roots. Up to `MAX_PLAN_REPAIRS = 3` repair attempts (no tools) for schema failures after a normal finish; every correction uses the latest safe diagnostic and the original deadline. `finishReason === "length"` stops with the configured limit and no further repair.
+- Configuration `testApi` sends one strict JSON-schema probe, using the planning token budget and 15-second test timeout. A normal finish and schema-valid feedback are required; passing this small probe does not guarantee every research plan will succeed.
 
 ## 6. Query execution and answer
 
@@ -100,7 +101,7 @@ Still in `createHkexRunner`, after a valid plan:
 |---|---|
 | "API request timed out after N seconds" | `HKEX_SERVER_TIMEOUT_MS`. Check which step was slow in the tool log. Prefer raising a token limit or narrowing the question over raising time. Keep server < `maxDuration` < client. |
 | "...reached its N-token output limit" | The step named in the message (planning, chart, explanation). Raise it in Configuration → Research output-token limits. Planning truncation never runs queries. |
-| Plan validation / repair errors | `hkexPlanSchema`, `planValidationDetails`, and the instructions and JSON examples in `hkex-skills.ts`. The model must support JSON-schema structured output. |
+| Plan validation / repair errors | `hkexPlanSchema`, `planValidationDetails`, and the instructions and JSON examples in `hkex-skills.ts`. The model must support JSON-schema structured output. Configuration's Test connection verifies a basic schema probe; research still validates each plan and stops after three failed repairs. |
 | "This query could not be completed" | `validateAgentSql` rejection (relation, function or node not allowed, or out of scope) or a database error. The `querySql` activity shows the SQL. |
 | No chart for a SQL answer | Was the result chartable (`isChartable`; no `chooseChart` entry means it wasn't)? Did `chooseChart` decline ("A chart would not add..."), or produce a `renderChart` error naming the failed rule? A `chooseChart` error shows only the generic "No chart was added" message. The real cause (token limit, schema or provider failure) is not surfaced, so reproduce it in `hkex-agent.test.ts` or add logging. |
 | No insight card for a SQL answer | `buildSqlInsights` returned null: no clear axis or measure, a single row, or repeated axis values. |
