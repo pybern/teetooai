@@ -6,6 +6,7 @@ import { setTimeout as delay } from "node:timers/promises";
 import { Client } from "pg";
 import { APICallError, createUIMessageStream, createUIMessageStreamResponse, streamText, type UIMessage, type LanguageModel, type TextStreamPart, type ToolSet } from "ai";
 import { createOpenAICompatible } from "@ai-sdk/openai-compatible";
+import { z } from "zod";
 import {
   DEFAULT_CONNECTIONS, isVercelAiGateway, type ApiSettings, type Connections, type ConnectionTestResult,
   isReasoningEffort, modelReasoningEfforts, type ModelCatalog, type ReasoningEffort,
@@ -202,6 +203,57 @@ export async function loadBootstrapConnections(): Promise<Partial<Connections>> 
   };
 }
 
+function environmentApi(): ApiSettings | undefined {
+  const keys = ["LLM_BASE_URL", "LLM_MODEL", "LLM_API_KEY", "LLM_REASONING_EFFORT",
+    "LLM_PLANNING_OUTPUT_TOKENS", "LLM_CHART_OUTPUT_TOKENS", "LLM_EXPLANATION_OUTPUT_TOKENS"];
+  if (!keys.some((key) => process.env[key]?.trim())) return undefined;
+  if (!process.env.LLM_BASE_URL?.trim() || !process.env.LLM_MODEL?.trim()) {
+    throw new ConnectionError("Environment configuration requires both LLM_BASE_URL and LLM_MODEL.", 503);
+  }
+  return parseApi({
+    baseUrl: process.env.LLM_BASE_URL,
+    model: process.env.LLM_MODEL,
+    apiKey: process.env.LLM_API_KEY ?? "",
+    reasoningEffort: process.env.LLM_REASONING_EFFORT,
+    outputTokens: Object.fromEntries(OUTPUT_TOKEN_STEPS.map((step) => {
+      const value = process.env[`LLM_${step.toUpperCase()}_OUTPUT_TOKENS`];
+      return [step, value?.trim() ? Number(value) : undefined];
+    })),
+  });
+}
+
+function environmentDatabase(): DatabaseSettings | undefined {
+  const keys = ["DB_HOST", "DB_PORT", "DB_DATABASE", "DB_USERNAME", "DB_PASSWORD", "DB_SSL", "DB_CA_CERTIFICATE"];
+  if (!keys.some((key) => process.env[key]?.trim())) return undefined;
+  if (!process.env.DB_HOST?.trim() || !process.env.DB_DATABASE?.trim() || !process.env.DB_USERNAME?.trim()) {
+    throw new ConnectionError("Environment configuration requires DB_HOST, DB_DATABASE and DB_USERNAME.", 503);
+  }
+  const ssl = process.env.DB_SSL?.trim() || "true";
+  if (ssl !== "true" && ssl !== "false") {
+    throw new ConnectionError("DB_SSL must be true or false.", 503);
+  }
+  return parseDatabase({
+    host: process.env.DB_HOST,
+    port: process.env.DB_PORT?.trim() ? Number(process.env.DB_PORT) : 5432,
+    database: process.env.DB_DATABASE,
+    username: process.env.DB_USERNAME,
+    password: process.env.DB_PASSWORD ?? "",
+    ssl: ssl === "true",
+    caCertificate: process.env.DB_CA_CERTIFICATE ?? "",
+  });
+}
+
+export async function loadConfiguredBootstrapConnections(): Promise<Partial<Connections>> {
+  const api = environmentApi();
+  const database = environmentDatabase();
+  if (api && database) return { api, database };
+  const saved = await loadConnectionDocument();
+  return {
+    ...(api ? { api } : saved.api === undefined ? {} : { api: parseApi(saved.api) }),
+    ...(database ? { database } : saved.database === undefined ? {} : { database: parseDatabase(saved.database) }),
+  };
+}
+
 async function writeConnectionDocument(document: Record<string, unknown>) {
   const file = configPath();
   await mkdir(path.dirname(file), { recursive: true, mode: 0o700 });
@@ -250,13 +302,15 @@ async function readStoredApi(client: Client): Promise<{ initialized: boolean; ap
 }
 
 async function resolveSavedApi(saved: Partial<Connections>): Promise<ApiSettings | undefined> {
+  const api = environmentApi();
+  if (api) return api;
   if (!saved.database) return saved.api;
   const stored = await withConfigurationDatabase(saved.database, readStoredApi);
   return stored.initialized ? stored.api : saved.api;
 }
 
 export async function loadConnections(): Promise<Connections> {
-  const saved = await loadBootstrapConnections();
+  const saved = await loadConfiguredBootstrapConnections();
   return {
     api: await resolveSavedApi(saved) ?? structuredClone(DEFAULT_CONNECTIONS.api),
     database: saved.database ?? structuredClone(DEFAULT_CONNECTIONS.database),
@@ -264,12 +318,14 @@ export async function loadConnections(): Promise<Connections> {
 }
 
 export async function loadSavedApi(): Promise<ApiSettings> {
-  const api = await resolveSavedApi(await loadBootstrapConnections());
+  const api = environmentApi() ?? await resolveSavedApi(await loadConfiguredBootstrapConnections());
   if (!api) throw new ConnectionError("Save your API settings before starting a model chat.", 409);
   return api;
 }
 
 export async function loadSavedDatabase(): Promise<DatabaseSettings> {
+  const database = environmentDatabase();
+  if (database) return database;
   const saved = await loadConnectionDocument();
   if (saved.database === undefined) throw new ConnectionError("Save your database settings before using database operations.", 409);
   return parseDatabase(saved.database);
@@ -304,6 +360,9 @@ export function updateConnectionStorage<T>(update: () => Promise<T>): Promise<T>
 export function saveConnection(kind: "api" | "database", value: unknown): Promise<PublicConnections> {
   modelCatalogs.clear();
   return updateConnectionStorage(async () => {
+    if (kind === "api" ? environmentApi() : environmentDatabase()) {
+      throw new ConnectionError("This connection is managed by environment variables. Edit .env.local or your deployment environment and restart/redeploy; saved settings would not override it.", 409);
+    }
     const saved = await loadBootstrapConnections();
     if (kind === "database") {
       const database = parseDatabase(value, saved.database ?? DEFAULT_CONNECTIONS.database);
@@ -335,7 +394,8 @@ export function saveConnection(kind: "api" | "database", value: unknown): Promis
         throw error;
       }
     };
-    const stored = saved.database ? await withConfigurationDatabase(saved.database, persistApi) : undefined;
+    const database = environmentDatabase() ?? saved.database;
+    const stored = database ? await withConfigurationDatabase(database, persistApi) : undefined;
     const api = stored ?? parseApi(value, saved.api ?? DEFAULT_CONNECTIONS.api);
     if (stored) {
       try { await removeLegacyApi(); } catch {
@@ -344,7 +404,7 @@ export function saveConnection(kind: "api" | "database", value: unknown): Promis
     } else {
       await writeConnectionDocument({ ...saved, api });
     }
-    return publicConnections({ api, database: saved.database ?? DEFAULT_CONNECTIONS.database });
+    return publicConnections({ api, database: database ?? DEFAULT_CONNECTIONS.database });
   });
 }
 
@@ -461,6 +521,11 @@ async function checkReasoningEffort(settings: ApiSettings, signal?: AbortSignal,
   return settings;
 }
 
+const connectionProbeSchema = z.object({
+  ok: z.literal(true),
+  feedback: z.string().min(1).max(2000),
+}).strict();
+
 async function completeApi(
   settings: ApiSettings, messages: ModelChatMessage[], maxTokens: number, timeoutMs: number, signal?: AbortSignal,
 ): Promise<{ feedback: string; durationMs: number }> {
@@ -475,6 +540,14 @@ async function completeApi(
         model: settings.model,
         messages,
         max_tokens: maxTokens, stream: false,
+        response_format: {
+          type: "json_schema",
+          json_schema: {
+            name: "researchConnectionProbe",
+            strict: true,
+            schema: z.toJSONSchema(connectionProbeSchema),
+          },
+        },
         ...(settings.reasoningEffort ? { reasoning_effort: settings.reasoningEffort } : {}),
       }),
       signal: signal ? AbortSignal.any([signal, AbortSignal.timeout(timeoutMs)]) : AbortSignal.timeout(timeoutMs),
@@ -489,11 +562,35 @@ async function completeApi(
       if (error instanceof SyntaxError) throw new ConnectionError("API returned invalid JSON, not an OpenAI-compatible reply.", 502);
       throw error;
     }
-    const reply = (body as { choices?: { message?: { content?: unknown } }[] } | null)?.choices?.[0]?.message?.content;
+    const completion = z.object({
+      choices: z.array(z.object({
+        finish_reason: z.string(),
+        message: z.object({ content: z.string().nullable(), refusal: z.string().nullable().optional() }),
+      })).min(1),
+    }).safeParse(body);
+    if (!completion.success) {
+      throw new ConnectionError("API returned an incomplete OpenAI-compatible completion. The structured-output test did not pass.", 502);
+    }
+    const choice = completion.data.choices[0];
+    if (choice.finish_reason === "length") {
+      throw new ConnectionError(`The connection test reached its ${maxTokens.toLocaleString("en-US")}-token output limit. Lower thinking effort or raise the planning output-token limit, then test again.`, 502);
+    }
+    if (choice.finish_reason !== "stop" || choice.message.refusal) {
+      throw new ConnectionError("API did not finish the structured-output connection test normally. The test did not pass.", 502);
+    }
+    const reply = choice.message.content;
     if (typeof reply !== "string" || !reply.trim()) {
       throw new ConnectionError("API responded, but returned no non-empty assistant feedback. The test did not pass.", 502);
     }
-    return { feedback: redact(reply.trim(), [settings.apiKey]), durationMs: Date.now() - start };
+    let value: unknown;
+    try { value = JSON.parse(reply); } catch {
+      throw new ConnectionError("API returned assistant text instead of valid JSON-schema structured output. Choose a model and endpoint that support strict JSON-schema output for research.", 502);
+    }
+    const probe = connectionProbeSchema.safeParse(value);
+    if (!probe.success || !probe.data.feedback.trim()) {
+      throw new ConnectionError("API assistant output did not match the requested strict JSON schema. The research compatibility test did not pass.", 502);
+    }
+    return { feedback: redact(probe.data.feedback.trim(), [settings.apiKey]), durationMs: Date.now() - start };
   } catch (error) {
     if (error instanceof ConnectionError) throw error;
     if (signal?.aborted) throw new ConnectionError("Model request was cancelled.", 499);
@@ -504,9 +601,9 @@ async function completeApi(
 
 export async function testApi(settings: ApiSettings): Promise<ConnectionTestResult> {
   const result = await completeApi(settings, [
-    { role: "user", content: "Reply with a short confirmation that this connection test reached you." },
-  ], 64, TIMEOUT_MS);
-  return { ok: true, message: "Model feedback received.", ...result, feedback: result.feedback.slice(0, 2000) };
+    { role: "user", content: 'Return one JSON object matching the requested schema: {"ok":true,"feedback":"Connection confirmed."}. Use a short confirmation for feedback, no Markdown or extra fields.' },
+  ], outputTokenLimit(settings, "planning"), TIMEOUT_MS);
+  return { ok: true, message: "Model feedback and strict JSON-schema output verified. Research plans are still validated on every request.", ...result };
 }
 
 export type SavedModelRunOptions = {

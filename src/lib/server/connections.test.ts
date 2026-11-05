@@ -25,7 +25,7 @@ vi.mock("pg", () => ({
 
 import {
   authorizeConfiguration, listApiModels, listApiModelCatalog, loadConnections, parseApi, parseApiEndpoint, parseDatabase,
-  loadSavedApi, publicConnections, saveConnection, testApi, testDatabase,
+  loadSavedApi, loadSavedDatabase, loadBootstrapConnections, publicConnections, saveConnection, testApi, testDatabase,
   configurationError,
 } from "./connections";
 import { GET, PUT } from "@/app/api/config/route";
@@ -47,6 +47,10 @@ let providerBody = "";
 let providerStream: string | undefined;
 let streamingHandler: ((response: ServerResponse) => void) | undefined;
 let received: { path?: string; method?: string; authorization?: string; body?: Record<string, unknown> };
+
+function probeCompletion(feedback = "Connection confirmed.") {
+  return { choices: [{ finish_reason: "stop", message: { content: JSON.stringify({ ok: true, feedback }) } }] };
+}
 
 function configRequest(method = "GET", body?: unknown, token = adminToken) {
   return new Request("http://localhost/api/config", {
@@ -86,6 +90,11 @@ beforeAll(async () => {
 });
 
 beforeEach(() => {
+  for (const key of ["LLM_BASE_URL", "LLM_MODEL", "LLM_API_KEY", "LLM_REASONING_EFFORT",
+    "LLM_PLANNING_OUTPUT_TOKENS", "LLM_CHART_OUTPUT_TOKENS", "LLM_EXPLANATION_OUTPUT_TOKENS",
+    "DB_HOST", "DB_PORT", "DB_DATABASE", "DB_USERNAME", "DB_PASSWORD", "DB_SSL", "DB_CA_CERTIFICATE"]) {
+    vi.stubEnv(key, "");
+  }
   vi.stubEnv("AI_GATEWAY_API_KEY", "");
   vi.stubEnv("CONFIG_ADMIN_TOKEN", adminToken);
   vi.stubEnv("CONNECTION_CONFIG_PATH", path.join(directory, `${crypto.randomUUID()}.json`));
@@ -253,6 +262,155 @@ describe("persistent settings", () => {
   });
 });
 
+describe("environment-first connection settings", () => {
+  function setApiEnvironment() {
+    vi.stubEnv("LLM_BASE_URL", api.baseUrl);
+    vi.stubEnv("LLM_MODEL", "environment-model");
+    vi.stubEnv("LLM_API_KEY", "environment-api-secret");
+  }
+  function setDatabaseEnvironment() {
+    vi.stubEnv("DB_HOST", "environment-db.example.test");
+    vi.stubEnv("DB_DATABASE", database.database);
+    vi.stubEnv("DB_USERNAME", database.username);
+    vi.stubEnv("DB_PASSWORD", "environment-db-secret");
+  }
+
+  it("loads both groups without touching corrupt legacy storage or PostgreSQL", async () => {
+    await writeFile(process.env.CONNECTION_CONFIG_PATH!, "invalid JSON");
+    setApiEnvironment();
+    setDatabaseEnvironment();
+    vi.stubEnv("LLM_REASONING_EFFORT", "high");
+    vi.stubEnv("LLM_PLANNING_OUTPUT_TOKENS", "8192");
+    vi.stubEnv("LLM_CHART_OUTPUT_TOKENS", "256");
+    vi.stubEnv("LLM_EXPLANATION_OUTPUT_TOKENS", "32768");
+    const loaded = await loadConnections();
+    expect(loaded.api).toEqual({
+      baseUrl: api.baseUrl, model: "environment-model", apiKey: "environment-api-secret",
+      reasoningEffort: "high", outputTokens: { planning: 8192, chart: 256, explanation: 32768 },
+    });
+    expect(loaded.database).toEqual({
+      ...database, host: "environment-db.example.test", password: "environment-db-secret",
+    });
+    expect(await loadSavedApi()).toEqual(loaded.api);
+    expect(await loadSavedDatabase()).toEqual(loaded.database);
+    expect(pg.connect).not.toHaveBeenCalled();
+    const response = await GET(configRequest());
+    expect(response.status).toBe(200);
+    expect(await response.text()).not.toContain("environment-api-secret");
+    expect(JSON.stringify(publicConnections(loaded))).not.toContain("environment-db-secret");
+  });
+
+  it("uses env LLM with the saved database without querying the configuration table", async () => {
+    await writeFile(process.env.CONNECTION_CONFIG_PATH!, JSON.stringify({ api: "invalid", database }));
+    setApiEnvironment();
+    expect((await loadConnections()).database).toEqual(database);
+    expect((await loadSavedApi()).model).toBe("environment-model");
+    expect(pg.connect).not.toHaveBeenCalled();
+  });
+
+  it("uses env database for PostgreSQL API reads and saves without persisting env credentials", async () => {
+    setDatabaseEnvironment();
+    let stored = api;
+    pg.query.mockImplementation(async (sql: string, parameters?: string[]) => {
+      if (sql.includes("to_regclass")) return { rows: [{ relation: "insightful_configuration" }] };
+      if (sql.startsWith("SELECT settings")) return { rows: [{ settings: stored }] };
+      if (sql.startsWith("INSERT")) stored = JSON.parse(parameters![0]);
+      return { rows: [] };
+    });
+    expect((await loadConnections()).api).toEqual(api);
+    expect(pg.options).toHaveBeenCalledWith(expect.objectContaining({ host: "environment-db.example.test", password: "environment-db-secret" }));
+    await saveConnection("api", { ...api, model: "updated" });
+    expect((await loadSavedApi()).model).toBe("updated");
+    expect(await loadBootstrapConnections()).toEqual({});
+  });
+
+  it("keeps file-based API fallback and independent database loading", async () => {
+    await writeFile(process.env.CONNECTION_CONFIG_PATH!, JSON.stringify({ api }));
+    setDatabaseEnvironment();
+    expect((await loadConnections()).api).toEqual(api);
+    expect((await loadSavedDatabase()).host).toBe("environment-db.example.test");
+    await saveConnection("api", api);
+    expect(await loadBootstrapConnections()).toEqual({ api });
+    vi.stubEnv("LLM_BASE_URL", "invalid");
+    expect((await loadSavedDatabase()).host).toBe("environment-db.example.test");
+  });
+
+  it("does not inherit secrets or optional settings from another saved endpoint", async () => {
+    await writeFile(process.env.CONNECTION_CONFIG_PATH!, JSON.stringify({ api: { ...api, reasoningEffort: "high" }, database }));
+    setApiEnvironment();
+    setDatabaseEnvironment();
+    vi.stubEnv("LLM_API_KEY", "");
+    vi.stubEnv("DB_PASSWORD", "");
+    expect((await loadSavedApi()).apiKey).toBe("");
+    expect((await loadSavedApi()).reasoningEffort).toBeUndefined();
+    expect((await loadSavedDatabase()).password).toBe("");
+  });
+
+  it("rejects saves of env-managed groups and leaves existing fallback data untouched", async () => {
+    const content = JSON.stringify({ api, database });
+    await writeFile(process.env.CONNECTION_CONFIG_PATH!, content);
+    setApiEnvironment();
+    setDatabaseEnvironment();
+    for (const kind of ["api", "database"] as const) {
+      const response = await PUT(configRequest("PUT", { kind, settings: kind === "api" ? api : database }));
+      expect(response.status).toBe(409);
+      expect(await response.text()).toContain("managed by environment");
+    }
+    expect(await readFile(process.env.CONNECTION_CONFIG_PATH!, "utf8")).toBe(content);
+    expect(pg.query).not.toHaveBeenCalled();
+  });
+
+  it("retains database saving when only the LLM group is environment-managed", async () => {
+    setApiEnvironment();
+    await saveConnection("database", database);
+    expect(await loadBootstrapConnections()).toEqual({ database });
+    expect(pg.query).not.toHaveBeenCalled();
+  });
+
+  it("preserves omitted env database passwords during connection tests", async () => {
+    setDatabaseEnvironment();
+    const settings = { ...database };
+    delete settings.password;
+    const response = await POST(configRequest("POST", { kind: "database", settings }));
+    expect(response.status).toBe(200);
+    expect(pg.options).toHaveBeenCalledWith(expect.objectContaining({ password: "environment-db-secret" }));
+  });
+
+  it.each([
+    ["LLM_BASE_URL", api.baseUrl, "LLM_MODEL"],
+    ["LLM_API_KEY", "secret", "LLM_BASE_URL"],
+    ["DB_HOST", database.host, "DB_DATABASE"],
+    ["DB_PASSWORD", "secret", "DB_HOST"],
+  ])("rejects incomplete env groups (%s) instead of using saved settings", async (key, value, message) => {
+    await writeFile(process.env.CONNECTION_CONFIG_PATH!, JSON.stringify({ api, database }));
+    vi.stubEnv(key, value);
+    await expect(loadConnections()).rejects.toThrow(message);
+  });
+
+  it.each([
+    ["LLM_BASE_URL", "not-a-url"], ["LLM_REASONING_EFFORT", "invalid"],
+    ["LLM_PLANNING_OUTPUT_TOKENS", "255"], ["LLM_CHART_OUTPUT_TOKENS", "32769"],
+    ["LLM_EXPLANATION_OUTPUT_TOKENS", "1.5"], ["DB_PORT", "0"],
+    ["DB_PORT", "not-a-number"], ["DB_SSL", "yes"], ["DB_CA_CERTIFICATE", "invalid"],
+  ])("validates environment values (%s)", async (key, value) => {
+    setApiEnvironment();
+    setDatabaseEnvironment();
+    vi.stubEnv(key, value);
+    await expect(loadConnections()).rejects.toThrow();
+  });
+
+  it("restores legacy settings when environment groups are removed", async () => {
+    await writeFile(process.env.CONNECTION_CONFIG_PATH!, JSON.stringify({ api, database }));
+    setApiEnvironment();
+    setDatabaseEnvironment();
+    expect((await loadConnections()).api.model).toBe("environment-model");
+    for (const key of ["LLM_BASE_URL", "LLM_MODEL", "LLM_API_KEY", "DB_HOST", "DB_DATABASE", "DB_USERNAME", "DB_PASSWORD"]) {
+      vi.stubEnv(key, "");
+    }
+    expect(await loadConnections()).toEqual({ api, database });
+  });
+});
+
 describe("PostgreSQL API configuration storage", () => {
   let stored: ApiSettings | undefined;
   beforeEach(async () => {
@@ -350,9 +508,7 @@ describe("Gateway environment-key precedence", () => {
   const environmentKey = "test-environment-gateway-key";
   beforeEach(() => { vi.stubEnv("AI_GATEWAY_API_KEY", environmentKey); });
   it("uses and redacts the environment key for connection feedback", async () => {
-    const fetchSpy = vi.spyOn(globalThis, "fetch").mockResolvedValueOnce(Response.json({
-      choices: [{ message: { content: `Received ${environmentKey}` } }],
-    }));
+    const fetchSpy = vi.spyOn(globalThis, "fetch").mockResolvedValueOnce(Response.json(probeCompletion(`Received ${environmentKey}`)));
     const result = await testApi({ ...DEFAULT_CONNECTIONS.api, apiKey: "configured-key" });
     expect(new Headers(fetchSpy.mock.calls[0][1]?.headers).get("Authorization")).toBe(`Bearer ${environmentKey}`);
     expect(result.feedback).toBe("Received [redacted]");
@@ -371,7 +527,7 @@ describe("Gateway environment-key precedence", () => {
   });
   it.each(["", "   "])("uses the configured key when the environment variable is blank (%s)", async (value) => {
     vi.stubEnv("AI_GATEWAY_API_KEY", value);
-    const fetchSpy = vi.spyOn(globalThis, "fetch").mockResolvedValue(Response.json({ choices: [{ message: { content: "Confirmed" } }] }));
+    const fetchSpy = vi.spyOn(globalThis, "fetch").mockResolvedValue(Response.json(probeCompletion("Confirmed")));
     await testApi({ ...DEFAULT_CONNECTIONS.api, apiKey: "configured-key" });
     expect(new Headers(fetchSpy.mock.calls[0][1]?.headers).get("Authorization")).toBe("Bearer configured-key");
   });
@@ -380,7 +536,7 @@ describe("Gateway environment-key precedence", () => {
     "https://ai-gateway.vercel.sh:8443/v1", "http://ai-gateway.vercel.sh/v1",
     "https://ai-gateway.vercel.sh/other-proxy/v1",
   ])("never sends the environment credential to another endpoint (%s)", async (url) => {
-    const fetchSpy = vi.spyOn(globalThis, "fetch").mockResolvedValue(Response.json({ choices: [{ message: { content: "Confirmed" } }] }));
+    const fetchSpy = vi.spyOn(globalThis, "fetch").mockResolvedValue(Response.json(probeCompletion("Confirmed")));
     await testApi({ ...api, baseUrl: url });
     expect(new Headers(fetchSpy.mock.calls[0][1]?.headers).get("Authorization")).toBe(`Bearer ${api.apiKey}`);
   });
@@ -394,10 +550,11 @@ describe("Gateway environment-key precedence", () => {
 });
 
 describe("real HTTP model test", () => {
+  beforeEach(() => { providerBody = JSON.stringify(probeCompletion()); });
   it("validates advertised effort before sending the connection test override", async () => {
     const fetchSpy = vi.spyOn(globalThis, "fetch")
       .mockResolvedValueOnce(Response.json({ data: [{ id: api.model, reasoning_options: [{ type: "effort", values: ["low", "high"] }] }] }))
-      .mockResolvedValueOnce(Response.json({ choices: [{ message: { content: "Confirmed" } }] }));
+      .mockResolvedValueOnce(Response.json(probeCompletion("Confirmed")));
     expect((await testApi({ ...api, reasoningEffort: "high" })).ok).toBe(true);
     expect(fetchSpy).toHaveBeenCalledTimes(2);
     expect(fetchSpy.mock.calls[0][0]).toBe(`${api.baseUrl}/models`);
@@ -410,19 +567,62 @@ describe("real HTTP model test", () => {
     await expect(testApi({ ...api, reasoningEffort: "high" })).rejects.toThrow("does not advertise");
     expect(fetchSpy).toHaveBeenCalledOnce();
   });
-  it("sends a chat request and requires actual assistant feedback", async () => {
+  it("verifies strict structured output and retains actual assistant feedback in one request", async () => {
     const result = await testApi({ ...api, baseUrl });
     expect(result).toMatchObject({ ok: true, feedback: "Connection confirmed." });
     expect(result.durationMs).toBeGreaterThanOrEqual(0);
     expect(received).toMatchObject({
       path: "/v1/chat/completions",
       authorization: `Bearer ${api.apiKey}`,
-      body: { model: api.model, stream: false, max_tokens: 64 },
+      body: {
+        model: api.model, stream: false, max_tokens: 4096,
+        response_format: {
+          type: "json_schema",
+          json_schema: {
+            name: "researchConnectionProbe", strict: true,
+            schema: { type: "object", required: ["ok", "feedback"], additionalProperties: false },
+          },
+        },
+      },
     });
+    expect(result.message).toContain("strict JSON-schema output verified");
   });
-  it.each(["{}", '{"choices":[]}', '{"choices":[{"message":{"content":"  "}}]}', "null"])("does not pass HTTP 200 without feedback: %s", async (body) => {
+  it.each(["{}", '{"choices":[]}', '{"choices":[{"message":{"content":"  "}}]}', "null", '{"choices":"private upstream details"}'])("does not pass HTTP 200 with an incomplete completion: %s", async (body) => {
     providerBody = body;
+    await expect(testApi({ ...api, baseUrl })).rejects.toThrow("incomplete OpenAI-compatible completion");
+  });
+  it.each([null, "", "   "])("rejects normally finished responses without feedback (%s)", async (content) => {
+    providerBody = JSON.stringify({ choices: [{ finish_reason: "stop", message: { content } }] });
     await expect(testApi({ ...api, baseUrl })).rejects.toThrow("no non-empty assistant feedback");
+  });
+  it.each([
+    "Connection confirmed.", '{"ok":true,', "null", "[]",
+    JSON.stringify(JSON.stringify({ ok: true, feedback: "Confirmed" })),
+    JSON.stringify({ ok: false, feedback: "Confirmed" }),
+    JSON.stringify({ ok: true, feedback: " " }),
+    JSON.stringify({ ok: true, feedback: "Confirmed", "private-secret": "hidden" }),
+  ])("rejects ignored or violated schemas without reflecting output (%s)", async (content) => {
+    providerBody = JSON.stringify({ choices: [{ finish_reason: "stop", message: { content } }] });
+    const error = await testApi({ ...api, baseUrl }).catch((error: unknown) => error);
+    expect(error).toBeInstanceOf(Error);
+    expect(String(error)).toMatch(/JSON-schema|strict JSON schema/);
+    expect(String(error)).not.toMatch(/private-secret|hidden/);
+  });
+  it.each(["length", "content_filter", "tool_calls"])("does not accept valid JSON after a %s finish", async (finishReason) => {
+    const completion = probeCompletion();
+    completion.choices[0].finish_reason = finishReason;
+    providerBody = JSON.stringify(completion);
+    await expect(testApi({ ...api, baseUrl })).rejects.toThrow(finishReason === "length" ? "output limit" : "did not finish");
+  });
+  it("rejects refusals even when the content matches the schema", async () => {
+    providerBody = JSON.stringify({ choices: [{ ...probeCompletion().choices[0], message: {
+      ...probeCompletion().choices[0].message, refusal: "private upstream details",
+    } }] });
+    await expect(testApi({ ...api, baseUrl })).rejects.toThrow("did not finish");
+  });
+  it("uses the configured planning limit for the compatibility probe", async () => {
+    await testApi({ ...api, baseUrl, outputTokens: { planning: 6000 } });
+    expect(received.body?.max_tokens).toBe(6000);
   });
   it("rejects invalid JSON and oversized responses", async () => {
     providerBody = "<html>not a completion</html>";
@@ -446,7 +646,7 @@ describe("real HTTP model test", () => {
     expect(fetchSpy).toHaveBeenCalledOnce();
   });
   it("redacts credentials reflected in feedback", async () => {
-    providerBody = JSON.stringify({ choices: [{ message: { content: `Received ${api.apiKey}` } }] });
+    providerBody = JSON.stringify(probeCompletion(`Received ${api.apiKey}`));
     expect((await testApi({ ...api, baseUrl })).feedback).toBe("Received [redacted]");
   });
   it("reports timeout and connection errors explicitly", async () => {
@@ -852,9 +1052,19 @@ describe("configuration routes", () => {
     expect(await loaded.text()).not.toContain(api.apiKey);
   });
   it("tests unsaved settings without persisting them", async () => {
+    providerBody = JSON.stringify(probeCompletion());
     const result = await POST(configRequest("POST", { kind: "api", settings: { ...api, baseUrl } }));
     expect(result.status).toBe(200);
     expect(await result.json()).toMatchObject({ ok: true, feedback: "Connection confirmed." });
+    expect(await loadConnections()).toEqual(DEFAULT_CONNECTIONS);
+  });
+  it("reports schema-incompatible unsaved settings as a failed configuration test", async () => {
+    providerBody = JSON.stringify({ choices: [{ finish_reason: "stop", message: { content: "private upstream details" } }] });
+    const result = await POST(configRequest("POST", { kind: "api", settings: { ...api, baseUrl } }));
+    expect(result.status).toBe(502);
+    const body = await result.text();
+    expect(body).toContain("JSON-schema structured output");
+    expect(body).not.toContain("private upstream details");
     expect(await loadConnections()).toEqual(DEFAULT_CONNECTIONS);
   });
   it("can reuse a saved secret when testing and rejects invalid input", async () => {

@@ -80,6 +80,35 @@ available. Configuration keeps its administrator diagnostics.
 
 ## Connection configuration
 
+### Environment-first connections
+
+Copy `.env.example` to `.env.local` for a new setup (do not overwrite an existing
+env file). The LLM and database groups independently take precedence over saved
+configuration. Set `LLM_BASE_URL` (including `/v1` where applicable), `LLM_MODEL`,
+and optionally `LLM_API_KEY`, `LLM_REASONING_EFFORT`,
+`LLM_PLANNING_OUTPUT_TOKENS`, `LLM_CHART_OUTPUT_TOKENS` and
+`LLM_EXPLANATION_OUTPUT_TOKENS`. Token limits accept whole numbers from 256 to
+32,768; blank limits use the existing defaults.
+
+For PostgreSQL, set `DB_HOST`, `DB_DATABASE`, `DB_USERNAME`, and optionally
+`DB_PASSWORD`, `DB_PORT` (default 5432), `DB_SSL` (`true` by default, or `false`)
+and `DB_CA_CERTIFICATE` (PEM; quoted multiline values are supported by Next.js).
+Environment connection groups are complete replacements, not field-by-field
+merges: omitted credentials are empty, never inherited from a different endpoint.
+Leave every variable in a group unset or blank to use that group's existing
+JSON/PostgreSQL configuration. Partial or invalid environment groups fail
+explicitly; they do not fall back. A complete environment LLM group avoids
+reading the PostgreSQL settings table.
+
+Next.js loads `.env.local` server-side. On deployment, set these same variables
+in the host's environment settings. Do not use `NEXT_PUBLIC_` for credentials.
+Restart/redeploy after editing variables. The Configuration page displays and
+tests effective connections; saving an environment-managed group is rejected
+with instructions to edit the environment instead. Other groups retain normal
+saving behavior. Environment values are not migrated to configuration storage,
+and existing saved connections remain available when env groups are removed.
+`AI_GATEWAY_API_KEY` retains its Gateway-only precedence over `LLM_API_KEY`.
+
 Open **Configuration** (`/config`) from the desktop or mobile navigation to save
 and test an OpenAI-compatible model API and a direct PostgreSQL connection
 (including PlanetScale Postgres). This is **not** a PostgREST HTTP connection.
@@ -136,6 +165,12 @@ to private IPs reachable by the server.
   be entered manually if an endpoint does not support listing. Catalog errors
   are shown explicitly; loading a list does not test model access.
   Image, audio and embedding models remain selectable but may not support chat.
+  **Test connection** sends one strict JSON-schema compatibility probe and
+  requires a normally finished, schema-valid assistant response; plain chat
+  feedback alone no longer passes. It uses the planning output-token budget
+  and the existing 15-second connection-test timeout, and may incur provider
+  charges. A passing probe is a basic compatibility check, not a guarantee
+  that every research plan will succeed; plans remain strictly validated.
   **Thinking effort** appears when the selected model's live catalog includes
   `reasoning_options` with an `effort` entry. Only advertised levels supported
   by this Chat Completions integration are offered (`none`, `minimal`, `low`,
@@ -346,16 +381,20 @@ The provider receives a strict JSON schema for the plan's shape; the server
 separately validates business rules (clarification or queries, never both, and
 at most five stock-name lookups across the plan). Missing output, malformed JSON
 or schema/business-rule failures after a normally completed generation trigger
-at most **one automatic plan repair** using the same model, question and
+at most **three automatic plan repairs** (four planning attempts total) using the same model, question and
 workspace metadata. The correction request receives safe validation reasons,
 not the raw invalid output, and has no tools. Only a fully validated plan may
 execute final queries; a previously checked read-only SQL draft may already
 have run. Failed repair reports the specific category and bounded field
 paths/reasons in **Error details**, without model values, unknown field names,
-credentials or raw provider responses. Cancellation, timeouts, filtered/refused
+credentials or raw provider responses.
+Root-type failures identify whether the model returned null, an array or a
+primitive instead of a plan object, without exposing its content. The planner
+uses a named schema and explicitly forbids JSON-encoded strings and wrappers.
+Cancellation, timeouts, filtered/refused
 finishes, truncated output, transport and authentication failures do not trigger
 plan repair. Repair remains within the turn's existing deadline and can incur
-one additional generation charge (up to three model steps including a draft
+up to three additional generation charges (up to five model steps including a draft
 check). The separate single pre-stream HTTP 503 retry remains unchanged.
 HKEX planning and optional explanations use **low thinking effort** when the
 model catalog advertises it, without overwriting the saved model settings.
@@ -372,7 +411,7 @@ factual Markdown tables/charts from returned values. No second narrative call
 or chart-selection round trip is made. Query and chart requests normally
 use **one generation call**, or two when checking a SQL draft, excluding the
 existing single 503 retry.
-Invalid plans may also incur the single correction call described above.
+Invalid plans may also incur up to three correction calls as described above.
 Independent stock lookups run concurrently and identical search strings are
 resolved once per turn. Catalogue SQL queries do not depend on them, so they
 start before the lookups. After all stock filters are resolved and validated,
@@ -695,14 +734,15 @@ TEST_POSTGRES_URL='postgresql://user:password@127.0.0.1:5432/test' \
   npm test -- src/lib/server/database-seed.integration.test.ts src/lib/server/hkex-database.integration.test.ts
 ```
 
-After initialization, API/model settings (including any configured API key) are
+For groups not managed by environment variables, after initialization,
+API/model settings (including any configured API key) are
 stored in PostgreSQL in `public.insightful_configuration`. They are not encrypted
 by the application: restrict table access and protect database backups. The
 initializer revokes table access from `PUBLIC`; a separate runtime role needs
 `SELECT`, `INSERT` and `UPDATE` on this table. API saves use a transaction and an
 advisory lock to preserve omitted secrets across concurrent saves.
 
-Only the PostgreSQL connection (including its password) remains in the
+For file-managed connections, only the PostgreSQL connection (including its password) remains in the
 server-only, gitignored `.local/connections.json`, written atomically with
 owner-only permissions. It is the bootstrap needed to connect before loading
 settings. Override its location with `CONNECTION_CONFIG_PATH` on a private
@@ -712,7 +752,7 @@ secrets and are never migrated into PostgreSQL.
 Before the configuration table exists, API saves and reads continue using the
 private file so existing installations and API-first setup keep working. Save
 the database connection and explicitly run **Initialize database** to migrate.
-Once the table exists, PostgreSQL is authoritative, even when its API row is
+Without an environment LLM group, once the table exists, PostgreSQL is authoritative, even when its API row is
 absent; database outages, invalid schemas and permission errors fail explicitly
 without falling back to stale file values. Saving a database connection updates
 the bootstrap even if loading the new target's API settings fails; that failure
@@ -721,7 +761,7 @@ API configuration, not the previous database's settings.
 
 Protect the bootstrap host and backups. Saves and initialization are serialized
 within one Node.js process. Serverless, read-only, ephemeral or multi-instance
-deployments still require a persistent, consistently provisioned bootstrap
+deployments without a database environment group still require a persistent, consistently provisioned bootstrap
 connection; database-backed API settings do not remove that requirement.
 `GET/PUT /api/config`, `POST /api/config/test`, `POST /api/config/models`,
 `POST /api/config/chat` and `POST /api/config/database/initialize` require

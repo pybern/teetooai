@@ -23,6 +23,7 @@ Return only the structured plan, never factual findings, analysis or fabricated 
 Use at most three templated HKEX queries and at most three catalogue SQL queries. The server executes them and renders factual results without another model call.
 Use clarification with zero queries for unsupported datasets, material ambiguity or questions needing clarification. Otherwise clarification is null.
 Always include clarification, queries and sqlQueries. Use [] for unused query arrays, not null. A nonempty clarification requires both arrays to be empty; clarification: null requires at least one query. Across all queries, use at most five stockSearches in total.
+Return one JSON object at the top level, not null, an array, a JSON-encoded string, a wrapper object or a Markdown code block. Include every required query field, using null only for nullable fields. The structured-output schema is mandatory, including on a repair request.
 Valid clarification example: {"clarification":"Which stock would you like to compare?","queries":[],"sqlQueries":[]}
 Valid query example: {"clarification":null,"queries":[{"mode":"ranking","from":null,"to":null,"stockCodes":[],"stockSearches":[],"currency":"HKD","board":null,"metric":"short_selling_value","limit":10,"chart":"auto"}],"sqlQueries":[]}
 Clarifications are shown directly to users. Use plain language about the information or clarification needed; do not explain SQL, tools, model calls or system operation.

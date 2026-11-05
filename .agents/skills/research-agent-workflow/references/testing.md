@@ -19,6 +19,7 @@ All research-agent tests run offline with vitest. Use these fixtures rather than
   - `await POST(request({ messages, useCaseId }))` for raw stream assertions; read `response.body` with a reader to check ordering.
   - `interceptChat()` + `research(onTools, useCaseId)`, or `sendModelChat(...)`, for client-parsed results (`result.message.content`, `result.tools`, `result.reasoning`).
 - **Parity:** use `it.each(["hk", "hkex-db"])` for behaviour that must match across use cases.
+- **Repairs:** `MAX_PLAN_REPAIRS = 3` permits four planning attempts; a draft tool step can add one provider request. Test success on the final repair, exhausted failures, non-object roots, latest safe diagnostics, no tools on repairs, and immediate stops for truncation/cancellation. Never execute final queries from an invalid or truncated plan.
 - **Constants:** import `HKEX_SERVER_TIMEOUT_MS` and similar rather than writing numbers. Mock `AbortSignal.timeout` keyed on the constant to simulate deadlines.
 - **Useful assertions:**
   - `calls[0]` → `max_tokens`, `reasoning_effort`, `tools`, `response_format`.
@@ -46,7 +47,7 @@ All research-agent tests run offline with vitest. Use these fixtures rather than
 
 ## Other relevant suites
 
-- `src/lib/server/connections.test.ts`: `parseApi` validation (including `outputTokens`), the stream wrapper limits, and config routes.
+- `src/lib/server/connections.test.ts`: `parseApi` validation (including `outputTokens`), the stream wrapper limits, and config routes. The connection test requires a `stop` completion with strict schema-valid `{"ok":true,"feedback":"..."}` content; plain feedback, wrong root types, extra fields, refusals and truncated completions fail explicitly.
 - `src/components/connection-settings.test.ts`: the Configuration form (thinking effort, output-token limit fields, save payload).
 - `src/lib/model-chat-stream.test.ts`: `researchErrorMessage` mappings and the client timeout.
 - `src/lib/usecases.test.ts`: the default and unknown-id resolution.

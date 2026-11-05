@@ -6,7 +6,7 @@ import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } 
 import { sendModelChat } from "@/lib/model-chat-stream";
 import { DEFAULT_CONNECTIONS, HKEX_SERVER_TIMEOUT_MS, type ModelChatToolActivity, type OutputTokenLimits, type ReasoningEffort } from "@/lib/connections";
 import { loadConnections, saveConnection } from "./connections";
-import { CHART_TIMEOUT_MS, hkexPlanSchema, resolveStockSearch } from "./hkex-agent";
+import { CHART_TIMEOUT_MS, hkexPlanSchema, MAX_PLAN_REPAIRS, resolveStockSearch } from "./hkex-agent";
 import { POST } from "@/app/api/hkex/chat/route";
 import { POST as INSIGHT } from "@/app/api/insight/route";
 import { GET as CONFIG } from "@/app/api/config/route";
@@ -124,7 +124,7 @@ describe("single-call HKEX research", () => {
     expect(calls).toHaveLength(1);
     expect(calls[0]).toMatchObject({ model: "fixture-model", stream: true, max_tokens: 4096, reasoning_effort: "low" });
     expect(calls[0].tools).toBeUndefined();
-    expect(calls[0].response_format).toMatchObject({ type: "json_schema", json_schema: { strict: true } });
+    expect(calls[0].response_format).toMatchObject({ type: "json_schema", json_schema: { name: "hkexResearchPlan", strict: true } });
     expect(JSON.stringify(calls[0].messages)).toContain("2026-01-05");
     expect(JSON.stringify(calls[0].messages)).toContain("NOT short interest");
     expect(JSON.stringify(calls[0].messages)).not.toContain("12345.67");
@@ -540,6 +540,16 @@ describe("structured plan validation and repair", () => {
     { name: "empty plan", text: JSON.stringify({ clarification: null, queries: [], sqlQueries: [] }), diagnostic: "Provide either a clarification or at least one query" },
     { name: "conflicting clarification", text: JSON.stringify({ clarification: "private-secret", queries: [queryInput], sqlQueries: [] }), diagnostic: "Provide either a clarification or at least one query" },
     { name: "lookup budget", text: JSON.stringify({ clarification: null, queries: Array(3).fill({ ...queryInput, stockSearches: ["a", "b"] }), sqlQueries: [] }), diagnostic: "queries: At most five stock lookups per plan" },
+    ...[
+      { name: "null", value: null },
+      { name: "array", value: [] },
+      { name: "string", value: JSON.stringify({ clarification: null, queries: [queryInput], sqlQueries: [] }) },
+      { name: "number", value: 42 },
+      { name: "boolean", value: false },
+    ].map(({ name, value }) => ({ name: `root ${name}`, text: JSON.stringify(value), diagnostic: `plan: expected a JSON object, received ${name}` })),
+    { name: "missing top-level fields", text: "{}", diagnostic: "clarification: missing field or incorrect type" },
+    { name: "missing query fields", text: JSON.stringify({ clarification: null, queries: [{ mode: "ranking" }], sqlQueries: [] }), diagnostic: "queries.0.from: missing field or incorrect type" },
+    { name: "wrapped plan", text: JSON.stringify({ "private-secret": { clarification: null, queries: [queryInput], sqlQueries: [] } }), diagnostic: "unexpected fields are not allowed" },
   ];
   it.each(cases)("repairs $name once with strict structured output and no tools", async ({ text, diagnostic }) => {
     await saveSettings(); interceptChat();
@@ -547,13 +557,13 @@ describe("structured plan validation and repair", () => {
     const result = await research();
     expect(calls).toHaveLength(2);
     expect(calls[1].tools).toBeUndefined();
-    expect(calls[1].response_format).toMatchObject({ type: "json_schema", json_schema: { strict: true } });
+    expect(calls[1].response_format).toEqual(calls[0].response_format);
     const prompt = JSON.stringify(calls[1].messages);
     expect(prompt).toContain(diagnostic);
     expect(prompt).toContain("Regenerate a complete corrected plan");
     expect(prompt).not.toContain("private-secret");
     expect(result.message.content).toContain("00700 TENCENT");
-    expect(result.tools?.find((item) => item.tool === "planResearch")?.summary).toContain("after one automatic plan repair");
+    expect(result.tools?.find((item) => item.tool === "planResearch")?.summary).toContain("after 1 automatic plan repair");
     expect(pg.query.mock.calls.filter(([sql]) => typeof sql === "string" && sql.startsWith("WITH latest"))).toHaveLength(1);
   });
   it.each(["hk", "hkex-db"])("repairs once in the %s workspace", async (useCaseId) => {
@@ -563,11 +573,31 @@ describe("structured plan validation and repair", () => {
     expect(calls).toHaveLength(2);
     expect(result.message.content).toContain("## Results");
   });
-  it.each(cases)("reports safe specific details if $name fails again and never runs final queries", async ({ text, diagnostic }) => {
+  it.each(["hk", "hkex-db"])("blocks a non-object plan and failed repair in the %s workspace", async (useCaseId) => {
     await saveSettings(); interceptChat();
-    script = Array(2).fill(chunk({ content: text }, "stop") + "data: [DONE]\n\n");
-    await expect(research()).rejects.toThrow(diagnostic);
+    plan = "private-secret";
+    await expect(research(vi.fn(), useCaseId)).rejects.toThrow("plan: expected a JSON object, received string");
+    expect(calls).toHaveLength(MAX_PLAN_REPAIRS + 1);
+    expect(calls[1].tools).toBeUndefined();
+    expect(JSON.stringify(calls[1].messages)).not.toContain("private-secret");
+    expect(pg.query.mock.calls.some(([sql]) => typeof sql === "string" && sql.startsWith("WITH latest"))).toBe(false);
+  });
+  it("never repairs or executes a valid-looking repair cut off at the token limit", async () => {
+    await saveSettings(); interceptChat();
+    script = [
+      chunk({ content: "null" }, "stop") + "data: [DONE]\n\n",
+      chunk({ content: JSON.stringify(plan) }, "length") + "data: [DONE]\n\n",
+    ];
+    await expect(research()).rejects.toThrow("4,096-token output limit");
     expect(calls).toHaveLength(2);
+    expect(pg.query.mock.calls.some(([sql]) => typeof sql === "string" && sql.startsWith("WITH latest"))).toBe(false);
+  });
+  it.each(cases)("reports safe specific details after exhausting repairs for $name and never runs final queries", async ({ text, diagnostic }) => {
+    await saveSettings(); interceptChat();
+    script = Array(MAX_PLAN_REPAIRS + 1).fill(chunk({ content: text }, "stop") + "data: [DONE]\n\n");
+    await expect(research()).rejects.toThrow(diagnostic);
+    expect(calls).toHaveLength(MAX_PLAN_REPAIRS + 1);
+    expect(calls.slice(1).every((call) => call.tools === undefined)).toBe(true);
     expect(pg.query.mock.calls.some(([sql]) => typeof sql === "string" && sql.startsWith("WITH latest"))).toBe(false);
   });
   it("does not echo unknown field names, values, or raw provider output into errors", async () => {
@@ -575,8 +605,40 @@ describe("structured plan validation and repair", () => {
     plan = { clarification: null, queries: [], sqlQueries: [], "fixture-api-key": "db-secret" };
     await expect(research()).rejects.toThrow("unexpected fields are not allowed");
     const response = await (await POST(request())).text();
-    expect(response).toContain("single automatic plan repair also failed");
+    expect(response).toContain(`All ${MAX_PLAN_REPAIRS} automatic plan repairs failed`);
     expect(response).not.toMatch(/fixture-api-key|db-secret/);
+  });
+  it.each(["hk", "hkex-db"])("can succeed on the last permitted repair in the %s workspace without extra attempts", async (useCaseId) => {
+    await saveSettings(); interceptChat();
+    script = Array(MAX_PLAN_REPAIRS).fill(chunk({ content: "null" }, "stop") + "data: [DONE]\n\n");
+    const onTools = vi.fn<(tools: ModelChatToolActivity[]) => void>();
+    const result = await research(onTools, useCaseId);
+    expect(calls).toHaveLength(4);
+    expect(MAX_PLAN_REPAIRS).toBe(3);
+    expect(calls.slice(1).every((call) => call.tools === undefined)).toBe(true);
+    for (const call of calls) expect(call.response_format).toEqual(calls[0].response_format);
+    expect(result.message.content).toContain("00700 TENCENT");
+    expect(result.tools?.find((item) => item.tool === "planResearch")?.summary).toContain("after 3 automatic plan repairs");
+    const summaries = onTools.mock.calls.flatMap(([tools]) => tools.filter((item) => item.tool === "planResearch").map((item) => item.summary));
+    for (let repair = 1; repair <= MAX_PLAN_REPAIRS; repair++) {
+      expect(summaries.some((summary) => summary.includes(`repair ${repair} of ${MAX_PLAN_REPAIRS}`))).toBe(true);
+    }
+    expect(pg.query.mock.calls.filter(([sql]) => typeof sql === "string" && sql.startsWith("WITH latest"))).toHaveLength(1);
+  });
+  it("uses the latest safe validation failure for each correction and final error", async () => {
+    await saveSettings(); interceptChat();
+    script = [
+      chunk({ content: "null" }, "stop"),
+      chunk({ content: "[]" }, "stop"),
+      chunk({ content: "{}" }, "stop"),
+      chunk({ content: JSON.stringify({ clarification: null, queries: [], sqlQueries: [] }) }, "stop"),
+    ].map((response) => response + "data: [DONE]\n\n");
+    await expect(research()).rejects.toThrow(`Provide either a clarification or at least one query. All ${MAX_PLAN_REPAIRS} automatic plan repairs failed`);
+    expect(calls).toHaveLength(4);
+    expect(JSON.stringify(calls[1].messages)).toContain("received null");
+    expect(JSON.stringify(calls[2].messages)).toContain("received array");
+    expect(JSON.stringify(calls[3].messages)).toContain("clarification: missing field or incorrect type");
+    expect(pg.query.mock.calls.some(([sql]) => typeof sql === "string" && sql.startsWith("WITH latest"))).toBe(false);
   });
   it.each(["content_filter", "length"])("does not repair a %s finish", async (reason) => {
     await saveSettings(); interceptChat();
@@ -762,19 +824,19 @@ describe("catalog-guided research", () => {
     expect(result.message.content).toContain("## Largest economies");
   });
 
-  it("repairs an invalid final plan after a draft check without re-executing tools", async () => {
+  it.each([1, MAX_PLAN_REPAIRS])("allows %s repairs after a draft check without re-executing tools", async (repairs) => {
     await saveSettings(); interceptChat();
     plan = { clarification: null, queries: [], sqlQueries: [{ title: "Largest economies", sql: finalSql }] };
     script = [
       toolCall("runSql", { sql: finalSql }),
-      chunk({ content: '{"clarification":null,"queries":[],"sqlQueries":[]}' }, "stop") + "data: [DONE]\n\n",
+      ...Array(repairs).fill(chunk({ content: '{"clarification":null,"queries":[],"sqlQueries":[]}' }, "stop") + "data: [DONE]\n\n"),
     ];
     const result = await research();
-    expect(calls).toHaveLength(3);
-    expect(calls[2].tools).toBeUndefined();
+    expect(calls).toHaveLength(2 + repairs);
+    expect(calls.slice(2).every((call) => call.tools === undefined)).toBe(true);
     expect(result.tools?.filter((item) => item.tool === "runSql")).toHaveLength(1);
     expect(result.message.content).toContain("## Largest economies");
-    expect(result.tools?.find((item) => item.tool === "planResearch")?.summary).toContain("3 model steps");
+    expect(result.tools?.find((item) => item.tool === "planResearch")?.summary).toContain(`${2 + repairs} model steps`);
   });
 
   it("executes at most one draft even when the model requests multiple SQL checks together", async () => {
