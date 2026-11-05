@@ -6,7 +6,7 @@ import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } 
 import { sendModelChat } from "@/lib/model-chat-stream";
 import { DEFAULT_CONNECTIONS, HKEX_SERVER_TIMEOUT_MS, type ModelChatToolActivity, type OutputTokenLimits, type ReasoningEffort } from "@/lib/connections";
 import { loadConnections, saveConnection } from "./connections";
-import { hkexPlanSchema } from "./hkex-agent";
+import { CHART_TIMEOUT_MS, hkexPlanSchema, resolveStockSearch } from "./hkex-agent";
 import { POST } from "@/app/api/hkex/chat/route";
 import { POST as INSIGHT } from "@/app/api/insight/route";
 import { GET as CONFIG } from "@/app/api/config/route";
@@ -35,6 +35,7 @@ let chartCalls: Record<string, unknown>[];
 let chartChoice: unknown;
 let chartStatus = 200;
 let chartGate: Promise<void> | undefined;
+let modelCatalogRequests = 0;
 function toolCall(name: string, input: unknown, id = `call_${name}`) {
   return chunk({ tool_calls: [{ index: 0, id, type: "function", function: { name, arguments: JSON.stringify(input) } }] }) +
     chunk({}, "tool_calls") + "data: [DONE]\n\n";
@@ -51,6 +52,7 @@ beforeAll(async () => {
   directory = await mkdtemp(path.join(tmpdir(), "hkex-planner-"));
   server = createServer(async (req, response) => {
     if (req.method === "GET" && req.url === "/v1/models") {
+      modelCatalogRequests++;
       response.writeHead(200, { "Content-Type": "application/json" });
       response.end(JSON.stringify({ data: [{ id: "fixture-model", reasoning_options: [{ type: "effort", values: supportedEfforts }] }] }));
       return;
@@ -80,7 +82,7 @@ beforeAll(async () => {
 });
 beforeEach(() => {
   calls = []; providerStatus = 200; explanation = false; script = undefined;
-  chartCalls = []; chartChoice = { charts: [] }; chartStatus = 200; chartGate = undefined;
+  chartCalls = []; chartChoice = { charts: [] }; chartStatus = 200; chartGate = undefined; modelCatalogRequests = 0;
   supportedEfforts = ["none", "minimal", "low", "medium", "high"];
   finishReason = "stop"; reasoning = "Select the supported query.";
   plan = { clarification: null, queries: [{ ...queryInput }], sqlQueries: [] };
@@ -328,6 +330,48 @@ describe("single-call HKEX research", () => {
     expect(pg.query.mock.calls.some(([sql]) => sql.startsWith("WITH latest"))).toBe(false);
     expect(result.tools?.some((item) => item.explanationId)).toBe(false);
     expect(result.tools?.some((item) => item.insights)).toBe(false);
+  });
+  it.each(["hk", "hkex-db"])("still runs the rest of the plan when one stock name is ambiguous in %s", async (useCaseId) => {
+    await saveSettings(); interceptChat();
+    plan = { clarification: null, queries: [{ ...queryInput, stockSearches: ["bank"] }, { ...queryInput }], sqlQueries: [] };
+    const original = pg.query.getMockImplementation()!;
+    pg.query.mockImplementation(async (sql: string) => sql.includes("stock_name ILIKE")
+      ? { rows: [evidence, { ...evidence, stock_code: "00005", stock_name: "HSBC HOLDINGS" }] } : original(sql));
+    const result = await research(vi.fn(), useCaseId);
+    expect(calls).toHaveLength(1);
+    expect(result.message.content).toContain("## Clarification needed");
+    expect(result.message.content).toContain("so it was not queried");
+    expect(result.message.content).toContain("- 00005 HSBC HOLDINGS");
+    expect(result.message.content.indexOf("Clarification needed")).toBeLessThan(result.message.content.indexOf("12345.67"));
+    const queries = pg.query.mock.calls.filter(([sql]) => sql.startsWith("WITH latest"));
+    expect(queries).toHaveLength(1);
+    expect(queries[0][1][4]).toEqual([]);
+    expect(result.tools?.find((item) => item.explanationId)?.explanationId).toMatch(/^[0-9a-f-]{36}$/);
+  });
+  it("reuses the provider model catalog across research turns until settings are saved again", async () => {
+    await saveSettings(); interceptChat();
+    await research();
+    await research();
+    expect(modelCatalogRequests).toBe(1);
+    await saveSettings("high");
+    await research();
+    expect(modelCatalogRequests).toBe(2);
+  });
+  it("checks the model settings while the database preflight is still running", async () => {
+    await saveSettings(); interceptChat();
+    const original = pg.query.getMockImplementation()!;
+    let releasePreflight!: () => void;
+    const preflight = new Promise<void>((resolve) => { releasePreflight = resolve; });
+    pg.query.mockImplementation(async (sql: string, parameters: unknown[]) => {
+      if (sql.includes("information_schema.columns")) await preflight;
+      return original(sql, parameters);
+    });
+    const done = research();
+    await vi.waitFor(() => expect(modelCatalogRequests).toBe(1));
+    expect(calls).toHaveLength(0);
+    releasePreflight();
+    expect((await done).message.content).toContain("## Results");
+    expect(calls).toHaveLength(1);
   });
   it("handles unsupported requests with one planner clarification and no data query", async () => {
     await saveSettings(); interceptChat();
@@ -860,6 +904,64 @@ describe("catalog-guided research", () => {
     expect(JSON.stringify(result)).not.toContain("private upstream details");
   });
 
+  it("keeps the completed answer when chart selection runs out of its time budget", async () => {
+    await saveSettings(); interceptChat();
+    plan = { clarification: null, queries: [], sqlQueries: [{ title: "Largest economies", sql: finalSql }] };
+    script = [];
+    let answerChart!: () => void;
+    chartGate = new Promise((resolve) => { answerChart = resolve; });
+    const chartDeadline = new AbortController();
+    const realTimeout = AbortSignal.timeout.bind(AbortSignal);
+    vi.spyOn(AbortSignal, "timeout").mockImplementation((ms) => ms === CHART_TIMEOUT_MS ? chartDeadline.signal : realTimeout(ms));
+    try {
+      const done = research();
+      await vi.waitFor(() => expect(chartCalls).toHaveLength(1));
+      chartDeadline.abort(new DOMException("Timeout", "TimeoutError"));
+      const result = await done;
+      expect(result.message.content).toContain("| United States | 27.4 |");
+      expect(result.tools?.find((item) => item.tool === "chooseChart")).toMatchObject({ status: "error", summary: expect.stringContaining("ran out of time") });
+      expect(result.tools?.some((item) => item.sqlChart)).toBe(false);
+    } finally { answerChart(); }
+  });
+
+  it("skips the chart request when the turn is nearly out of time", async () => {
+    await saveSettings(); interceptChat();
+    plan = { clarification: null, queries: [], sqlQueries: [{ title: "Largest economies", sql: finalSql }] };
+    script = [];
+    const realNow = Date.now.bind(Date);
+    let elapsed = 0;
+    vi.spyOn(Date, "now").mockImplementation(() => realNow() + elapsed);
+    const original = pg.query.getMockImplementation()!;
+    pg.query.mockImplementation(async (input: string | { text: string }, parameters?: unknown[]) => {
+      if (JSON.stringify(input).includes("AS agent_query")) elapsed = HKEX_SERVER_TIMEOUT_MS - 12000;
+      return original(input, parameters);
+    });
+    const result = await research();
+    expect(chartCalls).toHaveLength(0);
+    expect(result.message.content).toContain("| United States | 27.4 |");
+    expect(result.tools?.find((item) => item.tool === "chooseChart")).toMatchObject({ status: "complete", summary: expect.stringContaining("nearly out of time") });
+  });
+
+  it.each(["hk", "hkex-db"])("starts catalogue SQL without waiting for stock lookups in %s", async (useCaseId) => {
+    await saveSettings(); interceptChat();
+    const sql = useCaseId === "hk" ? "SELECT id FROM public.insightful_datasets ORDER BY id LIMIT 5" : finalSql;
+    plan = { clarification: null, queries: [{ ...queryInput, stockSearches: ["Tencent"] }], sqlQueries: [{ title: "Largest economies", sql }] };
+    script = [];
+    const original = pg.query.getMockImplementation()!;
+    let releaseLookup!: () => void;
+    const lookup = new Promise<void>((resolve) => { releaseLookup = resolve; });
+    pg.query.mockImplementation(async (input: string | { text: string }, parameters?: unknown[]) => {
+      const sql = typeof input === "string" ? input : input.text;
+      if (sql.includes("stock_name ILIKE")) { await lookup; return { rows: [evidence] }; }
+      if (sql.includes("AS agent_query")) releaseLookup();
+      return original(input, parameters);
+    });
+    const result = await sendModelChat(undefined, [{ role: "user", content: "Tencent and economies" }], new AbortController().signal, vi.fn(), vi.fn(), { api: "/api/hkex/chat", useCaseId });
+    expect(result.message.content).toContain("12345.67");
+    expect(result.message.content).toContain("## Largest economies");
+    expect(result.message.content.indexOf("12345.67")).toBeLessThan(result.message.content.indexOf("## Largest economies"));
+  });
+
   it("makes no chart request for HKEX template answers or results that cannot be charted", async () => {
     await saveSettings(); interceptChat();
     plan = { clarification: null, queries: [{ ...queryInput }], sqlQueries: [] };
@@ -872,5 +974,30 @@ describe("catalog-guided research", () => {
     expect(chartCalls).toHaveLength(0);
     expect(result.tools?.some((item) => item.tool === "chooseChart")).toBe(false);
     expect(result.tools?.some((item) => item.tool === "computeInsights")).toBe(false);
+  });
+});
+
+describe("stock search resolution", () => {
+  const stock = (stock_code: string, stock_name: string, trading_currency = "HKD") => ({ stock_code, stock_name, trading_currency });
+  it("prefers an exact name over longer names that contain it", () => {
+    const rows = [stock("02318", "PING AN"), stock("03070", "PING AN HKDIV"), stock("82318", "PING AN-R", "CNY")];
+    expect(resolveStockSearch("Ping An", rows, "HKD", false)).toEqual({ code: "02318" });
+    expect(resolveStockSearch("ping  an", rows, "CNY", false)).toEqual({ code: "82318" });
+  });
+  it("ignores listing suffixes when comparing names", () => {
+    expect(resolveStockSearch("BABA", [stock("09988", "BABA-W"), stock("09999", "BABA HEALTH")], "HKD", false)).toEqual({ code: "09988" });
+  });
+  it("prefers an exact stock code over names containing the digits", () => {
+    expect(resolveStockSearch("700", [stock("00700", "TENCENT"), stock("01700", "FUND 700")], "HKD", false)).toEqual({ code: "00700" });
+  });
+  it("returns candidates when names are genuinely ambiguous or missing", () => {
+    expect(resolveStockSearch("BYD", [stock("00285", "BYD ELECTRONIC"), stock("01211", "BYD COMPANY")], "HKD", false)).toEqual({
+      candidates: [{ code: "00285", name: "BYD ELECTRONIC" }, { code: "01211", name: "BYD COMPANY" }],
+    });
+    expect(resolveStockSearch("Alibaba", [], "HKD", false)).toEqual({ candidates: [] });
+  });
+  it("does not trust a single partial match from a truncated lookup, but accepts an exact one", () => {
+    expect(resolveStockSearch("Tencent", [stock("00700", "TENCENT HOLDINGS")], "HKD", true)).toEqual({ candidates: [{ code: "00700", name: "TENCENT HOLDINGS" }] });
+    expect(resolveStockSearch("Tencent", [stock("00700", "TENCENT")], "HKD", true)).toEqual({ code: "00700" });
   });
 });
