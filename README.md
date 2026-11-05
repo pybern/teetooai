@@ -402,7 +402,10 @@ Explicit saved `none`/`minimal` efforts are preserved rather than increased.
 If `low` is not advertised, the saved supported effort (or provider default)
 remains in use. Research checks the model catalog before generation; catalog
 failures are reported explicitly, and this metadata request is not a generation
-round trip. Configuration tests and the playground retain their saved effort.
+round trip. The check runs alongside the database preflight, and research
+reuses a successfully loaded catalog for up to five minutes per endpoint and
+key; saving settings clears it and reloading the model list refreshes it.
+Configuration tests and the playground retain their saved effort.
 The server validates it, resolves names, queries the saved database and builds
 factual Markdown tables/charts from returned values. No second narrative call
 or chart-selection round trip is made. Query and chart requests normally
@@ -410,16 +413,22 @@ use **one generation call**, or two when checking a SQL draft, excluding the
 existing single 503 retry.
 Invalid plans may also incur up to three correction calls as described above.
 Independent stock lookups run concurrently and identical search strings are
-resolved once per turn. After all stock filters are resolved and validated,
-up to three independent queries run concurrently; answer sections retain plan
-order. Each read still uses a separate read-only transaction with the existing
+resolved once per turn. Catalogue SQL queries do not depend on them, so they
+start before the lookups. After all stock filters are resolved and validated,
+up to three independent HKEX queries run concurrently; answer sections retain
+plan order. Each read still uses a separate read-only transaction with the existing
 timeouts and evidence limits, but its transaction setup uses one database
 round trip instead of three. Explicit end dates skip the latest-date scan.
 Preflight schema and coverage remain fresh on every turn; no cross-turn result
 cache is used. Completed chat messages are memoized so typing and subsequent
 streaming updates do not repeatedly parse their Markdown or rebuild charts.
-Up to five stock-name lookups are allowed per plan; ambiguous matches ask
-the user to specify a five-digit code rather than guessing or looping.
+Up to five stock-name lookups are allowed per plan. Within the query's
+currency, an exact stock code or an exact name (ignoring listing suffixes such
+as `-W` or `-R`) wins over names that merely contain the search, so "Ping An"
+resolves to 02318 PING AN rather than also matching PING AN HKDIV. A search
+that still matches several stocks, or none, asks the user for a five-digit
+code (listing the candidates) instead of guessing. Only the queries that need
+that stock are skipped; the rest of the plan still runs.
 Unsupported requests receive a planner clarification, not fabricated data.
 Internal activity records status, SQL templates, parameters and row counts.
 The public conversation shows live provider reasoning in a collapsed Thinking
@@ -680,9 +689,13 @@ keeps the answer. The provider-stream size cap grows with the largest limit
 shortened for display instead of failing the turn.
 
 Time is a safety net rather than the main limit. Each research or explanation
-request has a 290-second server deadline after database preflight (including
-catalog validation), covering planning, queries and the optional chart request,
-with a 320-second browser deadline for the entire request. The chat route sets
+request has a 290-second server deadline that starts before database preflight
+(including catalog validation) and covers planning, queries and the optional
+chart request, with a 320-second browser deadline for the entire request. The
+chart request runs after the answer, so it has its own budget: at most 60
+seconds, ending 5 seconds before the deadline, and it is skipped when less than
+10 seconds would remain. A slow chart therefore adds no chart but never turns
+a completed answer into a timeout. The chat route sets
 `maxDuration = 300` so hosts such as Vercel allow the full turn, including
 the single pre-stream 503 retry described above; SDK-level retries remain disabled.
 Cancellation closes active database reads as well as model generation.

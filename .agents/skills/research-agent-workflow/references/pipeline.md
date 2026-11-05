@@ -36,13 +36,13 @@ Function-level walk through one research turn, in execution order. Paths are rel
 2. `acquireHkexRequest(request)` (`hkex-access.ts`): origin and cross-site checks, then a process-wide limiter (2 concurrent turns, 10 starts per minute, otherwise 429). Released in `finally`.
 3. Research: `new HkexDatabase(loadSavedDatabase(), request.signal, agentScopeFor(useCase))`. `agentScopeFor` → `{ datasetIds: null }` for `agentDatasets: "all"`, otherwise the use case's `datasetIds`.
 4. `database.inspect()` is the preflight: HKEX columns and coverage plus the permitted catalog entries (`catalogIdsForScope`) with full descriptions. It fails before any model call if the database is unreachable or the metadata exceeds `METADATA_MAX_CHARS` (128,000).
-5. `createHkexRunner(database, metadata, useCase)` or `createHkexExplanationRunner(explanationId)`; then `streamChatWithSavedModel(messages, signal, runner)`.
+5. `createHkexRunner(database, metadata, useCase)` or `createHkexExplanationRunner(explanationId)`. The route passes the runner to `streamChatWithSavedModel(messages, signal, runnerPromise)` as a promise, so preflight runs alongside loading and checking the model settings. Either failure still returns a JSON error before any generation call.
 
 ## 4. Stream wrapper and limits
 
 `src/lib/server/connections.ts` `streamChatWithSavedModel`:
-- `loadSavedApi()` → `effectiveApiSettings` (`AI_GATEWAY_API_KEY` override for the Vercel AI Gateway) → `checkReasoningEffort` (research prefers `low` when supported).
-- Deadline `HKEX_SERVER_TIMEOUT_MS` (290 s) for runners, 60 s for the config chat. One delayed 503 retry per research turn; never retries 429.
+- `loadSavedApi()` → `effectiveApiSettings` (`AI_GATEWAY_API_KEY` override for the Vercel AI Gateway) → `checkReasoningEffort` (research prefers `low` when supported). Research reuses a model catalog loaded in the last 5 minutes (`cachedModelCatalog`, keyed by endpoint and key); `saveConnection` clears it and `listApiModelCatalog` refreshes it.
+- Deadline `HKEX_SERVER_TIMEOUT_MS` (290 s) for runners, 60 s for the config chat. It starts before the preflight resolves and is passed to runners as `deadline` (epoch ms). One delayed 503 retry per research turn; never retries 429.
 - Provider stream byte cap is `max(1 MB, largest outputTokenLimit × 512 bytes)`.
 - Text output is capped at `MAX_CHAT_MESSAGE_CHARS` (16,000) and fails if exceeded. Research **thinking** is clipped with "[Thinking shortened for display.]" instead of failing.
 - A `finish` part with `finishReason: "length"` throws a generic output-token-limit error (the runners throw step-specific ones first).
@@ -62,7 +62,8 @@ Token limits (`src/lib/connections.ts`): `OUTPUT_TOKEN_STEPS = ["planning", "cha
 
 Still in `createHkexRunner`, after a valid plan:
 - Yields `text-start` and "## Results". A clarification yields only "## Clarification needed".
-- Stock searches: `findStocks` per unique search. If a search doesn't resolve to exactly one code for the query's currency, the turn ends with a clarification.
+- SQL sections start first, before stock lookups, since they never depend on them.
+- Stock searches: `findStocks` per unique search, then `resolveStockSearch` in the query's currency: exact code, then exact name ignoring listing suffixes (`-W`, `-R`, ...), then a single match from an untruncated lookup. Otherwise a "## Clarification needed" section lists the candidates and only that query is skipped. The turn ends early only when nothing else is left to run.
 - **HKEX sections** (parallel): `queryHkex` (`database.query`, built by `buildHkexQuery`) → `computeInsights` (`buildHkexInsights`, exact decimals) → `formatHkexEvidence` → if the plan's `chart` is not null: `getHkexChartOptions` + `buildHkexChart` → `renderChart` activity with `chart`.
 - **SQL sections** (parallel): `querySql` (`database.runAgentSql` → `validateAgentSql` in `agent-sql.ts`: libpg-query parse, allow-listed nodes, functions and relations, scope rewrite, `READ ONLY`, `AGENT_SQL_ROW_LIMIT = 100`) → `buildSqlInsights` → a `computeInsights` activity when it isn't null → `formatSqlEvidence` (20 rows, 10 columns preview). A failed SQL section becomes "This query could not be completed".
 - All sections run concurrently but are yielded in plan order (HKEX first, then SQL).
@@ -74,6 +75,7 @@ Still in `createHkexRunner`, after a valid plan:
 `src/lib/server/sql-chart.ts`, called from `createHkexRunner` after the SQL text loop and the explanation store, before `text-end`:
 - `profileColumns(rows)` classifies columns as number, date or text (raw string rows from `pg`). `isChartable`: ≥2 rows, ≥2 columns, at least one number column.
 - If none are chartable: no call and no `chooseChart` activity.
+- Time budget: `min(CHART_TIMEOUT_MS = 60 s, deadline − now − CHART_DEADLINE_MARGIN_MS = 5 s)`. Below `MIN_CHART_TIME_MS` (10 s) the call is skipped with a `chooseChart` "nearly out of time" note. When the budget runs out, the answer is kept and `chooseChart` errors with "ran out of time". Only a client cancel or the turn deadline itself is rethrown.
 - `chooseSqlCharts({ model, settings, abortSignal, onError, question, results })`: structured output `sqlChartChoiceSchema` (named `sqlChartChoice`, which the test fixture keys on). `maxOutputTokens: outputTokenLimit(settings, "chart")`. Input is `chartAgentInput`: question, titles, column profiles, ≤12 sample rows (values ≤80 chars). Drops choices for results it wasn't offered and duplicate choices.
 - `buildSqlChart(result, choice)` validates: columns exist; values are numeric and not the axis; the series column is separate and only used with one value column; line/area need a date or number axis; area has one series; ≤100 points and ≤8 series; no duplicate (label, series); ≥2 numeric values. Time axes are sorted, bars keep SQL order, and nulls are preserved. The output is `SqlChartSpec` (`src/lib/sql-chart.ts`).
 - Activities: `chooseChart` running → per choice `renderChart` complete with `sqlChart`, or an error → `chooseChart` complete or error. A non-abort failure is caught, so the answer still completes.

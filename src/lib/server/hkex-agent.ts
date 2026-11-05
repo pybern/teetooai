@@ -110,10 +110,49 @@ export function formatHkexEvidence(query: HkexQuery, result: DatabaseEvidence): 
   ].filter(Boolean).join("\n\n");
 }
 
+// HKEX short names end with listing markers such as -W, -S, -SW or -R (RMB counter).
+const LISTING_SUFFIX = /-[A-Z]{1,3}$/;
+function normalizeStockName(value: string) {
+  return value.toUpperCase().replace(/\s+/g, " ").trim().replace(LISTING_SUFFIX, "").trim();
+}
+
+export type StockResolution = { code: string } | { candidates: { code: string; name: string }[] };
+
+/** Resolve a stock search to one code in the query's currency, preferring an exact code or name over partial name matches. */
+export function resolveStockSearch(search: string, rows: DatabaseEvidence["rows"], currency: HkexQuery["currency"], truncated: boolean): StockResolution {
+  const stocks = new Map<string, string>();
+  for (const row of rows) {
+    if (row.trading_currency === currency && typeof row.stock_code === "string") stocks.set(row.stock_code, String(row.stock_name ?? ""));
+  }
+  const term = search.trim();
+  const code = /^\d{1,5}$/.test(term) ? term.padStart(5, "0") : null;
+  if (code && stocks.has(code)) return { code };
+  const name = normalizeStockName(term);
+  const exact = [...stocks].filter(([, stockName]) => normalizeStockName(stockName) === name);
+  if (exact.length === 1) return { code: exact[0][0] };
+  if (stocks.size === 1 && !truncated) return { code: [...stocks.keys()][0] };
+  return { candidates: [...stocks].map(([stockCode, stockName]) => ({ code: stockCode, name: stockName })) };
+}
+
+function stockClarification(search: string, currency: HkexQuery["currency"], candidates: { code: string; name: string }[], truncated: boolean): string {
+  if (!candidates.length) {
+    return `Stock search **${cell(search)}** did not match a ${currency} stock name or code, so it was not queried. Reply with its five-digit stock code.`;
+  }
+  return [
+    `Stock search **${cell(search)}** matched more than one ${currency} stock, so it was not queried. Reply with the five-digit code you mean:`,
+    candidates.map(({ code, name }) => `- ${cell(code)} ${cell(name.slice(0, 120))}`).join("\n"),
+    truncated ? "More stocks matched than are listed here." : "",
+  ].filter(Boolean).join("\n\n");
+}
+
 /** Plan directly from preloaded descriptions, or check one draft with runSql first. */
 export const MAX_AGENT_TOOL_CALLS = 1;
 export const MAX_AGENT_STEPS = 2;
 export const MAX_PLAN_REPAIRS = 3;
+// The chart call runs after the answer, so it must finish (or give up) before the turn deadline ends the stream.
+export const CHART_TIMEOUT_MS = 60000;
+export const CHART_DEADLINE_MARGIN_MS = 5000;
+export const MIN_CHART_TIME_MS = 10000;
 const SQL_PREVIEW_ROWS = 20;
 const SQL_PREVIEW_COLUMNS = 10;
 
@@ -142,7 +181,7 @@ export function agentScopeFor(useCase: UseCase) {
 export function createHkexRunner(
   database: HkexDatabase, metadata: Awaited<ReturnType<HkexDatabase["inspect"]>>, useCase: UseCase = USE_CASE_BY_ID["hkex-db"],
 ): SavedModelRunner {
-  return async function* ({ model, settings, messages, abortSignal, onError, onToolActivity }) {
+  return async function* ({ model, settings, messages, abortSignal, deadline, onError, onToolActivity }) {
     database.attachSignal(abortSignal);
     const activity = async <T>(name: string, execute: () => Promise<T>, describe: (value: T) => Partial<ModelChatToolActivity>): Promise<T> => {
       const id = randomUUID();
@@ -270,49 +309,7 @@ export function createHkexRunner(
       yield { type: "text-delta", id: "research", text: "## Results\n\n" };
       if (plan.clarification) yield { type: "text-delta", id: "research", text: `## Clarification needed\n\n${cell(plan.clarification)}` };
       else {
-        const searches = [...new Set(plan.queries.flatMap((item) => item.stockSearches))];
-        const lookups = new Map(await Promise.all(searches.map(async (search) => [
-          search,
-          await activity("findStocks", () => database.findStocks(search), (value) => ({ summary: `${value.rows.length} stock matches.`, sql: value.sql, parameters: value.parameters })),
-        ] as const)));
-        const queries: HkexQuery[] = [];
-        for (const item of plan.queries) {
-          const codes = new Set(item.stockCodes);
-          for (const search of item.stockSearches) {
-            const lookup = lookups.get(search)!;
-            const matches = lookup.rows.filter((row) => row.trading_currency === item.currency);
-            const matchingCodes = [...new Set(matches.map((row) => row.stock_code))];
-            if (lookup.truncated || matchingCodes.length !== 1 || typeof matchingCodes[0] !== "string") {
-              yield {
-                type: "text-delta", id: "research",
-                text: `## Clarification needed\n\nStock search **${cell(search)}** did not resolve to one ${item.currency} stock. Please specify a five-digit code.\n\n` +
-                  matchingCodes.filter((code) => typeof code === "string").map((code) => `- ${cell(code)}`).join("\n"),
-              };
-              yield { type: "text-end", id: "research" };
-              yield finish;
-              return;
-            }
-            codes.add(matchingCodes[0]);
-          }
-          queries.push(validateHkexQuery({ ...item, stockCodes: [...codes] }));
-        }
-        const hkexSections = queries.map(async (query, index) => {
-          const evidence = await activity("queryHkex", () => database.query(query), (value) => ({ summary: `${value.rows.length} evidence rows.`, sql: value.sql, parameters: value.parameters }));
-          await activity("computeInsights", async () => buildHkexInsights(evidence, query), (insights) => ({
-            summary: `Calculated ${insights.insights.length} factual findings from returned rows without a model call.`, insights,
-          }));
-          let text = formatHkexEvidence(query, evidence) + "\n\n";
-          const preference = plan.queries[index].chart;
-          if (preference && evidence.rows.length) {
-            const options = getHkexChartOptions(evidence, query);
-            const selected = options.choices.find((option) => option.component === (preference === "auto" ? options.recommendedComponent : preference));
-            if (!selected) {
-              text += "This chart isn't available for these results. Try a different chart.\n\n";
-              onToolActivity({ id: randomUUID(), tool: "renderChart", status: "error", summary: "Selected chart is incompatible with actual results." });
-            } else await activity("renderChart", async () => buildHkexChart(evidence, query, selected.type), (chart) => ({ summary: `Rendered ${chart.elements.chart.props.points.length} grounded points without another model call.`, chart }));
-          }
-          return { query, result: evidence, text };
-        });
+        // SQL sections never depend on stock lookups, so they start before them.
         const sqlSections = plan.sqlQueries.map(async (item) => {
           try {
             const evidence = await activity("querySql", () => database.runAgentSql(item.sql), (value) => ({
@@ -329,8 +326,53 @@ export function createHkexRunner(
             return { text: `## ${cell(item.title)}\n\nThis query could not be completed. Try rephrasing the question.\n\n`, explained: null };
           }
         });
-        // Every query is already running; this only prevents unhandled rejections while earlier sections are awaited.
-        for (const section of [...hkexSections, ...sqlSections]) (section as Promise<unknown>).catch(() => undefined);
+        // Prevents unhandled rejections while earlier steps and sections are awaited.
+        for (const section of sqlSections) section.catch(() => undefined);
+        const searches = [...new Set(plan.queries.flatMap((item) => item.stockSearches))];
+        const lookups = new Map(await Promise.all(searches.map(async (search) => [
+          search,
+          await activity("findStocks", () => database.findStocks(search), (value) => ({ summary: `${value.rows.length} stock matches.`, sql: value.sql, parameters: value.parameters })),
+        ] as const)));
+        const queries: { query: HkexQuery; chart: (typeof plan.queries)[number]["chart"] }[] = [];
+        const clarifications = new Map<string, string>();
+        for (const item of plan.queries) {
+          const codes = new Set(item.stockCodes);
+          let resolved = true;
+          for (const search of item.stockSearches) {
+            const lookup = lookups.get(search)!;
+            const match = resolveStockSearch(search, lookup.rows, item.currency, lookup.truncated);
+            if ("code" in match) codes.add(match.code);
+            else {
+              resolved = false;
+              clarifications.set(JSON.stringify([search, item.currency]), stockClarification(search, item.currency, match.candidates, lookup.truncated));
+            }
+          }
+          if (resolved) queries.push({ query: validateHkexQuery({ ...item, stockCodes: [...codes] }), chart: item.chart });
+        }
+        // An unresolved stock skips only the queries that need it; the rest of the plan still runs.
+        if (clarifications.size) yield { type: "text-delta", id: "research", text: `## Clarification needed\n\n${[...clarifications.values()].join("\n\n")}\n\n` };
+        if (!queries.length && !sqlSections.length) {
+          yield { type: "text-end", id: "research" };
+          yield finish;
+          return;
+        }
+        const hkexSections = queries.map(async ({ query, chart: preference }) => {
+          const evidence = await activity("queryHkex", () => database.query(query), (value) => ({ summary: `${value.rows.length} evidence rows.`, sql: value.sql, parameters: value.parameters }));
+          await activity("computeInsights", async () => buildHkexInsights(evidence, query), (insights) => ({
+            summary: `Calculated ${insights.insights.length} factual findings from returned rows without a model call.`, insights,
+          }));
+          let text = formatHkexEvidence(query, evidence) + "\n\n";
+          if (preference && evidence.rows.length) {
+            const options = getHkexChartOptions(evidence, query);
+            const selected = options.choices.find((option) => option.component === (preference === "auto" ? options.recommendedComponent : preference));
+            if (!selected) {
+              text += "This chart isn't available for these results. Try a different chart.\n\n";
+              onToolActivity({ id: randomUUID(), tool: "renderChart", status: "error", summary: "Selected chart is incompatible with actual results." });
+            } else await activity("renderChart", async () => buildHkexChart(evidence, query, selected.type), (chart) => ({ summary: `Rendered ${chart.elements.chart.props.points.length} grounded points without another model call.`, chart }));
+          }
+          return { query, result: evidence, text };
+        });
+        for (const section of hkexSections) section.catch(() => undefined);
         const results: Awaited<typeof hkexSections[number]>[] = [];
         for (const section of hkexSections) {
           const result = await section;
@@ -352,11 +394,17 @@ export function createHkexRunner(
         }
         // Charts are decided last, after every section has streamed, so they never delay the answer.
         const chartable = sqlEvidence.map((result, index) => ({ index, result })).filter(({ result }) => isChartable(result));
-        if (chartable.length) {
+        const chartTime = Math.min(CHART_TIMEOUT_MS, deadline - Date.now() - CHART_DEADLINE_MARGIN_MS);
+        if (chartable.length && chartTime < MIN_CHART_TIME_MS) {
+          onToolActivity({ id: randomUUID(), tool: "chooseChart", status: "complete", summary: "Skipped the chart because this turn is nearly out of time; the results above are complete." });
+        } else if (chartable.length) {
           const chartId = randomUUID();
+          const chartTimeout = AbortSignal.timeout(chartTime);
           onToolActivity({ id: chartId, tool: "chooseChart", status: "running", summary: "Deciding whether a chart would help; one additional model request." });
           try {
-            const choices = await chooseSqlCharts({ model, settings, abortSignal, onError, question: messages.at(-1)!.content, results: chartable });
+            const choices = await chooseSqlCharts({
+              model, settings, abortSignal: AbortSignal.any([abortSignal, chartTimeout]), onError, question: messages.at(-1)!.content, results: chartable,
+            });
             let rendered = 0;
             for (const choice of choices) {
               try {
@@ -373,7 +421,10 @@ export function createHkexRunner(
             });
           } catch (error) {
             if (abortSignal.aborted) throw error;
-            onToolActivity({ id: chartId, tool: "chooseChart", status: "error", summary: "No chart was added; the results above are complete." });
+            onToolActivity({
+              id: chartId, tool: "chooseChart", status: "error",
+              summary: chartTimeout.aborted ? "Chart selection ran out of time, so no chart was added; the results above are complete." : "No chart was added; the results above are complete.",
+            });
           }
         }
       }

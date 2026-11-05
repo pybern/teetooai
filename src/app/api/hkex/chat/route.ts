@@ -19,16 +19,16 @@ export async function POST(request: Request) {
     if (useCase?.execution !== "database-agent") throw new ConnectionError("Choose a research workspace that supports database questions.", 400);
     release = acquireHkexRequest(request);
     const messages = body.explanationId === undefined ? parseChatMessages(body.messages) : [{ role: "user" as const, content: "Explain these retrieved HKEX results." }];
-    let runner: SavedModelRunner;
-    if (body.explanationId !== undefined) runner = createHkexExplanationRunner(body.explanationId);
-    else {
-      const database = new HkexDatabase(await loadSavedDatabase(), request.signal, agentScopeFor(useCase));
-      const metadata = await database.inspect();
-      runner = createHkexRunner(database, metadata, useCase);
-    }
-    const limitedRunner: SavedModelRunner = async function* (options) {
-      try { yield* runner(options); } finally { release?.(); }
-    };
+    // Database preflight still fails before any model request, but runs alongside the model settings check.
+    const runner: Promise<SavedModelRunner> = body.explanationId !== undefined
+      ? Promise.resolve(createHkexExplanationRunner(body.explanationId))
+      : (async () => {
+        const database = new HkexDatabase(await loadSavedDatabase(), request.signal, agentScopeFor(useCase));
+        return createHkexRunner(database, await database.inspect(), useCase);
+      })();
+    const limitedRunner = runner.then((resolved): SavedModelRunner => async function* (options) {
+      try { yield* resolved(options); } finally { release?.(); }
+    });
     return await streamChatWithSavedModel(messages, request.signal, limitedRunner);
   } catch (error) {
     release?.();
