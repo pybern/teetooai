@@ -1,16 +1,15 @@
 import { describe, expect, it } from "vitest";
 import { buildHkexChart, getHkexChartOptions } from "./hkex-chart";
 import { hkexChartCatalog, hkexChartSpecSchema } from "@/lib/hkex-chart";
-import type { DatabaseEvidence, HkexQuery } from "./hkex-database";
+import type { DatabaseEvidence, HkexEvidence, HkexQuery } from "./hkex-database";
 
 const query: HkexQuery = { mode: "ranking", from: null, to: null, stockCodes: [], currency: "HKD", board: null, metric: "short_selling_value", limit: 10 };
 const row = {
   stock_code: "00700", stock_name: "TENCENT", short_selling_value: "9007199254740993.12",
   short_selling_shares: "9007199254740993", short_turnover_percent: null,
   trading_currency: "HKD", first_date: "2026-01-05", last_date: "2026-01-05",
-  source_url: "https://www.hkex.com.hk/example",
 };
-const evidence: DatabaseEvidence = { sql: "SELECT", parameters: [], rows: [row], truncated: false };
+const evidence: HkexEvidence = { sql: "SELECT", parameters: [], rows: [row], truncated: false, sources: ["https://www.hkex.com.hk/example"] };
 
 describe("grounded json-render chart specification", () => {
   it("builds a catalog-valid ranking with exact decimals, leading zeros, currency, dates and sources", () => {
@@ -54,9 +53,11 @@ describe("grounded json-render chart specification", () => {
   it.each([
     { trading_currency: "USD" }, { stock_code: "700" }, { short_selling_value: "NaN" },
     { short_selling_value: "1e999" }, { first_date: "2026-02-30" },
-    { source_url: "javascript:alert(1)" }, { source_url: "https://www.hkex.com.hk.evil.example/" },
   ])("rejects incompatible or malformed evidence: %j", (override) => {
     expect(() => buildHkexChart({ ...evidence, rows: [{ ...row, ...override }] }, query, "bar")).toThrow();
+  });
+  it.each([[[]], [["javascript:alert(1)"]], [["https://www.hkex.com.hk.evil.example/"]]])("rejects missing or unsafe source links: %j", (sources) => {
+    expect(() => buildHkexChart({ ...evidence, sources }, query, "bar")).toThrow();
   });
   it("rejects empty, oversized or duplicate query results rather than fabricating a plot", () => {
     const missingMetric: DatabaseEvidence["rows"][number] = { ...row };
