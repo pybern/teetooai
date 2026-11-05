@@ -185,6 +185,58 @@ export function formatSqlEvidence(title: string, result: DatabaseEvidence & { re
   ].filter(Boolean).join("\n\n");
 }
 
+export const RESEARCH_CONTEXT_MAX_CHARS = 8000;
+export const RESEARCH_CONTEXT_PREFIX = "Earlier research turn record (context for follow-up questions, not evidence): ";
+const CONTEXT_ROWS = 5;
+const CONTEXT_COLUMNS = 8;
+const CONTEXT_VALUE_CHARS = 60;
+
+type ContextRow = Record<string, string | number | null>;
+export type ResearchTurnRecord = {
+  clarification?: string;
+  stockClarifications?: { search: string; currency: HkexQuery["currency"]; candidates: string[] }[];
+  hkexQueries?: { query: HkexQuery; rows: number; dates: [string, string] | null; truncated: boolean; firstRows?: ContextRow[] }[];
+  sqlQueries?: ({ title: string; sql: string; rows: number; columns: string[]; truncated: boolean; firstRows?: ContextRow[] } | { title: string; sql: string; failed: true })[];
+};
+
+function contextValue(value: unknown): string | number | null {
+  if (value === null || value === undefined) return null;
+  return typeof value === "number" ? value : String(value).slice(0, CONTEXT_VALUE_CHARS);
+}
+
+function contextRows(rows: DatabaseEvidence["rows"], columns: string[]): ContextRow[] {
+  return rows.slice(0, CONTEXT_ROWS).map((row) => Object.fromEntries(columns.filter((column) => column in row).map((column) => [column, contextValue(row[column])])));
+}
+
+export function hkexContextEntry(query: HkexQuery, result: HkexEvidence): NonNullable<ResearchTurnRecord["hkexQueries"]>[number] {
+  const dates = result.rows.flatMap((row) => [row.first_date, row.last_date]).filter((value): value is string => typeof value === "string").sort();
+  const { mode, from, to, stockCodes, currency, board, metric, limit } = query;
+  return {
+    query: { mode, from, to, stockCodes, currency, board, metric, limit },
+    rows: result.rows.length, dates: dates.length ? [dates[0], dates.at(-1)!] : null, truncated: result.truncated,
+    firstRows: contextRows(result.rows, ["stock_code", "stock_name", "trading_date", query.metric]),
+  };
+}
+
+export function sqlContextEntry(title: string, result: DatabaseEvidence): NonNullable<ResearchTurnRecord["sqlQueries"]>[number] {
+  const columns = Object.keys(result.rows[0] ?? {});
+  return { title, sql: result.sql, rows: result.rows.length, columns, truncated: result.truncated, firstRows: contextRows(result.rows, columns.slice(0, CONTEXT_COLUMNS)) };
+}
+
+/** Serializes a turn record for conversation history; leading rows are dropped first, and an oversized record is omitted. */
+export function researchTurnContext(record: ResearchTurnRecord): string | undefined {
+  const serialize = (value: ResearchTurnRecord) => RESEARCH_CONTEXT_PREFIX + JSON.stringify(value);
+  const full = serialize(record);
+  if (full.length <= RESEARCH_CONTEXT_MAX_CHARS) return full;
+  // JSON.stringify omits undefined fields.
+  const compact = serialize({
+    ...record,
+    hkexQueries: record.hkexQueries?.map((entry) => ({ ...entry, firstRows: undefined })),
+    sqlQueries: record.sqlQueries?.map((entry) => "failed" in entry ? entry : { ...entry, firstRows: undefined }),
+  });
+  return compact.length <= RESEARCH_CONTEXT_MAX_CHARS ? compact : undefined;
+}
+
 /** Data scope for a database-agent use case; null datasetIds allows every catalogued dataset. */
 export function agentScopeFor(useCase: UseCase) {
   return { datasetIds: useCase.agentDatasets === "all" ? null : [...useCase.datasetIds] };
@@ -353,8 +405,14 @@ export function createHkexRunner(
       // The answer streams section by section in plan order as each query finishes.
       yield { type: "text-start", id: "research" };
       yield { type: "text-delta", id: "research", text: "## Results\n\n" };
-      if (plan.clarification) yield { type: "text-delta", id: "research", text: `## Clarification needed\n\n${cell(plan.clarification)}` };
-      else {
+      const saveContext = (record: ResearchTurnRecord) => {
+        const context = researchTurnContext(record);
+        if (context) onToolActivity({ id: randomUUID(), tool: "researchContext", status: "complete", summary: "Saved a compact record of this turn's queries for follow-up questions.", context });
+      };
+      if (plan.clarification) {
+        yield { type: "text-delta", id: "research", text: `## Clarification needed\n\n${cell(plan.clarification)}` };
+        saveContext({ clarification: plan.clarification });
+      } else {
         // SQL sections never depend on stock lookups, so they start before them.
         const querySql = (sql: string) => activity("querySql", () => database.runAgentSql(sql), (value) => ({
           summary: `${value.rows.length} rows from ${value.relations.join(", ")}.`, sql: value.sql, parameters: value.parameters,
@@ -386,10 +444,13 @@ export function createHkexRunner(
             if (insights) {
               onToolActivity({ id: randomUUID(), tool: "computeInsights", status: "complete", summary: `Calculated ${insights.insights.length} factual findings from returned rows without a model call.`, insights });
             }
-            return { text: formatSqlEvidence(item.title, evidence) + "\n\n", explained };
+            return { text: formatSqlEvidence(item.title, evidence) + "\n\n", explained, record: sqlContextEntry(item.title, evidence) };
           } catch (error) {
             if (abortSignal.aborted) throw error;
-            return { text: `## ${cell(item.title)}\n\nThis query could not be completed. Try rephrasing the question.\n\n`, explained: null };
+            return {
+              text: `## ${cell(item.title)}\n\nThis query could not be completed. Try rephrasing the question.\n\n`, explained: null,
+              record: { title: item.title, sql: item.sql, failed: true as const },
+            };
           }
         });
         // Prevents unhandled rejections while earlier steps and sections are awaited.
@@ -401,6 +462,7 @@ export function createHkexRunner(
         ] as const)));
         const queries: { query: HkexQuery; chart: (typeof plan.queries)[number]["chart"] }[] = [];
         const clarifications = new Map<string, string>();
+        const stockClarifications = new Map<string, NonNullable<ResearchTurnRecord["stockClarifications"]>[number]>();
         for (const item of plan.queries) {
           const codes = new Set(item.stockCodes);
           let resolved = true;
@@ -410,14 +472,21 @@ export function createHkexRunner(
             if ("code" in match) codes.add(match.code);
             else {
               resolved = false;
-              clarifications.set(JSON.stringify([search, item.currency]), stockClarification(search, item.currency, match.candidates, lookup.truncated));
+              const key = JSON.stringify([search, item.currency]);
+              clarifications.set(key, stockClarification(search, item.currency, match.candidates, lookup.truncated));
+              stockClarifications.set(key, {
+                search, currency: item.currency,
+                candidates: match.candidates.slice(0, CONTEXT_ROWS).map(({ code, name }) => `${code} ${name.slice(0, CONTEXT_VALUE_CHARS)}`),
+              });
             }
           }
           if (resolved) queries.push({ query: validateHkexQuery({ ...item, stockCodes: [...codes] }), chart: item.chart });
         }
         // An unresolved stock skips only the queries that need it; the rest of the plan still runs.
         if (clarifications.size) yield { type: "text-delta", id: "research", text: `## Clarification needed\n\n${[...clarifications.values()].join("\n\n")}\n\n` };
+        const stockNotes = stockClarifications.size ? { stockClarifications: [...stockClarifications.values()] } : {};
         if (!queries.length && !sqlSections.length) {
+          saveContext(stockNotes);
           yield { type: "text-end", id: "research" };
           yield finish;
           return;
@@ -446,11 +515,18 @@ export function createHkexRunner(
           yield { type: "text-delta", id: "research", text: result.text };
         }
         const sqlEvidence: SqlExplanationResult[] = [];
+        const sqlRecords: NonNullable<ResearchTurnRecord["sqlQueries"]> = [];
         for (const section of sqlSections) {
-          const { text, explained } = await section;
+          const { text, explained, record } = await section;
           if (explained) sqlEvidence.push(explained);
+          sqlRecords.push(record);
           yield { type: "text-delta", id: "research", text };
         }
+        saveContext({
+          ...stockNotes,
+          ...(results.length ? { hkexQueries: results.map(({ query, result }) => hkexContextEntry(query, result)) } : {}),
+          ...(sqlRecords.length ? { sqlQueries: sqlRecords } : {}),
+        });
         const savedEvidence = results.map(({ query, result }) => ({ query, result }));
         if (savedEvidence.some((item) => item.result.rows.length) || sqlEvidence.some((item) => item.rows.length)) {
           const explanationId = storeHkexExplanation(messages.at(-1)!.content, savedEvidence, {

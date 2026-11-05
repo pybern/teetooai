@@ -74,7 +74,7 @@ beforeAll(async () => {
     if (body.response_format?.json_schema?.name === "agentSqlRepair") {
       sqlRepairCalls.push(body);
       response.writeHead(200, { "Content-Type": "text/event-stream" });
-      response.end(chunk({ content: JSON.stringify(sqlRepair) }, "stop") + "data: [DONE]\n\n");
+      response.end(chunk({ content: JSON.stringify(typeof sqlRepair === "function" ? sqlRepair(body) : sqlRepair) }, "stop") + "data: [DONE]\n\n");
       return;
     }
     calls.push(body);
@@ -1154,6 +1154,83 @@ describe("catalog-guided research", () => {
     expect(chartCalls).toHaveLength(0);
     expect(result.tools?.some((item) => item.tool === "chooseChart")).toBe(false);
     expect(result.tools?.some((item) => item.tool === "computeInsights")).toBe(false);
+  });
+
+  const turnRecord = (tools: ModelChatToolActivity[] | undefined) => {
+    const context = tools?.find((item) => item.tool === "researchContext")?.context;
+    expect(context?.startsWith(agent.RESEARCH_CONTEXT_PREFIX)).toBe(true);
+    return { context: context!, record: JSON.parse(context!.slice(agent.RESEARCH_CONTEXT_PREFIX.length)) };
+  };
+
+  it.each(["hk", "hkex-db"])("records what ran for follow-ups in %s, and the planner receives the record instead of the rendered tables", async (useCaseId) => {
+    await saveSettings(); interceptChat();
+    const sql = useCaseId === "hk" ? "SELECT id FROM public.insightful_datasets ORDER BY id LIMIT 5" : finalSql;
+    plan = { clarification: null, queries: [{ ...queryInput }], sqlQueries: [{ title: "Largest economies", sql }] };
+    script = [];
+    const first = await sendModelChat(undefined, [{ role: "user", content: "Rank stocks and economies" }], new AbortController().signal, vi.fn(), vi.fn(), { api: "/api/hkex/chat", useCaseId });
+    const { context, record } = turnRecord(first.tools);
+    expect(record).toEqual({
+      hkexQueries: [{
+        query: { mode: "ranking", from: null, to: null, stockCodes: [], currency: "HKD", board: null, metric: "short_selling_value", limit: 10 },
+        rows: 1, dates: ["2026-01-05", "2026-01-05"], truncated: false,
+        firstRows: [{ stock_code: "00700", stock_name: "TENCENT", short_selling_value: "12345.67" }],
+      }],
+      sqlQueries: [{
+        title: "Largest economies", sql, rows: 2, columns: ["entity", "gdp"], truncated: false,
+        firstRows: [{ entity: "United States", gdp: "27.4" }, { entity: "China", gdp: "18.5" }],
+      }],
+    });
+    expect(context).not.toContain("| --- |");
+    await sendModelChat(undefined, [
+      { role: "user", content: "Rank stocks and economies" }, { role: "assistant", content: context }, { role: "user", content: "Same for 2025" },
+    ], new AbortController().signal, vi.fn(), vi.fn(), { api: "/api/hkex/chat", useCaseId });
+    const prompt = JSON.stringify(calls.at(-1)!.messages);
+    expect(prompt).toContain("Earlier research turn record");
+    expect(prompt).toContain("Earlier assistant turns may be research records");
+    expect(prompt).not.toContain("| --- |");
+  });
+
+  it("records the corrected SQL that ran, failed queries, stock clarifications and planner clarifications", async () => {
+    await saveSettings(); interceptChat();
+    plan = {
+      clarification: null, queries: [{ ...queryInput, stockSearches: ["bank"] }],
+      sqlQueries: [{ title: "Fixed", sql: "SELECT settings FROM public.insightful_configuration" }, { title: "Secrets", sql: "SELECT * FROM insightful_configuration" }],
+    };
+    script = [];
+    sqlRepair = (body: unknown) => ({ sql: JSON.stringify(body).includes("Secrets") ? "SELECT * FROM insightful_configuration" : finalSql });
+    const original = pg.query.getMockImplementation()!;
+    pg.query.mockImplementation(async (input: string | { text: string }, parameters?: unknown[]) => {
+      const text = typeof input === "string" ? input : input.text;
+      if (text.includes("stock_name ILIKE")) return { rows: [evidence, { ...evidence, stock_code: "00005", stock_name: "HSBC HOLDINGS" }] };
+      return original(input, parameters);
+    });
+    const { record } = turnRecord((await research()).tools);
+    expect(record.stockClarifications).toEqual([{ search: "bank", currency: "HKD", candidates: ["00700 TENCENT", "00005 HSBC HOLDINGS"] }]);
+    expect(record.hkexQueries).toBeUndefined();
+    expect(record.sqlQueries).toEqual([
+      expect.objectContaining({ title: "Fixed", sql: finalSql, rows: 2 }),
+      { title: "Secrets", sql: "SELECT * FROM insightful_configuration", failed: true },
+    ]);
+
+    plan = { clarification: "Which period do you mean?", queries: [], sqlQueries: [] };
+    expect(turnRecord((await research()).tools).record).toEqual({ clarification: "Which period do you mean?" });
+  });
+});
+
+describe("follow-up research context", () => {
+  const query = { mode: "ranking", from: null, to: null, stockCodes: [], currency: "HKD", board: null, metric: "short_selling_value", limit: 10 } as const;
+  const sqlEntry = (rows: number) => ({ title: "Rows", sql: "SELECT 1", rows, columns: ["a"], truncated: false, firstRows: [{ a: "x".repeat(60) }] });
+  it("keeps the record within its budget by dropping leading rows first, then omitting it", () => {
+    const small = agent.researchTurnContext({ sqlQueries: [sqlEntry(1)] })!;
+    expect(small).toContain('"firstRows"');
+    const many = { hkexQueries: Array(3).fill({ query, rows: 5, dates: null, truncated: false, firstRows: Array(5).fill({ stock_name: "x".repeat(60) }) }), sqlQueries: Array(3).fill(sqlEntry(5)).map((entry) => ({ ...entry, firstRows: Array(5).fill({ a: "y".repeat(200), b: "z".repeat(200), c: "w".repeat(200), d: "v".repeat(200) }) })) };
+    expect(JSON.stringify(many).length).toBeGreaterThan(agent.RESEARCH_CONTEXT_MAX_CHARS);
+    const compact = agent.researchTurnContext(many)!;
+    expect(compact.length).toBeLessThanOrEqual(agent.RESEARCH_CONTEXT_MAX_CHARS);
+    expect(compact).not.toContain("firstRows");
+    expect(compact).toContain('"rows":5');
+    const huge = { sqlQueries: Array(3).fill({ title: "Long", sql: "S".repeat(4000), failed: true as const }) };
+    expect(agent.researchTurnContext(huge)).toBeUndefined();
   });
 });
 

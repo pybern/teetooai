@@ -42,7 +42,9 @@ export type PublicConnections = {
 };
 export type ConnectionTestResult = { ok: true; message: string; feedback: string; durationMs: number };
 export type ModelChatMessage = { role: "user" | "assistant"; content: string };
-export type ModelChatToolActivity = { id: string; tool: string; status: "running" | "complete" | "error"; summary: string; sql?: string; parameters?: (string | string[] | number | null)[]; chart?: HkexChartSpec; sqlChart?: SqlChartSpec; insights?: InsightSummary; explanationId?: string };
+export type ModelChatToolActivity = { id: string; tool: string; status: "running" | "complete" | "error"; summary: string; sql?: string; parameters?: (string | string[] | number | null)[]; chart?: HkexChartSpec; sqlChart?: SqlChartSpec; insights?: InsightSummary; explanationId?: string;
+  /** Compact record of a research turn, sent back in place of the rendered answer when the turn is history. */
+  context?: string };
 export type ModelChatResult = { message: ModelChatMessage; reasoning?: string; tools?: ModelChatToolActivity[]; model: string; baseUrl: string; durationMs: number };
 export type ModelChatMetadata = { model: string; baseUrl: string; durationMs: number; completed: boolean };
 export type DatabaseInitializationResult = {

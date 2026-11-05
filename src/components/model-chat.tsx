@@ -198,6 +198,12 @@ function ExplainResults({ id, onExplain, disabled }: { id: string; onExplain: No
 
 type ConversationMessage = ModelChatMessage & { reasoning?: string; tools?: ModelChatToolActivity[] };
 
+/** Earlier research answers are resent as the server's compact record of what ran, not their rendered tables. */
+function historyContent(message: ConversationMessage, agentMode: boolean): string {
+  if (!agentMode || message.role !== "assistant") return message.content;
+  return message.tools?.find((item) => item.context)?.context ?? message.content;
+}
+
 const ChatMessage = memo(function ChatMessage({ message, agentMode, onExplain, disabled }: {
   message: ConversationMessage;
   agentMode: boolean;
@@ -241,7 +247,7 @@ export function ModelChat({
   const log = useRef<HTMLDivElement>(null);
   const input = useRef<HTMLTextAreaElement>(null);
   const full = messages.length + 1 > MAX_CHAT_MESSAGES ||
-    messages.reduce((total, message) => total + message.content.length, 0) + draft.trim().length > MAX_CHAT_TOTAL_CHARS;
+    messages.reduce((total, message) => total + historyContent(message, agentMode).length, 0) + draft.trim().length > MAX_CHAT_TOTAL_CHARS;
   const buttonClass = "min-h-10 border border-slate-600 px-4 text-sm text-slate-200 transition hover:border-sky-400 hover:text-white disabled:cursor-not-allowed disabled:opacity-50";
 
   useEffect(() => () => { activeRequest.current?.abort(); }, []);
@@ -288,7 +294,7 @@ export function ModelChat({
     setIncomplete(null);
     const partial = { prompt: user.content, text: "", reasoning: "", tools: [] as ModelChatToolActivity[] };
     try {
-      const context = [...messages, user].map(({ role, content }) => ({ role, content }));
+      const context = [...messages, user].map((message) => ({ role: message.role, content: historyContent(message, agentMode) }));
       const result = await onSend(context, controller.signal, (text) => {
         if (!controller.signal.aborted) { partial.text = text; setStreamingText(text); }
       }, (reasoning) => {

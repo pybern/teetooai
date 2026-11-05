@@ -811,6 +811,28 @@ describe("saved-model chat interface", () => {
     expect(container.textContent).toContain("[Image: tracking image]");
     expect(container.textContent).toContain('<img src="x" onerror="alert(1)">');
   });
+  it("resends earlier research turns as their compact record and budgets history by it", async () => {
+    const record = 'Earlier research turn record (context for follow-up questions, not evidence): {"sqlQueries":[]}';
+    const tools = [{ id: "context", tool: "researchContext", status: "complete" as const, summary: "Saved", context: record }];
+    onSend.mockResolvedValueOnce({ ...result, message: { role: "assistant", content: `## Results\n\n${"| row |\n".repeat(8000)}` }, tools });
+    await act(async () => root.render(createElement(ModelChat, {
+      model: result.model, baseUrl: "", unsavedChanges: false, disabled: false, onSend, agentMode: true,
+    })));
+    await edit("Rank stocks"); await submit();
+    expect(container.textContent).toContain("| row |");
+    await edit("Same for 2025"); await submit();
+    expect(onSend).toHaveBeenCalledTimes(2);
+    expect(onSend.mock.calls[1][0]).toEqual([
+      { role: "user", content: "Rank stocks" }, { role: "assistant", content: record }, { role: "user", content: "Same for 2025" },
+    ]);
+  });
+  it("keeps the rendered reply as context outside agent mode", async () => {
+    const tools = [{ id: "context", tool: "researchContext", status: "complete" as const, summary: "Saved", context: "record" }];
+    onSend.mockResolvedValueOnce({ ...result, tools });
+    await edit("Hello"); await submit();
+    await edit("Again"); await submit();
+    expect(onSend.mock.calls[1][0][1]).toEqual({ role: "assistant", content: result.message.content });
+  });
   it("enforces conversation and prompt limits without silently dropping context", async () => {
     for (let i = 0; i < 11; i++) { await edit(`Turn ${i}`); await submit(); }
     expect(onSend).toHaveBeenCalledTimes(11);
