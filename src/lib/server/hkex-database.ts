@@ -26,6 +26,8 @@ export type CatalogDetail = {
 };
 export const AGENT_SQL_ROW_LIMIT = 100;
 export const HKEX_READ_LIMIT = 24;
+export const EVIDENCE_MAX_CHARS = 32000;
+const AGENT_SQL_ROWS_MAX_CHARS = 24000;
 const METADATA_MAX_CHARS = 128000;
 const rawText = { getTypeParser: () => (value: string) => value };
 
@@ -34,6 +36,23 @@ function date(value: unknown): value is string | null {
   if (typeof value !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
   const parsed = new Date(`${value}T00:00:00Z`);
   return Number.isFinite(parsed.getTime()) && parsed.toISOString().slice(0, 10) === value;
+}
+
+/**
+ * Keep the longest prefix of rows whose JSON fits the budget, so a large result becomes partial instead of failing.
+ * The first row is always kept; if it alone is too large, the read's evidence limit still rejects it.
+ */
+export function fitRows<T>(rows: T[], budget: number): { rows: T[]; truncated: boolean } {
+  let size = 2;
+  for (let index = 0; index < rows.length; index++) {
+    size += JSON.stringify(rows[index]).length + (index ? 1 : 0);
+    if (size > budget && index > 0) return { rows: rows.slice(0, index), truncated: true };
+  }
+  return { rows, truncated: false };
+}
+
+function evidenceRowBudget(envelope: object, rowsMaxChars = EVIDENCE_MAX_CHARS) {
+  return Math.min(rowsMaxChars, EVIDENCE_MAX_CHARS - JSON.stringify({ ...envelope, rows: [], truncated: false }).length);
 }
 
 export function validateHkexQuery(value: HkexQuery): HkexQuery {
@@ -102,7 +121,7 @@ export class HkexDatabase {
     this.signal = AbortSignal.any([this.signal, signal]);
   }
 
-  private async read<T>(operation: (client: Client) => Promise<T>, exposeQueryErrors = false, maxChars = 32000): Promise<T> {
+  private async read<T>(operation: (client: Client) => Promise<T>, exposeQueryErrors = false, maxChars = EVIDENCE_MAX_CHARS): Promise<T> {
     if (this.signal.aborted) throw new ConnectionError("Database research was cancelled.", 499);
     if (++this.calls > HKEX_READ_LIMIT) throw new ConnectionError(`Database research reached its ${HKEX_READ_LIMIT}-read limit. Ask a narrower question.`, 429);
     const client = createPostgresClient(this.settings, "insightful-hkex-agent", 10000);
@@ -197,7 +216,8 @@ export class HkexDatabase {
     const { sql, parameters } = buildHkexQuery(input);
     return this.read(async (client) => {
       const rows = (await client.query<DatabaseRow>(sql, parameters)).rows;
-      return { sql, parameters, rows: rows.slice(0, input.limit), truncated: rows.length > input.limit };
+      const fitted = fitRows(rows.slice(0, input.limit), evidenceRowBudget({ sql, parameters }));
+      return { sql, parameters, rows: fitted.rows, truncated: rows.length > input.limit || fitted.truncated };
     });
   }
 
@@ -241,12 +261,11 @@ export class HkexDatabase {
     const wrapped = `SELECT * FROM (\n${executable}\n) AS agent_query LIMIT ${limit + 1}`;
     return this.read(async (client) => {
       const result = await client.query<DatabaseRow>({ text: wrapped, types: rawText });
-      let rows = result.rows.slice(0, limit).map((row) => Object.fromEntries(Object.entries(row).map(([key, value]) => [
+      const rows = result.rows.slice(0, limit).map((row) => Object.fromEntries(Object.entries(row).map(([key, value]) => [
         key.slice(0, 63), value === null || value === undefined ? null : String(value).slice(0, 300),
       ])));
-      let truncated = result.rows.length > limit;
-      while (rows.length > 1 && JSON.stringify(rows).length > 24000) { rows = rows.slice(0, Math.ceil(rows.length / 2)); truncated = true; }
-      return { sql, parameters: [], rows, truncated, relations };
+      const fitted = fitRows(rows, evidenceRowBudget({ sql, parameters: [], relations }, AGENT_SQL_ROWS_MAX_CHARS));
+      return { sql, parameters: [], rows: fitted.rows, truncated: result.rows.length > limit || fitted.truncated, relations };
     }, true);
   }
 }

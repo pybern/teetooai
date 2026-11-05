@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { DEFAULT_CONNECTIONS } from "@/lib/connections";
-import { buildHkexQuery, HkexDatabase, HKEX_READ_LIMIT, validateHkexQuery, type HkexQuery } from "./hkex-database";
+import { buildHkexQuery, EVIDENCE_MAX_CHARS, fitRows, HkexDatabase, HKEX_READ_LIMIT, validateHkexQuery, type HkexQuery } from "./hkex-database";
 import { buildCatalogEntries, catalogIdsForScope } from "./table-catalog";
 
 const pg = vi.hoisted(() => ({ connect: vi.fn(), query: vi.fn(), end: vi.fn(), on: vi.fn() }));
@@ -76,6 +76,41 @@ describe("bounded HKEX queries", () => {
     await expect(database.inspect()).rejects.toThrow("existing HKEX table is empty");
     pg.query.mockImplementation(async (sql: string) => ({ rows: sql.startsWith("WITH latest") ? [{ stock_name: "x".repeat(32001) }] : [] }));
     await expect(database.query(filters)).rejects.toThrow("32,000");
+  });
+  it.each(["ranking", "stock-trend", "market-trend"] as const)("returns a partial %s result instead of failing when 100 typical rows exceed the evidence limit", async (mode) => {
+    const row = (index: number) => ({
+      ...(mode === "ranking" ? {} : { trading_date: `2026-${String(1 + Math.floor(index / 28)).padStart(2, "0")}-${String(1 + (index % 28)).padStart(2, "0")}` }),
+      ...(mode === "market-trend" ? {} : { stock_code: String(index).padStart(5, "0"), stock_name: "TENCENT HOLDINGS" }),
+      trading_currency: "HKD", first_date: "2026-08-24", last_date: "2026-10-20", observations: "40",
+      short_selling_shares: "123456789", short_selling_value: "12345678901.234", total_traded_shares: "987654321",
+      total_turnover: "98765432109.876", short_turnover_percent: "12.3456", source_url: "https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm",
+    });
+    const rows = Array.from({ length: 101 }, (_, index) => row(index));
+    pg.query.mockImplementation(async (sql: string) => ({ rows: sql.startsWith("WITH latest") ? rows : [] }));
+    const query = { ...filters, mode, stockCodes: mode === "stock-trend" ? ["00700"] : [], limit: 100 };
+    const result = await new HkexDatabase(settings, new AbortController().signal).query(query);
+    expect(result.truncated).toBe(true);
+    expect(result.rows.length).toBeLessThan(100);
+    expect(result.rows).toEqual(rows.slice(0, result.rows.length));
+    expect(JSON.stringify(result).length).toBeLessThanOrEqual(EVIDENCE_MAX_CHARS);
+    expect(JSON.stringify({ ...result, rows: rows.slice(0, result.rows.length + 1) }).length).toBeGreaterThan(EVIDENCE_MAX_CHARS);
+  });
+  it("keeps every catalogue SQL row that fits instead of halving the result", async () => {
+    const wide = Array.from({ length: 101 }, (_, index) => ({ id: String(index), note: "x".repeat(300) }));
+    pg.query.mockImplementation(async (input: string | { text: string }) => ({
+      rows: typeof input === "object" && input.text.includes("AS agent_query") ? wide : [],
+    }));
+    const result = await new HkexDatabase(settings, new AbortController().signal).runAgentSql("SELECT id, title AS note FROM public.insightful_datasets ORDER BY id");
+    expect(result.truncated).toBe(true);
+    expect(result.rows.length).toBeGreaterThan(70);
+    expect(result.rows.length).toBeLessThan(100);
+    expect(JSON.stringify(result.rows).length).toBeLessThanOrEqual(24000);
+    expect(JSON.stringify([...result.rows, wide[result.rows.length]]).length).toBeGreaterThan(24000);
+  });
+  it("fits rows to a character budget, always keeping the first row", () => {
+    expect(fitRows([{ a: 1 }, { a: 2 }], 100)).toEqual({ rows: [{ a: 1 }, { a: 2 }], truncated: false });
+    expect(fitRows([{ a: 1 }, { a: 2 }], JSON.stringify([{ a: 1 }]).length)).toEqual({ rows: [{ a: 1 }], truncated: true });
+    expect(fitRows([{ a: "x".repeat(50) }], 10)).toEqual({ rows: [{ a: "x".repeat(50) }], truncated: false });
   });
   it.each([null, ["hk-indices", "hk-valuations", "hk-prices", "hk-financials"]])("preloads all permitted real catalog descriptions for scope %j", async (datasetIds) => {
     const scope = { datasetIds };
