@@ -2,7 +2,7 @@ import { randomUUID } from "node:crypto";
 import { isStepCount, NoObjectGeneratedError, NoOutputGeneratedError, Output, streamText, tool, type TextStreamPart, type ToolSet } from "ai";
 import { z } from "zod";
 import { ConnectionError, type SavedModelRunner } from "./connections";
-import { HkexDatabase, HKEX_METRICS, HKEX_QUERY_MODES, validateHkexQuery, type DatabaseEvidence, type HkexQuery } from "./hkex-database";
+import { HkexDatabase, HKEX_METRICS, HKEX_QUERY_MODES, validateHkexQuery, type DatabaseEvidence, type HkexEvidence, type HkexQuery } from "./hkex-database";
 import { HKEX_AGENT_INSTRUCTIONS, HKEX_RESEARCH_SKILL, NO_CATALOG_INSTRUCTIONS, PRELOADED_CATALOG_INSTRUCTIONS } from "./hkex-skills";
 import { AGENT_SQL_MAX_CHARS } from "./agent-sql";
 import { outputTokenLimit, type ModelChatToolActivity } from "@/lib/connections";
@@ -86,15 +86,15 @@ function cell(value: unknown): string {
   return String(value ?? "Unavailable").replace(/[\\`*_[\]<>|]/g, "\\$&").replace(/[\r\n]+/g, " ");
 }
 
-export function formatHkexEvidence(query: HkexQuery, result: DatabaseEvidence): string {
+export function formatHkexEvidence(query: HkexQuery, result: HkexEvidence): string {
   const metric = HKEX_CHART_METRICS[query.metric];
   const unit = query.metric === "short_selling_value" ? query.currency : query.metric === "short_turnover_percent" ? "%" : "shares";
   const rows = result.rows.slice(0, 10);
   const dates = result.rows.flatMap((row) => [row.first_date, row.last_date]).filter((value): value is string => typeof value === "string").sort();
-  const sources = [...new Set(result.rows.map((row) => row.source_url).filter((value): value is string => {
-    if (typeof value !== "string" || value.length > 512) return false;
+  const sources = result.sources.filter((value) => {
+    if (value.length > 512) return false;
     try { const url = new URL(value); return url.origin === "https://www.hkex.com.hk" && !url.username && !url.password; } catch { return false; }
-  }))];
+  });
   return [
     `## ${metric} (${unit})`,
     `Currency: **${query.currency}**. Dates covered: **${dates[0] ?? "No matching data"}** to **${dates.at(-1) ?? "No matching data"}**. Results: **${result.rows.length}**.`,
@@ -104,7 +104,9 @@ export function formatHkexEvidence(query: HkexQuery, result: DatabaseEvidence): 
       ...rows.map((row) => `| ${cell(row.stock_code ? `${row.stock_code} ${String(row.stock_name ?? "").slice(0, 120)}` : "Market")} | ${cell(row.trading_date ?? `${row.first_date} to ${row.last_date}`)} | ${cell(row[query.metric])} |`),
     ].join("\n") : "No matching data was found. This does not mean there was no activity.",
     result.rows.length > 10 ? "The table shows the first 10 results; charts include all results shown for this question." : "",
-    result.truncated ? "**Partial results:** more matching data is available. Try a narrower date range or fewer stocks for a complete comparison." : "",
+    result.truncated ? query.mode === "ranking"
+      ? "**Partial results:** more matching data is available. Try a narrower date range or fewer stocks for a complete comparison."
+      : "**Partial results:** only the most recent dates fit, so earlier dates in the period are not included. Try a narrower date range or fewer stocks for a complete comparison." : "",
     sources.length ? `Representative sources: ${sources.slice(0, 3).map((url, index) => `[HKEX ${index + 1}](${new URL(url).href.replace(/\(/g, "%28").replace(/\)/g, "%29")})`).join(", ")}.` : "No valid representative HKEX source link was returned.",
     "### About the data\nFigures may not include the latest activity. Missing values do not mean zero. A turnover ratio is unavailable when total turnover is missing or zero. Short turnover ratio is not short interest. Currencies are shown separately.",
   ].filter(Boolean).join("\n\n");

@@ -77,23 +77,61 @@ describe("bounded HKEX queries", () => {
     pg.query.mockImplementation(async (sql: string) => ({ rows: sql.startsWith("WITH latest") ? [{ stock_name: "x".repeat(32001) }] : [] }));
     await expect(database.query(filters)).rejects.toThrow("32,000");
   });
-  it.each(["ranking", "stock-trend", "market-trend"] as const)("returns a partial %s result instead of failing when 100 typical rows exceed the evidence limit", async (mode) => {
-    const row = (index: number) => ({
-      ...(mode === "ranking" ? {} : { trading_date: `2026-${String(1 + Math.floor(index / 28)).padStart(2, "0")}-${String(1 + (index % 28)).padStart(2, "0")}` }),
-      ...(mode === "market-trend" ? {} : { stock_code: String(index).padStart(5, "0"), stock_name: "TENCENT HOLDINGS" }),
-      trading_currency: "HKD", first_date: "2026-08-24", last_date: "2026-10-20", observations: "40",
-      short_selling_shares: "123456789", short_selling_value: "12345678901.234", total_traded_shares: "987654321",
-      total_turnover: "98765432109.876", short_turnover_percent: "12.3456", source_url: "https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm",
-    });
-    const rows = Array.from({ length: 101 }, (_, index) => row(index));
-    pg.query.mockImplementation(async (sql: string) => ({ rows: sql.startsWith("WITH latest") ? rows : [] }));
-    const query = { ...filters, mode, stockCodes: mode === "stock-trend" ? ["00700"] : [], limit: 100 };
+  const day = (index: number) => new Date(Date.UTC(2026, 9, 31) - index * 86400000).toISOString().slice(0, 10);
+  const hkexRow = (date: string | null, code: string | null) => ({
+    ...(date ? { trading_date: date } : {}),
+    ...(code ? { stock_code: code, stock_name: "TENCENT HOLDINGS" } : {}),
+    trading_currency: "HKD", first_date: date ?? "2026-08-24", last_date: date ?? "2026-10-20", observations: "40",
+    short_selling_shares: "123456789", short_selling_value: "12345678901.234", total_traded_shares: "987654321",
+    total_turnover: "98765432109.876", short_turnover_percent: "12.3456",
+    source_url: `https://www.hkex.com.hk/eng/stat/smstat/dayquot/d${(date ?? "2026-10-20").slice(2).replaceAll("-", "")}e.htm`,
+  });
+  const runQuery = async (query: HkexQuery, fetched: Record<string, unknown>[]) => {
+    pg.query.mockImplementation(async (sql: string) => ({ rows: sql.startsWith("WITH latest") ? fetched : [] }));
     const result = await new HkexDatabase(settings, new AbortController().signal).query(query);
-    expect(result.truncated).toBe(true);
-    expect(result.rows.length).toBeLessThan(100);
-    expect(result.rows).toEqual(rows.slice(0, result.rows.length));
     expect(JSON.stringify(result).length).toBeLessThanOrEqual(EVIDENCE_MAX_CHARS);
-    expect(JSON.stringify({ ...result, rows: rows.slice(0, result.rows.length + 1) }).length).toBeGreaterThan(EVIDENCE_MAX_CHARS);
+    expect(result.rows.some((row) => "source_url" in row)).toBe(false);
+    return result;
+  };
+  it("orders trends newest first in SQL so a cut keeps the latest dates", () => {
+    expect(buildHkexQuery({ ...filters, mode: "market-trend" }).sql).toContain("ORDER BY trading_date DESC, trading_currency DESC");
+    expect(buildHkexQuery({ ...filters, mode: "stock-trend", stockCodes: ["00700"] }).sql).toContain("ORDER BY trading_date DESC, stock_code DESC, trading_currency DESC");
+  });
+  it("returns a partial ranking instead of failing, listing the shared source once", async () => {
+    const fetched = Array.from({ length: 101 }, (_, index) => hkexRow(null, String(index).padStart(5, "0")));
+    const result = await runQuery({ ...filters, limit: 100 }, fetched);
+    expect(result.truncated).toBe(true);
+    expect(result.rows.length).toBeGreaterThan(85);
+    expect(result.rows.length).toBeLessThan(100);
+    expect(result.rows.map((row) => row.stock_code)).toEqual(fetched.slice(0, result.rows.length).map((row) => row.stock_code));
+    expect(result.sources).toEqual(["https://www.hkex.com.hk/eng/stat/smstat/dayquot/d261020e.htm"]);
+  });
+  it("keeps the most recent dates of a market trend that does not fit, returned oldest first", async () => {
+    const fetched = Array.from({ length: 101 }, (_, index) => hkexRow(day(index), null));
+    const result = await runQuery({ ...filters, mode: "market-trend", limit: 100 }, fetched);
+    expect(result.truncated).toBe(true);
+    const dates = result.rows.map((row) => row.trading_date);
+    expect(dates.at(-1)).toBe(day(0));
+    expect(dates).toEqual(fetched.slice(0, dates.length).map((row) => row.trading_date).reverse());
+    expect(result.sources).toHaveLength(dates.length);
+  });
+  it("keeps only complete recent dates of a stock trend cut mid-date", async () => {
+    const codes = ["00700", "00005", "00001"];
+    const fetched = Array.from({ length: 40 }, (_, index) => codes.map((code) => hkexRow(day(index), code))).flat();
+    const result = await runQuery({ ...filters, mode: "stock-trend", stockCodes: codes, limit: 100 }, fetched.slice(0, 101));
+    expect(result.truncated).toBe(true);
+    const byDate = Map.groupBy(result.rows, (row) => row.trading_date);
+    expect([...byDate.values()].every((rows) => rows.length === codes.length)).toBe(true);
+    expect([...byDate.keys()].at(-1)).toBe(day(0));
+    expect([...byDate.keys()]).toEqual([...byDate.keys()].toSorted());
+  });
+  it("keeps a stock trend whole when the cut falls between dates", async () => {
+    const codes = ["00700", "00005"];
+    const fetched = Array.from({ length: 6 }, (_, index) => codes.map((code) => hkexRow(day(index), code))).flat();
+    const result = await runQuery({ ...filters, mode: "stock-trend", stockCodes: codes, limit: 10 }, fetched.slice(0, 11));
+    expect(result.truncated).toBe(true);
+    expect(result.rows).toHaveLength(10);
+    expect(result.rows[0].trading_date).toBe(day(4));
   });
   it("keeps every catalogue SQL row that fits instead of halving the result", async () => {
     const wide = Array.from({ length: 101 }, (_, index) => ({ id: String(index), note: "x".repeat(300) }));

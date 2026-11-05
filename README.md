@@ -479,7 +479,11 @@ Query evidence is different: when a template or catalogue SQL result would
 exceed its limit, the server keeps as many leading rows as fit and marks the
 section as partial, instead of failing. Catalogue SQL rows also stay within a
 24,000-character budget. Only a single row too large to fit on its own is
-rejected.
+rejected. Trend queries are read newest first, so a cut drops the earliest
+dates and keeps the latest ones; rows are then returned oldest first for
+display. A cut stock trend also drops a partly kept oldest date so every shown
+date covers all requested stocks. HKEX source links are returned once per
+result in `sources` rather than on every row, which leaves room for more rows.
 The only model-callable tool is `runSql` (at most one call and two model steps
 per turn; the final step has no tools so it always returns a plan):
 

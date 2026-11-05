@@ -19,6 +19,8 @@ export type HkexQuery = {
 };
 type DatabaseRow = Record<string, string | number | null>;
 export type DatabaseEvidence = { sql: string; parameters: (string | string[] | number | null)[]; rows: DatabaseRow[]; truncated: boolean };
+/** Template-query evidence: rows omit source_url, and the result lists each distinct representative HKEX source once. */
+export type HkexEvidence = DatabaseEvidence & { sources: string[] };
 export type CatalogOverview = { id: string; kind: string; title: string }[];
 export type CatalogDetail = {
   id: string; relation: string; title: string; description: string; columns: unknown; sample_rows: unknown;
@@ -49,6 +51,14 @@ export function fitRows<T>(rows: T[], budget: number): { rows: T[]; truncated: b
     if (size > budget && index > 0) return { rows: rows.slice(0, index), truncated: true };
   }
   return { rows, truncated: false };
+}
+
+function hkexSources(rows: DatabaseRow[]): string[] {
+  return [...new Set(rows.map((row) => row.source_url).filter((value): value is string => typeof value === "string" && value.length > 0))];
+}
+
+function withoutSource(row: DatabaseRow): DatabaseRow {
+  return Object.fromEntries(Object.entries(row).filter(([key]) => key !== "source_url"));
 }
 
 function evidenceRowBudget(envelope: object, rowsMaxChars = EVIDENCE_MAX_CHARS) {
@@ -102,7 +112,7 @@ export function buildHkexQuery(input: HkexQuery): { sql: string; parameters: Dat
         AND ($4::text IS NULL OR board = $4)
         AND (cardinality($5::text[]) = 0 OR stock_code = ANY($5::text[]))
       GROUP BY ${groups}
-      ORDER BY ${trend ? `trading_date ASC, ${stock ? "stock_code ASC," : ""} trading_currency ASC` : `${metric === "short_turnover_percent"
+      ORDER BY ${trend ? `trading_date DESC, ${stock ? "stock_code DESC, " : ""}trading_currency DESC` : `${metric === "short_turnover_percent"
         ? "100 * sum(short_selling_value) / nullif(sum(total_turnover), 0)"
         : `sum(${metric})`} DESC NULLS LAST, stock_code ASC`}
       LIMIT $6`,
@@ -212,12 +222,23 @@ export class HkexDatabase {
     });
   }
 
-  async query(input: HkexQuery): Promise<DatabaseEvidence> {
+  async query(input: HkexQuery): Promise<HkexEvidence> {
     const { sql, parameters } = buildHkexQuery(input);
     return this.read(async (client) => {
-      const rows = (await client.query<DatabaseRow>(sql, parameters)).rows;
-      const fitted = fitRows(rows.slice(0, input.limit), evidenceRowBudget({ sql, parameters }));
-      return { sql, parameters, rows: fitted.rows, truncated: rows.length > input.limit || fitted.truncated };
+      // Trends arrive newest first so any cut keeps the latest dates; they are returned oldest first.
+      const fetched = (await client.query<DatabaseRow>(sql, parameters)).rows;
+      let rows = fetched.slice(0, input.limit);
+      let truncated = fetched.length > input.limit;
+      const fitted = fitRows(rows.map(withoutSource), evidenceRowBudget({ sql, parameters, sources: hkexSources(rows) }));
+      if (fitted.truncated) { rows = rows.slice(0, fitted.rows.length); truncated = true; }
+      const oldest = rows.at(-1)?.trading_date;
+      if (input.mode === "stock-trend" && fetched[rows.length]?.trading_date === oldest) {
+        // The cut fell inside the oldest kept date, which would show only some stocks; drop it unless it is the only date.
+        const complete = rows.filter((row) => row.trading_date !== oldest);
+        if (complete.length) rows = complete;
+      }
+      if (input.mode !== "ranking") rows = [...rows].reverse();
+      return { sql, parameters, rows: rows.map(withoutSource), sources: hkexSources(rows), truncated };
     });
   }
 

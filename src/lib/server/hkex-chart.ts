@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { HKEX_CHART_OPTIONS, hkexChartSpecSchema, type HkexChartSpec, type HkexChartType } from "@/lib/hkex-chart";
 import { ConnectionError } from "./connections";
-import type { DatabaseEvidence, HkexQuery } from "./hkex-database";
+import type { DatabaseEvidence, HkexEvidence, HkexQuery } from "./hkex-database";
 
 export function getHkexChartOptions(evidence: DatabaseEvidence, query: HkexQuery) {
   const ranking = query.mode === "ranking";
@@ -30,7 +30,7 @@ export function getHkexChartOptions(evidence: DatabaseEvidence, query: HkexQuery
   };
 }
 
-export function buildHkexChart(evidence: DatabaseEvidence, query: HkexQuery, type: HkexChartType): HkexChartSpec {
+export function buildHkexChart(evidence: HkexEvidence, query: HkexQuery, type: HkexChartType): HkexChartSpec {
   if (!evidence.rows.length) throw new ConnectionError("No retrieved rows are available to chart. Narrow or change the query.");
   const options = getHkexChartOptions(evidence, query);
   const choice = options.choices.find((item) => item.type === type);
@@ -66,7 +66,7 @@ export function buildHkexChart(evidence: DatabaseEvidence, query: HkexQuery, typ
         props: {
           type, metric: query.metric, currency: query.currency,
           from: firstDates[0], to: lastDates.at(-1), truncated: evidence.truncated, points,
-          sources: [...new Set(evidence.rows.map((row) => row.source_url))],
+          sources: evidence.sources,
         },
       },
     },
