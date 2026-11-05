@@ -1,7 +1,7 @@
 "use client";
 
-import { memo, useEffect, useId, useRef, useState, type FormEvent } from "react";
-import { ChevronDown } from "lucide-react";
+import { memo, useEffect, useId, useRef, useState, type FormEvent, type ReactNode } from "react";
+import { ArrowUp, ChevronDown, Square } from "lucide-react";
 import { cn } from "cn";
 import ReactMarkdown, { type Components } from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -21,10 +21,12 @@ type Props = {
   unsavedChanges: boolean;
   disabled: boolean;
   agentMode?: boolean;
-  /** Agent-mode header label and PDF export title. */
+  /** Agent-mode accessible label and PDF export title. */
   agentLabel?: string;
   exportTitle?: string;
   emptyPrompt?: string;
+  /** Agent-mode welcome content shown above the suggestions until the first question. */
+  intro?: ReactNode;
   initialDraft?: string;
   suggestions?: string[];
   onExplain?: (id: string, signal: AbortSignal, onText: (text: string) => void, onReasoning: (text: string) => void) => Promise<ModelChatResult>;
@@ -204,6 +206,15 @@ function historyContent(message: ConversationMessage, agentMode: boolean): strin
   return message.tools?.find((item) => item.context)?.context ?? message.content;
 }
 
+function UserBubble({ text }: { text: string }) {
+  return (
+    <div className="flex flex-col items-end">
+      <span className="sr-only">You</span>
+      <p className="max-w-[85%] whitespace-pre-wrap break-words border border-slate-700 bg-slate-900 px-4 py-2.5 text-sm leading-relaxed text-slate-100">{text}</p>
+    </div>
+  );
+}
+
 const ChatMessage = memo(function ChatMessage({ message, agentMode, onExplain, disabled }: {
   message: ConversationMessage;
   agentMode: boolean;
@@ -211,8 +222,9 @@ const ChatMessage = memo(function ChatMessage({ message, agentMode, onExplain, d
   disabled: boolean;
 }) {
   const explanationId = message.tools?.find((item) => item.explanationId)?.explanationId;
+  if (agentMode && message.role === "user") return <article className="py-3"><UserBubble text={message.content} /></article>;
   return (
-    <article className={`border-b border-slate-700 px-3 py-4 last:border-b-0 ${message.role === "user" ? "bg-slate-900" : ""}`}>
+    <article className={agentMode ? "py-4" : `border-b border-slate-700 px-3 py-4 last:border-b-0 ${message.role === "user" ? "bg-slate-900" : ""}`}>
       <div className="meta text-slate-500">{message.role === "user" ? "You" : agentMode ? "Answer" : "Model"}</div>
       {message.role === "assistant" && message.reasoning && <ThinkingBlock text={message.reasoning} />}
       {message.tools && <ToolActivities tools={message.tools} />}
@@ -231,7 +243,7 @@ const ChatMessage = memo(function ChatMessage({ message, agentMode, onExplain, d
 export function ModelChat({
   model, baseUrl, unsavedChanges, disabled, onSend, onExplain, agentMode = false, initialDraft = "", suggestions = [],
   agentLabel = "HKEX short selling", exportTitle = "HKEX Short-Selling Research",
-  emptyPrompt = "Compare stocks, explore short-selling trends or start with a question below.",
+  emptyPrompt = "Compare stocks, explore short-selling trends or start with a question below.", intro,
 }: Props) {
   const inputId = useId();
   const [messages, setMessages] = useState<ConversationMessage[]>([]);
@@ -252,7 +264,7 @@ export function ModelChat({
 
   useEffect(() => () => { activeRequest.current?.abort(); }, []);
   useEffect(() => {
-    if (log.current) log.current.scrollTop = log.current.scrollHeight;
+    if (log.current && (messages.length || pending || incomplete)) log.current.scrollTop = log.current.scrollHeight;
   }, [messages, pending, streamingText, streamingReasoning, streamingTools, incomplete]);
 
   function cancel() {
@@ -331,96 +343,182 @@ export function ModelChat({
     }
   }
 
+  if (agentMode) {
+    const empty = !messages.length && !pending && !incomplete;
+    const column = "mx-auto w-full max-w-3xl px-4 md:px-6";
+    return (
+      <section aria-label={agentLabel} className="flex min-h-0 flex-1 flex-col overflow-hidden bg-slate-950">
+        <div className="shrink-0 px-4 pt-3 md:px-6">
+          <div className="flex justify-end gap-2">
+            <PdfExportButton target={log} title={exportTitle} disabled={!!pending || (!messages.length && !incomplete)} />
+            <button type="button" className="min-h-10 border border-slate-600 px-3 text-sm text-slate-200 transition hover:border-sky-400 hover:text-white disabled:cursor-not-allowed disabled:opacity-50" disabled={empty && !draft} onClick={clear}>New chat</button>
+          </div>
+        </div>
+        <div ref={log} role="log" tabIndex={0} aria-label="Research conversation" aria-live="polite" aria-relevant="additions" className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
+          {empty ? (
+            <div className={`${column} flex min-h-full flex-col justify-center gap-8 py-10`}>
+              {intro}
+              <div>
+                <p className="text-sm text-slate-400">{emptyPrompt}</p>
+                {suggestions.length > 0 && <div className="mt-4 grid gap-2 sm:grid-cols-2">
+                  {suggestions.map((question) => <button key={question} type="button" className="border border-slate-700 px-3 py-2.5 text-left text-sm text-slate-300 transition hover:border-sky-400 hover:text-white" disabled={disabled} onClick={() => { setDraft(question); input.current?.focus(); }}>{question}</button>)}
+                </div>}
+              </div>
+            </div>
+          ) : (
+            <div className={`${column} py-6`}>
+              {messages.map((message, index) => (
+                <ChatMessage key={index} message={message} agentMode onExplain={onExplain} disabled={disabled || !!pending} />
+              ))}
+              {incomplete && (
+                <article className="border-l-2 border-amber-400/60 py-4 pl-4">
+                  <p className="meta text-amber-400">Incomplete research</p>
+                  <p className="mt-2 whitespace-pre-wrap break-words text-sm text-slate-300">{incomplete.prompt}</p>
+                  <p className="mt-2 text-xs text-slate-400">We couldn&apos;t finish this answer. The results below may be incomplete. You can send your question again.</p>
+                  {incomplete.reasoning && <ThinkingBlock text={incomplete.reasoning} />}
+                  {incomplete.tools.length > 0 && <ToolActivities tools={incomplete.tools} />}
+                  <ResearchInsights tools={incomplete.tools} />
+                  {incomplete.text && <MarkdownReply text={incomplete.text} />}
+                  <ResearchCharts tools={incomplete.tools} />
+                  <SqlCharts tools={incomplete.tools} />
+                  <SqlPreview tools={incomplete.tools} />
+                </article>
+              )}
+              {pending && (
+                <div className="py-3">
+                  <UserBubble text={pending} />
+                  <div className="pt-4">
+                    {streamingReasoning && <ThinkingBlock text={streamingReasoning} streaming={!streamingText} />}
+                    {streamingTools.length > 0 && <ToolActivities tools={streamingTools} active />}
+                    <SqlPreview tools={streamingTools} />
+                    <ResearchInsights tools={streamingTools} />
+                    {streamingText && (
+                      <div className="mt-4">
+                        <div className="meta text-slate-500">Answer</div>
+                        <MarkdownReply text={streamingText} />
+                      </div>
+                    )}
+                    <ResearchCharts tools={streamingTools} />
+                    <SqlCharts tools={streamingTools} />
+                    <ChartPlaceholder tools={streamingTools} />
+                    <p role="status" className="mt-4 text-xs text-sky-300"><span className="research-shimmer">Researching your question...</span></p>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+        <form onSubmit={send} className="shrink-0 px-4 pb-4 pt-2 md:px-6">
+          <div className="mx-auto w-full max-w-3xl">
+            {error && <ChatError error={error} />}
+            {full && <p role="status" className="mt-3 text-xs text-amber-400">Start a new chat to keep exploring.</p>}
+            <label htmlFor={inputId} className="sr-only">Your question</label>
+            <div className="mt-2 flex items-end gap-2 border border-slate-600 bg-slate-900 p-2 transition focus-within:border-sky-500">
+              <textarea
+                id={inputId}
+                ref={input}
+                className="max-h-40 min-h-10 flex-1 resize-none bg-transparent px-2 py-2 text-sm text-white placeholder:text-slate-500 focus-visible:outline-none disabled:opacity-50"
+                rows={1}
+                maxLength={MAX_CHAT_MESSAGE_CHARS}
+                required
+                value={draft}
+                disabled={!!pending || disabled}
+                onChange={(event) => setDraft(event.target.value)}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" && !event.shiftKey && !event.nativeEvent.isComposing) {
+                    event.preventDefault();
+                    event.currentTarget.form?.requestSubmit();
+                  }
+                }}
+                placeholder="Ask a question about the data..."
+              />
+              {pending ? (
+                <button type="button" aria-label="Cancel request" title="Cancel request" className="flex size-10 shrink-0 items-center justify-center border border-slate-600 text-slate-200 transition hover:border-sky-400 hover:text-white" onClick={cancel}>
+                  <Square aria-hidden="true" className="size-3.5 fill-current" />
+                </button>
+              ) : (
+                <button type="submit" aria-label="Send message" title="Send message" className="flex size-10 shrink-0 items-center justify-center border border-sky-500 bg-sky-500/10 text-sky-300 transition hover:bg-sky-500/20 hover:text-white disabled:cursor-not-allowed disabled:opacity-40" disabled={!draft.trim() || disabled || full}>
+                  <ArrowUp aria-hidden="true" className="size-4" />
+                </button>
+              )}
+            </div>
+            <p className="meta mt-2 text-center text-slate-500">Enter to send · Shift+Enter for a new line</p>
+          </div>
+        </form>
+      </section>
+    );
+  }
+
   return (
-    <section aria-labelledby={`${inputId}-title`} className={`flex flex-col overflow-hidden border border-slate-700 bg-slate-950 ${agentMode ? "min-h-0 flex-1 p-3 md:p-5" : "h-[52rem] p-5 md:p-6"}`}>
+    <section aria-labelledby={`${inputId}-title`} className="flex h-[52rem] flex-col overflow-hidden border border-slate-700 bg-slate-950 p-5 md:p-6">
       <div className="flex shrink-0 flex-wrap items-start justify-between gap-3">
         <div className="min-w-0 flex-1">
-          <div className="meta text-slate-500">{agentMode ? agentLabel : "Live model playground"}</div>
-          <h2 id={`${inputId}-title`} className="mt-2 text-xl font-semibold text-white">{agentMode ? "Ask a question" : "Chat with your saved model"}</h2>
-          {!agentMode && <p className="mt-2 break-words font-mono text-xs text-slate-300">{lastResult?.model ?? model}</p>}
-          {!agentMode && (lastResult?.baseUrl ?? baseUrl) && <p className="mt-1 break-all text-xs text-slate-500">{lastResult?.baseUrl ?? baseUrl}</p>}
+          <div className="meta text-slate-500">Live model playground</div>
+          <h2 id={`${inputId}-title`} className="mt-2 text-xl font-semibold text-white">Chat with your saved model</h2>
+          <p className="mt-2 break-words font-mono text-xs text-slate-300">{lastResult?.model ?? model}</p>
+          {(lastResult?.baseUrl ?? baseUrl) && <p className="mt-1 break-all text-xs text-slate-500">{lastResult?.baseUrl ?? baseUrl}</p>}
         </div>
         <div className="flex flex-wrap justify-end gap-2">
-          {agentMode && <PdfExportButton target={log} title={exportTitle} disabled={!!pending || (!messages.length && !incomplete)} />}
           <button type="button" className={buttonClass} onClick={clear}>New chat</button>
         </div>
       </div>
-      {!agentMode && <p className="mt-4 shrink-0 text-xs leading-relaxed text-slate-400">
+      <p className="mt-4 shrink-0 text-xs leading-relaxed text-slate-400">
         Save your API settings before chatting.{" "}
         Requests use only the server&apos;s saved endpoint, key and model,
         never unsaved form values. Saving API settings starts a new chat.
         Messages stay in page memory and are sent to your provider with conversation context.
         Provider charges may apply. Replies can take up to 60 seconds.
-      </p>}
-      {!agentMode && unsavedChanges && <p className="mt-3 shrink-0 text-xs text-amber-400">You have unsaved API changes. This chat still uses the previously saved settings.</p>}
-      <div ref={log} role="log" tabIndex={0} aria-label={agentMode ? "Research conversation" : "Model test conversation"} aria-live="polite" aria-relevant="additions" className={`${agentMode ? "mt-3" : "mt-5"} min-h-0 flex-1 overflow-y-auto overscroll-contain border-y border-slate-700`}>
+      </p>
+      {unsavedChanges && <p className="mt-3 shrink-0 text-xs text-amber-400">You have unsaved API changes. This chat still uses the previously saved settings.</p>}
+      <div ref={log} role="log" tabIndex={0} aria-label="Model test conversation" aria-live="polite" aria-relevant="additions" className="mt-5 min-h-0 flex-1 overflow-y-auto overscroll-contain border-y border-slate-700">
         {!messages.length && !pending && !incomplete && (
           <div className="px-1 py-8 text-sm text-slate-500">
-            <p>{agentMode ? emptyPrompt : "Send a message to see a real reply from your saved model."}</p>
+            <p>Send a message to see a real reply from your saved model.</p>
             {suggestions.length > 0 && <div className="mt-4 flex flex-wrap gap-2">
               {suggestions.map((question) => <button key={question} type="button" className="border border-slate-700 px-3 py-2 text-left text-xs text-slate-300 hover:border-sky-400" disabled={disabled} onClick={() => { setDraft(question); input.current?.focus(); }}>{question}</button>)}
             </div>}
           </div>
         )}
         {messages.map((message, index) => (
-          <ChatMessage key={index} message={message} agentMode={agentMode} onExplain={onExplain} disabled={disabled || !!pending} />
+          <ChatMessage key={index} message={message} agentMode={false} onExplain={onExplain} disabled={disabled || !!pending} />
         ))}
-        {incomplete && (
-          <article className="border-b border-amber-400/40 px-3 py-4">
-            <p className="meta text-amber-400">Incomplete research</p>
-            <p className="mt-2 whitespace-pre-wrap break-words text-sm text-slate-300">{incomplete.prompt}</p>
-            <p className="mt-2 text-xs text-slate-400">We couldn&apos;t finish this answer. The results below may be incomplete. You can send your question again.</p>
-            {incomplete.reasoning && <ThinkingBlock text={incomplete.reasoning} />}
-            {incomplete.tools.length > 0 && <ToolActivities tools={incomplete.tools} />}
-            {agentMode && <ResearchInsights tools={incomplete.tools} />}
-            {incomplete.text && <MarkdownReply text={incomplete.text} />}
-            {agentMode && <ResearchCharts tools={incomplete.tools} />}
-            {agentMode && <SqlCharts tools={incomplete.tools} />}
-            {agentMode && <SqlPreview tools={incomplete.tools} />}
-          </article>
-        )}
         {pending && (
           <div className="px-3 py-4">
             <div className="meta text-slate-500">You</div>
             <p className="mt-2 whitespace-pre-wrap break-words text-sm text-slate-200">{pending}</p>
             {streamingReasoning && <ThinkingBlock text={streamingReasoning} streaming={!streamingText} />}
             {streamingTools.length > 0 && <ToolActivities tools={streamingTools} active />}
-            {agentMode && <SqlPreview tools={streamingTools} />}
-            {agentMode && <ResearchInsights tools={streamingTools} />}
             {streamingText && (
               <div className="mt-4">
-                <div className="meta text-slate-500">{agentMode ? "Answer" : "Model"}</div>
+                <div className="meta text-slate-500">Model</div>
                 <MarkdownReply text={streamingText} />
               </div>
             )}
-            {agentMode && <ResearchCharts tools={streamingTools} />}
-            {agentMode && <SqlCharts tools={streamingTools} />}
-            {agentMode && <ChartPlaceholder tools={streamingTools} />}
-            <p role="status" className="mt-4 text-xs text-sky-300"><span className="research-shimmer">{agentMode ? "Researching your question..." : streamingText ? "Receiving model reply..." : streamingReasoning ? "Receiving model thinking..." : streamingTools.length ? "Running database research..." : "Waiting for model feedback..."}</span></p>
+            <p role="status" className="mt-4 text-xs text-sky-300"><span className="research-shimmer">{streamingText ? "Receiving model reply..." : streamingReasoning ? "Receiving model thinking..." : streamingTools.length ? "Running database research..." : "Waiting for model feedback..."}</span></p>
           </div>
         )}
       </div>
-      {!agentMode && lastResult && <p className="mt-2 text-xs text-slate-500">Last reply: {lastResult.durationMs} ms</p>}
+      {lastResult && <p className="mt-2 text-xs text-slate-500">Last reply: {lastResult.durationMs} ms</p>}
       {error && <ChatError error={error} />}
-      {full && <p role="status" className="mt-3 text-xs text-amber-400">{agentMode ? "Start a new chat to keep exploring." : "Conversation limit reached. Choose New chat or shorten your message."}</p>}
-      <form onSubmit={send} className={`${agentMode ? "mt-3" : "mt-5"} shrink-0`}>
-        <label htmlFor={inputId} className="text-sm text-slate-300">{agentMode ? "Your question" : "Message to saved model"}</label>
+      {full && <p role="status" className="mt-3 text-xs text-amber-400">Conversation limit reached. Choose New chat or shorten your message.</p>}
+      <form onSubmit={send} className="mt-5 shrink-0">
+        <label htmlFor={inputId} className="text-sm text-slate-300">Message to saved model</label>
         <textarea
           id={inputId}
           ref={input}
-          className={`mt-2 max-h-40 w-full resize-y border border-slate-700 bg-slate-950 px-3 py-2.5 text-sm text-white placeholder:text-slate-500 disabled:opacity-50 ${agentMode ? "min-h-16" : "min-h-24"}`}
-          rows={agentMode ? 2 : 3}
+          className="mt-2 max-h-40 min-h-24 w-full resize-y border border-slate-700 bg-slate-950 px-3 py-2.5 text-sm text-white placeholder:text-slate-500 disabled:opacity-50"
+          rows={3}
           maxLength={MAX_CHAT_MESSAGE_CHARS}
           required
           value={draft}
           disabled={!!pending || disabled}
           onChange={(event) => setDraft(event.target.value)}
-          placeholder={agentMode ? "What would you like to know?" : "Ask your model a question..."}
+          placeholder="Ask your model a question..."
         />
         <div className="mt-3 flex flex-wrap items-center gap-3">
           <button type="submit" className={`${buttonClass} border-sky-500 text-sky-300`} disabled={!draft.trim() || !!pending || disabled || full}>Send message</button>
           {pending && <button type="button" className={buttonClass} onClick={cancel}>Cancel request</button>}
-          {!agentMode && <span className="text-xs text-slate-500">{Math.floor(messages.length / 2)} completed turns / 11 maximum</span>}
+          <span className="text-xs text-slate-500">{Math.floor(messages.length / 2)} completed turns / 11 maximum</span>
         </div>
       </form>
     </section>

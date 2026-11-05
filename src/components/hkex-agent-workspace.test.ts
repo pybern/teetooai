@@ -56,6 +56,27 @@ describe("HKEX database agent workspace", () => {
     expect(log.tabIndex).toBe(0);
     expect(container.querySelector("form")!.classList.contains("shrink-0")).toBe(true);
   });
+  it("renders as a full-page chat whose brief disappears once the conversation starts, sending on Enter", async () => {
+    expect(container.querySelector("h2")).toBeNull();
+    expect(container.textContent).not.toContain("Ask a question");
+    expect(container.querySelector("section")!.classList.contains("border")).toBe(false);
+    expect(container.querySelector("h1")?.textContent).toBe("HKEX Short-Selling Research");
+    fetchMock.mockImplementationOnce(async () => createUIMessageStreamResponse({ stream: createUIMessageStream({
+      execute: ({ writer }) => {
+        writer.write({ type: "start" });
+        writer.write({ type: "text-start", id: "answer" });
+        writer.write({ type: "text-delta", id: "answer", delta: "Full-page answer" });
+        writer.write({ type: "text-end", id: "answer" });
+        writer.write({ type: "finish", messageMetadata: { model: settings.api.model, baseUrl: "", durationMs: 25, completed: true } });
+      },
+    }) }));
+    await edit("textarea", "Rank HKD");
+    await act(async () => { container.querySelector("textarea")!.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true, cancelable: true })); });
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(container.textContent).toContain("Full-page answer");
+    expect(container.querySelector("h1")).toBeNull();
+    expect(container.textContent).not.toContain(USE_CASE_BY_ID["hkex-db"].questions[0].q);
+  });
   it("opens directly without a token or configuration request and does not automatically query or charge", async () => {
     expect(fetchMock).not.toHaveBeenCalled();
     expect(container.textContent).toContain("HKEX Short-Selling Research");
