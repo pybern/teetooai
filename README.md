@@ -475,6 +475,11 @@ ids and their full descriptions, including sample rows and example SQL.
 Preflight metadata has a separate 128,000-character limit to accommodate the
 full catalog; query evidence retains its 32,000-character limit. Oversized or
 incomplete metadata fails explicitly rather than silently dropping descriptions.
+Query evidence is different: when a template or catalogue SQL result would
+exceed its limit, the server keeps as many leading rows as fit and marks the
+section as partial, instead of failing. Catalogue SQL rows also stay within a
+24,000-character budget. Only a single row too large to fit on its own is
+rejected.
 The only model-callable tool is `runSql` (at most one call and two model steps
 per turn; the final step has no tools so it always returns a plan):
 
@@ -667,7 +672,8 @@ statement timeouts and two-second lock timeouts. There is no arbitrary-SQL tool,
 write tool, URL-fetch tool, or access to other tables. Grant the database user
 only the SELECT privileges it needs in production. Research is bounded to one
 planning generation, three queries, five stock lookups, ten database reads
-including preflight, a 366-day date span, 32,000 characters per evidence result,
+including preflight, a 366-day date span, 32,000 characters per evidence result
+(larger results are cut to the rows that fit and marked partial),
 and a configurable output-token limit per model call (see below). Summaries show
 up to ten rows per query; chart tables retain all returned rows.
 
