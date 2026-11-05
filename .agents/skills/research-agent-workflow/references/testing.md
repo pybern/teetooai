@@ -13,13 +13,15 @@ All research-agent tests run offline with vitest. Use these fixtures rather than
     - `finishReason`, `reasoning`, `explanation`, `providerStatus`.
     - `chartChoice`, `chartStatus`.
     - `chartGate`: a promise that holds the chart response so you can assert ordering.
+    - `sqlRepair`: the `{ sql }` returned to SQL corrections, recorded in `sqlRepairCalls` (schema name `agentSqlRepair`). The default is a forbidden query, so corrections fail unless a test sets it.
+    - `onPlannerCall`: runs when a planner request arrives; with a `Date.now` spy it simulates the turn nearly running out of time at that point.
 - **Database:** `vi.mock("pg")` with `pg.query` routing on SQL text. Inside a `describe`, override with `pg.query.mockImplementation` and fall back to the original. In the catalog block, `"AS agent_query"` returns the SQL result rows.
 - **Settings:** `await saveSettings(reasoningEffort?, outputTokens?)` writes the API and database connection to a temp file.
 - **Calling:**
   - `await POST(request({ messages, useCaseId }))` for raw stream assertions; read `response.body` with a reader to check ordering.
   - `interceptChat()` + `research(onTools, useCaseId)`, or `sendModelChat(...)`, for client-parsed results (`result.message.content`, `result.tools`, `result.reasoning`).
 - **Parity:** use `it.each(["hk", "hkex-db"])` for behaviour that must match across use cases.
-- **Repairs:** `MAX_PLAN_REPAIRS = 3` permits four planning attempts; a draft tool step can add one provider request. Test success on the final repair, exhausted failures, non-object roots, latest safe diagnostics, no tools on repairs, and immediate stops for truncation/cancellation. Never execute final queries from an invalid or truncated plan.
+- **Repairs:** `MAX_PLAN_REPAIRS = 3` permits four planning attempts; a draft tool step can add one provider request. Test success on the final repair, exhausted failures, non-object roots, latest safe diagnostics, no tools on repairs, and immediate stops for truncation/cancellation, and no repair start near the deadline. Never execute final queries from an invalid or truncated plan. SQL corrections: assert `sqlRepairCalls` length, that the prompt carries the safe error, and that the corrected SQL was revalidated (`querySql` statuses).
 - **Constants:** import `HKEX_SERVER_TIMEOUT_MS` and similar rather than writing numbers. Mock `AbortSignal.timeout` keyed on the constant to simulate deadlines.
 - **Useful assertions:**
   - `calls[0]` → `max_tokens`, `reasoning_effort`, `tools`, `response_format`.

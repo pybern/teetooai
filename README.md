@@ -323,8 +323,17 @@ Gateway environment-key precedence; browser connection overrides are ignored.
 Each actual turn sends its question, conversation context and database metadata
 to your configured AI provider and can incur charges. New query results are
 rendered by the server; requesting an explanation explicitly sends their bounded
-evidence to the provider. Later questions include prior textual results in
-conversation context. Chat and tool activity remain in page memory,
+evidence to the provider. Later questions include each earlier research turn
+as a compact record of what ran, in place of its rendered answer: the
+validated template filters, the catalogue SQL that actually executed
+(including a corrected query), failed queries, stock clarifications, row
+counts, dates covered and up to five leading rows (8 columns, values cut to
+60 characters). The record is capped at 8,000 characters; leading rows are
+dropped first, and a turn whose record still does not fit falls back to its
+answer text. This lets follow-ups such as "same for 2025" or "the top stock"
+reuse the earlier query, and it keeps data-heavy turns from filling the
+64,000-character conversation limit. The planner treats these records as
+context for planning, never as evidence. Chat and tool activity remain in page memory,
 not localStorage, history or dashboard pins. **New chat** clears the conversation.
 Database hostnames, credentials and the configured API base URL are not exposed
 by this workspace. Connection editing, configuration chat and initialization
@@ -395,7 +404,11 @@ Cancellation, timeouts, filtered/refused
 finishes, truncated output, transport and authentication failures do not trigger
 plan repair. Repair remains within the turn's existing deadline and can incur
 up to three additional generation charges (up to five model steps including a draft
-check). The separate single pre-stream HTTP 503 retry remains unchanged.
+check). A repair is not started when less than 20 seconds of the turn remain;
+the error then says planning timed out before the repair could start. When the
+planner checked a SQL draft, each repair is also told the draft SQL and its
+outcome (row count and column names, or the validation/database error), since
+repairs have no tools. The separate single pre-stream HTTP 503 retry remains unchanged.
 HKEX planning and optional explanations use **low thinking effort** when the
 model catalog advertises it, without overwriting the saved model settings.
 Explicit saved `none`/`minimal` efforts are preserved rather than increased.
@@ -411,7 +424,8 @@ factual Markdown tables/charts from returned values. No second narrative call
 or chart-selection round trip is made. Query and chart requests normally
 use **one generation call**, or two when checking a SQL draft, excluding the
 existing single 503 retry.
-Invalid plans may also incur up to three correction calls as described above.
+Invalid plans may also incur up to three correction calls as described above,
+and each failed catalogue SQL query at most one (see [Table catalog and agent SQL](#table-catalog-and-agent-sql)).
 Independent stock lookups run concurrently and identical search strings are
 resolved once per turn. Catalogue SQL queries do not depend on them, so they
 start before the lookups. After all stock filters are resolved and validated,
@@ -493,7 +507,15 @@ per turn; the final step has no tools so it always returns a plan):
 
 The final plan may contain up to three `sqlQueries` alongside the templated HKEX
 queries. The server re-validates and runs them (100-row cap), renders a Markdown
-table with the tables used, and exposes the SQL through **View SQL**. Templated
+table with the tables used, and exposes the SQL through **View SQL**. If a
+final query is rejected by the SQL validator or fails with a PostgreSQL syntax
+or data error (`42xxx` except permissions, or `22xxx`), the server makes **one
+correction request** for that query (`repairSql` in the tool log): no tools, the
+planning output-token limit, the safe error message, and at most 90 seconds
+within the turn deadline (skipped when less than 20 seconds remain). The
+corrected SQL is validated and scoped again before it runs; if that also fails,
+the section says the query could not be completed. Connection, permission,
+read-limit and evidence-size failures are never sent back for correction. Templated
 HKEX queries are still preferred for HKEX rankings/trends because their charts
 are chosen in the plan and validated against HKEX evidence. SQL results get
 their own insight cards and charts (below). Without a catalog (not yet re-initialized) the
