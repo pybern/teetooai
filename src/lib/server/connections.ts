@@ -1,4 +1,4 @@
-import { randomUUID, timingSafeEqual } from "node:crypto";
+import { createHash, randomUUID, timingSafeEqual } from "node:crypto";
 import { mkdir, readFile, rename, rm, writeFile } from "node:fs/promises";
 import { isIP } from "node:net";
 import path from "node:path";
@@ -302,6 +302,7 @@ export function updateConnectionStorage<T>(update: () => Promise<T>): Promise<T>
 }
 
 export function saveConnection(kind: "api" | "database", value: unknown): Promise<PublicConnections> {
+  modelCatalogs.clear();
   return updateConnectionStorage(async () => {
     const saved = await loadBootstrapConnections();
     if (kind === "database") {
@@ -376,6 +377,21 @@ export async function listApiModels(settings: Pick<ApiSettings, "baseUrl" | "api
   return (await listApiModelCatalog(settings)).models;
 }
 
+// Research turns reuse a recent catalog instead of calling GET /models before every plan.
+const MODEL_CATALOG_TTL_MS = 5 * 60 * 1000;
+const MODEL_CATALOG_CACHE_SIZE = 16;
+const modelCatalogs = new Map<string, { expires: number; catalog: ModelCatalog }>();
+
+function modelCatalogKey(settings: Pick<ApiSettings, "baseUrl" | "apiKey">) {
+  return createHash("sha256").update(JSON.stringify([settings.baseUrl, settings.apiKey])).digest("hex");
+}
+
+async function cachedModelCatalog(settings: Pick<ApiSettings, "baseUrl" | "apiKey">, signal?: AbortSignal): Promise<ModelCatalog> {
+  const cached = modelCatalogs.get(modelCatalogKey(effectiveApiSettings(settings)));
+  if (cached && cached.expires > Date.now()) return cached.catalog;
+  return listApiModelCatalog(settings, signal);
+}
+
 export async function listApiModelCatalog(settings: Pick<ApiSettings, "baseUrl" | "apiKey">, signal?: AbortSignal): Promise<ModelCatalog> {
   settings = effectiveApiSettings(settings);
   try {
@@ -415,10 +431,13 @@ export async function listApiModelCatalog(settings: Pick<ApiSettings, "baseUrl" 
       return [model.id, [...new Set(efforts)]];
     });
     if (!entries.length) throw new ConnectionError("The provider returned an empty model catalog. You can enter a model ID manually.", 502);
-    return {
+    const catalog: ModelCatalog = {
       models: [...new Set(entries.map(([id]) => id))].sort((a, b) => a.localeCompare(b)),
       reasoningEfforts: Object.fromEntries(entries),
     };
+    while (modelCatalogs.size >= MODEL_CATALOG_CACHE_SIZE) modelCatalogs.delete(modelCatalogs.keys().next().value!);
+    modelCatalogs.set(modelCatalogKey(settings), { expires: Date.now() + MODEL_CATALOG_TTL_MS, catalog });
+    return catalog;
   } catch (error) {
     if (error instanceof ConnectionError) throw error;
     if (signal?.aborted) throw new ConnectionError("Model catalog request was cancelled or timed out.", 499);
@@ -431,7 +450,7 @@ export async function listApiModelCatalog(settings: Pick<ApiSettings, "baseUrl" 
 
 async function checkReasoningEffort(settings: ApiSettings, signal?: AbortSignal, preferLow = false): Promise<ApiSettings> {
   if (!settings.reasoningEffort && !preferLow) return settings;
-  const catalog = await listApiModelCatalog(settings, signal);
+  const catalog = preferLow ? await cachedModelCatalog(settings, signal) : await listApiModelCatalog(settings, signal);
   const supported = modelReasoningEfforts(catalog, settings.model);
   if (preferLow && supported.includes("low") && !["none", "minimal"].includes(settings.reasoningEffort ?? "")) {
     return { ...settings, reasoningEffort: "low" };
@@ -495,21 +514,27 @@ export type SavedModelRunOptions = {
   settings: ApiSettings;
   messages: ModelChatMessage[];
   abortSignal: AbortSignal;
+  /** Epoch milliseconds at which the server deadline aborts the turn. */
+  deadline: number;
   onError: (error: unknown) => void;
   onToolActivity: (activity: ModelChatToolActivity) => void;
 };
 export type SavedModelRunner = (options: SavedModelRunOptions) => AsyncIterable<TextStreamPart<ToolSet>>;
 
+/** A pending runner (for example one awaiting database preflight) is prepared alongside the model settings. */
 export async function streamChatWithSavedModel(
-  messages: ModelChatMessage[], signal?: AbortSignal, runner?: SavedModelRunner,
+  messages: ModelChatMessage[], signal?: AbortSignal, pendingRunner?: SavedModelRunner | Promise<SavedModelRunner>,
 ): Promise<Response> {
-  const savedSettings = effectiveApiSettings(await loadSavedApi());
   const started = Date.now();
-  const timeoutMs = runner ? HKEX_SERVER_TIMEOUT_MS : 60000;
+  const timeoutMs = pendingRunner ? HKEX_SERVER_TIMEOUT_MS : 60000;
+  const deadline = started + timeoutMs;
   const timeout = AbortSignal.timeout(timeoutMs);
   const upstream = new AbortController();
   const abortSignal = AbortSignal.any([...(signal ? [signal] : []), timeout, upstream.signal]);
-  const settings = await checkReasoningEffort(savedSettings, abortSignal, Boolean(runner));
+  const [settings, runner] = await Promise.all([
+    loadSavedApi().then((saved) => checkReasoningEffort(effectiveApiSettings(saved), abortSignal, Boolean(pendingRunner))),
+    pendingRunner,
+  ]);
   let transportError: ConnectionError | undefined;
   let retryUsed = false;
   // Larger token limits need room for SSE framing (roughly 100-400 bytes per streamed token).
@@ -615,7 +640,7 @@ export async function streamChatWithSavedModel(
         const onError = (error: unknown) => { console.error("Saved-model stream:", streamError(error)); };
         const model = provider.chatModel(settings.model);
         const modelStream = runner ? runner({
-          model, settings, messages, abortSignal, onError,
+          model, settings, messages, abortSignal, deadline, onError,
           onToolActivity: (activity) => writer.write({ type: "data-tool", id: activity.id, data: activity }),
         }) : streamText({
           model, messages, maxOutputTokens: 1024, maxRetries: 0, abortSignal,
